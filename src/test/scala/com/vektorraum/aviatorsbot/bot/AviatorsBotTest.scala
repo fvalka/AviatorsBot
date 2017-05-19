@@ -1,4 +1,4 @@
-package com.vektorraum.aviatorsbot.scala.bot
+package com.vektorraum.aviatorsbot.bot
 
 /**
   * Created by fvalka on 18.05.2017.

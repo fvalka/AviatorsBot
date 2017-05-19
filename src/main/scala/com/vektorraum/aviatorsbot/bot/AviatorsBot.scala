@@ -1,4 +1,4 @@
-package com.vektorraum.aviatorsbot.scala.bot
+package com.vektorraum.aviatorsbot.bot
 
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.Implicits._
