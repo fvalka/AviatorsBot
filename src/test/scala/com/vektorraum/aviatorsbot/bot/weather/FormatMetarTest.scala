@@ -1,9 +1,8 @@
 package com.vektorraum.aviatorsbot.bot.weather
 
-import com.vektorraum.aviatorsbot.generated.METAR
 import com.vektorraum.aviatorsbot.service.weather.METARFixtures
-import org.scalatest.{FunSuite, GivenWhenThen}
 import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 20.05.2017.

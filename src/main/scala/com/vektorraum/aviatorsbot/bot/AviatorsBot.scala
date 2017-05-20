@@ -12,7 +12,7 @@ import scala.io.Source
   * Created by fvalka on 18.05.2017.
   */
 object AviatorsBot extends TelegramBot with Polling with Commands {
-  lazy val token = scala.util.Properties
+  lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromResource("bot.token").getLines().mkString)
 
