@@ -1,4 +1,4 @@
-package com.vektorraum.aviatorsbot.weather
+package com.vektorraum.aviatorsbot.service.weather
 
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import com.vektorraum.aviatorsbot.generated.{METAR, Response}
