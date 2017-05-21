@@ -10,7 +10,7 @@ class AddsWeatherServiceIT extends AsyncFunSuite with GivenWhenThen {
 
   test("Calling the live systems getMetars with valid stations should yield a valid result") {
     Given("The actual live addsWeatherService")
-    val cut = new AddsWeatherService()
+    val cut = new AddsWeatherServiceProduction()
     When("Calling getMetars for valid stations")
     val metarsFuture = cut.getMetars(List("LOWW", "KJFK"))
     Then("Get a valid looking result")
@@ -27,7 +27,7 @@ class AddsWeatherServiceIT extends AsyncFunSuite with GivenWhenThen {
 
   test("Calling the live systems getMetars with an invalid station should yield an empty list") {
     Given("The actual live addsWeatherService")
-    val cut = new AddsWeatherService()
+    val cut = new AddsWeatherServiceProduction()
     When("Calling getMetars with an invalid station")
     val metarsFuture = cut.getMetars(List("XXNN"))
     Then("Get an empty list is returned")

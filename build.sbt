@@ -22,6 +22,9 @@ libraryDependencies += "com.softwaremill.macwire" %% "macrosakka" % "2.3.0" % "p
 libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.0"
 libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.0"
 
+// Scala Mock
+libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
+
 lazy val scalaXml = "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6"
 lazy val dispatchV = "0.12.0"

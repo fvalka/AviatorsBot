@@ -1,6 +1,6 @@
 package com.vektorraum.aviatorsbot.bot
 
-import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
+import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api._
@@ -23,11 +23,11 @@ trait AviatorsBot extends TelegramBot with Polling with Commands {
     "THIS SOFTWARE IS NOT AN OFFICIAL BRIEFING SOURCE. ANY DATA SENT MIGHT BE WRONG, OUT OF DATE OR OTHERWISE UNUSABLE OR MISLEADING, NO GUARANTEES CAN BE MADE ABOUT THE AVAILABILITY OF THIS SERVICE, ESPECIALLY THE POLLING/SUBSCRIPTION MECHANISM\n" +
     "USE PURELY AT YOUR OWN RISK!"
 
-  protected lazy val token: String = scala.util.Properties
+  lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromResource("bot.token").getLines().mkString)
 
-  protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherService]
+  protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
 
   on("hello") { implicit msg => _ => reply("My token is SAFE!") }
 

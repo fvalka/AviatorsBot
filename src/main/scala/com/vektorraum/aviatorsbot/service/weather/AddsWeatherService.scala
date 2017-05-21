@@ -12,19 +12,10 @@ import scala.xml.Elem
 /**
   * Created by fvalka on 19.05.2017.
   */
-class AddsWeatherService {
+trait AddsWeatherService {
   val MetarMaxAge = 7
 
-  def callAddsServer(stations: List[String], maxAge: Int): Future[Elem] = {
-    Future {
-      blocking {
-        xml.XML.load("https://aviationweather.gov/adds/dataserver_current/httpparam?" +
-          "dataSource=metars&requestType=retrieve&format=xml&" +
-          s"stationString=${stations mkString ","}&hoursBeforeNow=$maxAge"
-        )
-      }
-    }
-  }
+  def callAddsServer(stations: List[String], maxAge: Int): Future[Elem]
 
   def getMetars(stations: List[String]): Future[Map[String, Seq[METAR]]] = {
     callAddsServer(stations, MetarMaxAge) map { xml =>
