@@ -12,9 +12,9 @@ import scala.xml.Elem
 /**
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotForTesting(metarResponseStub: Elem) extends AviatorsBot with MockFactory {
+class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends AviatorsBot with MockFactory {
   var replySent: String = ""
-  override lazy val weatherService = new AddsWeatherServiceForTest(metarResponseStub)
+  override lazy val weatherService: AddsWeatherService = weatherServiceStub
 
   override def reply(text                  : String,
                      parseMode             : Option[ParseMode] = None,

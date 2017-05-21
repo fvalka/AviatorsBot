@@ -10,6 +10,7 @@ import com.softwaremill.macwire._
 import com.vektorraum.aviatorsbot.bot.weather.FormatMetar
 import com.vektorraum.aviatorsbot.generated.METAR
 
+import scala.collection.mutable
 import scala.io.Source
 import scala.util.{Failure, Success}
 
@@ -18,7 +19,6 @@ import scala.util.{Failure, Success}
   */
 trait AviatorsBot extends TelegramBot with Polling with Commands {
   protected val WelcomeMessage: String = "Welcome to vektorraum AviatorsBot!\n\n" +
-    //"First of all I have to make sure that you read the following legalese:\n"
     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n" +
     "THIS SOFTWARE IS NOT AN OFFICIAL BRIEFING SOURCE. ANY DATA SENT MIGHT BE WRONG, OUT OF DATE OR OTHERWISE UNUSABLE OR MISLEADING, NO GUARANTEES CAN BE MADE ABOUT THE AVAILABILITY OF THIS SERVICE, ESPECIALLY THE POLLING/SUBSCRIPTION MECHANISM\n" +
     "USE PURELY AT YOUR OWN RISK!"
@@ -37,16 +37,24 @@ trait AviatorsBot extends TelegramBot with Polling with Commands {
     if(!args.forall(arg => StationUtil.isValidInput(arg))) {
       reply("Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\"")
     } else {
-      weatherService.getMetars(args.toList) onComplete {
+      val stations = args.toList.map(station => station.toUpperCase())
+      weatherService.getMetars(stations) onComplete {
         case Success(metars) =>
-          reply(buildWxMessage(args.toList, metars), parseMode = ParseMode.HTML)
+          reply(buildWxMessage(stations, metars), parseMode = ParseMode.HTML)
         case Failure(t) => reply("Could not retrieve METARs")
       }
     }
   }
 
   def buildWxMessage(stations: List[String], metars: Map[String, Seq[METAR]]): String = {
-    metars.values.map(values => FormatMetar(values)) mkString "\n"
+    val inputStationsSet = mutable.LinkedHashSet[String](stations.filter(StationUtil.isActualStation): _*)
+    val stationSet = inputStationsSet ++ metars.keySet
+
+    stationSet.map(station => metars.get(station) match {
+      case Some(mt) => FormatMetar(mt)
+      case None => s"<strong>$station</strong> No METAR received for station"
+    }) mkString "\n"
+    //metars.values.map(values => FormatMetar(values)) mkString "\n"
   }
 
 }
