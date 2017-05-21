@@ -8,7 +8,7 @@ import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
 import com.softwaremill.macwire._
 import com.vektorraum.aviatorsbot.bot.weather.FormatMetar
-import generated.METAR
+import com.vektorraum.aviatorsbot.generated.metar.METAR
 
 import scala.collection.mutable
 import scala.io.Source

@@ -1,6 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.weather
 
-import com.vektorraum.aviatorsbot.generated.METAR
+import com.vektorraum.aviatorsbot.generated.metar.METAR
+
 
 /**
   * Created by fvalka on 20.05.2017.

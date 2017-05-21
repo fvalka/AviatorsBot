@@ -25,10 +25,13 @@ libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.0"
 // Scala Mock
 libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
 
+unmanagedSourceDirectories in Compile += baseDirectory.value / "scalaxb-generated/main/scala"
+
 lazy val scalaXml = "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6"
 lazy val dispatchV = "0.12.0"
 lazy val dispatch = "net.databinder.dispatch" %% "dispatch-core" % dispatchV
+/*
 
 lazy val root = (project in file(".")).
   enablePlugins(ScalaxbPlugin).
@@ -45,9 +48,12 @@ lazy val root = (project in file(".")).
     }).
   settings(
     scalaxbDispatchVersion in (Compile, scalaxb) := dispatchV,
-    //scalaxbPackageName in (Compile, scalaxb)     := "com.vektorraum.aviatorsbot.generated"
+    scalaxbPackageName in (Compile, scalaxb)     := "com.vektorraum.aviatorsbot.generated",
     //scalaxbAutoPackages := true
-    scalaxbPackageNames in (Compile, scalaxb)    := Map(uri("https://aviationweather.gov/adds/dataserver/metar") -> "com.vektorraum.aviatorsbot.generated.adds.metar")
+    scalaxbPrependFamily in (Compile, scalaxb)   := true
+    // scalaxbWrapContents in (Compile, scalaxb)    := true
+
+    //scalaxbPackageNames in (Compile, scalaxb)    := Map(uri("https://aviationweather.gov/adds/dataserver/metar") -> "com.vektorraum.aviatorsbot.generated.adds.metar")
     // logLevel in (Compile, scalaxb) := Level.Debug
   )
-        
+        */

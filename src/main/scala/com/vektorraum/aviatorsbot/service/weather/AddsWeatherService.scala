@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.service.weather
 
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import com.vektorraum.aviatorsbot.generated.{METAR, Response}
+import com.vektorraum.aviatorsbot.generated.metar.{METAR, Response}
 
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
