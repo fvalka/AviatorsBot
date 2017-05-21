@@ -1,6 +1,6 @@
 package com.vektorraum.aviatorsbot.bot.weather
 
-import com.vektorraum.aviatorsbot.service.weather.METARFixtures
+import com.vektorraum.aviatorsbot.service.weather.fixtures.METARFixtures
 import org.scalatest.Matchers._
 import org.scalatest.{FunSuite, GivenWhenThen}
 

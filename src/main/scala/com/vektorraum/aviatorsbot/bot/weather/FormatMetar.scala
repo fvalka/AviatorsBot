@@ -5,8 +5,8 @@ import com.vektorraum.aviatorsbot.generated.METAR
 /**
   * Created by fvalka on 20.05.2017.
   */
-object FormatMetar extends ((List[METAR], Option[METAR], Boolean) => String) {
-  def apply(history: List[METAR], diffTo: Option[METAR] = None, sparklines: Boolean = false): String = {
+object FormatMetar extends ((Seq[METAR], Option[METAR], Boolean) => String) {
+  def apply(history: Seq[METAR], diffTo: Option[METAR] = None, sparklines: Boolean = false): String = {
     if(sparklines || diffTo.isDefined) {
       throw new NotImplementedError()
     }

@@ -1,8 +1,6 @@
-package com.vektorraum.aviatorsbot.service.weather
+package com.vektorraum.aviatorsbot.service.weather.fixtures
 
-import com.vektorraum.aviatorsbot.generated.{METAR, Sky_condition}
-
-import scalaxb.DataRecord
+import com.vektorraum.aviatorsbot.generated.METAR
 
 /**
   * Created by fvalka on 20.05.2017.
