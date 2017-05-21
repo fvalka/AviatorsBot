@@ -1,0 +1,179 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema/TAF">
+<xsd:element name="response" >
+    			<xsd:complexType >
+				<xsd:sequence >
+				    <xsd:element ref="request_index" />
+					<xsd:element ref="data_source"  />
+					<xsd:element ref="request"/>
+					<xsd:element ref="errors"/>
+					<xsd:element ref="warnings"/>
+					<xsd:element ref="time_taken_ms"/>
+					<xsd:element ref="data"/>
+				</xsd:sequence>
+				<xsd:attribute name="version" type="xsd:string" default="1.2"/>
+			</xsd:complexType>
+		</xsd:element>
+		
+		<xsd:element name="request_index" type="xsd:int"/>
+		<xsd:element name="data_source" >
+			<xsd:complexType>
+				<xsd:attribute name="name" type="xsd:string"/>
+			</xsd:complexType>
+				</xsd:element>
+		<xsd:element name="request" >
+			<xsd:complexType>
+					<xsd:attribute name="type" type="xsd:string" />
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="errors">
+			<xsd:complexType>
+				<xsd:sequence minOccurs="0" >
+					<xsd:element ref="error" />
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="warnings">
+			<xsd:complexType>
+				<xsd:sequence minOccurs="0">
+					<xsd:element ref="warning" />
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="data" >
+			<xsd:complexType>
+				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="TAF"/>
+				</xsd:sequence>
+				<xsd:attribute name="num_results" type="xsd:int"/>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="warning" type="xsd:string"/>
+		<xsd:element name="error" type="xsd:string"/>
+		<xsd:element name="time_taken_ms" type="xsd:int"/>
+		<xsd:attribute name="num_results" type="xsd:int"/>
+		
+		<xsd:element name="TAF">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element ref="raw_text" minOccurs="0"/>
+					<xsd:element ref="station_id" minOccurs="0"/>
+					<xsd:element ref="issue_time" minOccurs="0"/>
+					<xsd:element ref="bulletin_time" minOccurs="0"/>
+					<xsd:element ref="valid_time_from" minOccurs="0"/>
+					<xsd:element ref="valid_time_to" minOccurs="0"/>
+					<xsd:element ref="remarks" minOccurs="0"/>
+					<xsd:element ref="latitude" minOccurs="0"/>
+					<xsd:element ref="longitude" minOccurs="0"/>
+					<xsd:element ref="elevation_m" minOccurs="0"/>
+					<xsd:element ref="forecast" minOccurs="0" maxOccurs="unbounded"/>
+					
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+	    
+	    <xsd:element name="raw_text" type="xsd:string"/>
+	    <xsd:element name="station_id" type="xsd:string"/>
+	    <xsd:element name="issue_time" type="xsd:string"/>
+	    <xsd:element name="bulletin_time" type="xsd:string"/>
+	    <xsd:element name="valid_time_from" type="xsd:string"/>
+	    <xsd:element name="valid_time_to"  type="xsd:string"/>
+	    <xsd:element name="remarks" type="xsd:string"/>
+	    <xsd:element name="latitude" type="xsd:float"/>
+	    <xsd:element name="longitude" type="xsd:float"/>
+	    <xsd:element name="elevation_m" type="xsd:float"/>
+	    
+	    <xsd:element name="forecast">
+	    	<xsd:complexType>
+	    		<xsd:sequence>
+	    			<xsd:element ref="fcst_time_from" minOccurs="0"/>
+					<xsd:element ref="fcst_time_to" minOccurs="0"/>
+					<xsd:element ref="change_indicator" minOccurs="0"/>
+					<xsd:element ref="time_becoming" minOccurs="0"/>
+					<xsd:element ref="probability" minOccurs="0"/>
+					<xsd:element ref="wind_dir_degrees" minOccurs="0"/>
+					<xsd:element ref="wind_speed_kt" minOccurs="0"/>
+					<xsd:element ref="wind_gust_kt" minOccurs="0"/>
+					<xsd:element ref="wind_shear_hgt_ft_agl" minOccurs="0"/>
+					<xsd:element ref="wind_shear_dir_degrees" minOccurs="0"/>
+					<xsd:element ref="wind_shear_speed_kt" minOccurs="0"/>
+					<xsd:element ref="visibility_statute_mi" minOccurs="0"/>
+					<xsd:element ref="altim_in_hg" minOccurs="0"/>
+					<xsd:element ref="vert_vis_ft" minOccurs="0"/>
+					<xsd:element ref="wx_string" minOccurs="0"/>
+					<xsd:element ref="not_decoded" minOccurs="0"/>
+					<xsd:element ref="sky_condition" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="turbulence_condition" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="icing_condition" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="temperature" minOccurs="0" maxOccurs="unbounded"/>
+					
+	    		</xsd:sequence>
+	    	</xsd:complexType>
+	    </xsd:element>
+	    
+	    <xsd:element name="fcst_time_from" type="xsd:string"/>
+	    <xsd:element name="fcst_time_to" type="xsd:string"/>
+	    <xsd:element name="change_indicator" type="xsd:string"/>
+	    <xsd:element name="time_becoming" type="xsd:string"/>
+	    <xsd:element name="probability" type="xsd:int"/>
+	    <xsd:element name="wind_dir_degrees" type="xsd:short"/>
+	    <xsd:element name="wind_speed_kt" type="xsd:int"/>
+	    <xsd:element name="wind_gust_kt" type="xsd:int"/>
+	    <xsd:element name="wind_shear_hgt_ft_agl" type="xsd:short"/>
+	    <xsd:element name="wind_shear_dir_degrees" type="xsd:short"/>
+	    <xsd:element name="wind_shear_speed_kt"  type="xsd:int"/>
+	    <xsd:element name="visibility_statute_mi" type="xsd:float" />
+	    <xsd:element name="altim_in_hg" type="xsd:float"/>
+	    <xsd:element name="vert_vis_ft" type="xsd:short"/>
+	    <xsd:element name="wx_string" type="xsd:string"/>
+	    <xsd:element name="not_decoded" type="xsd:string"/>
+	    
+	    <xsd:element name="sky_condition">
+	        <xsd:complexType>
+	            <xsd:attribute name="sky_cover" type="xsd:string"/>
+	  		    <xsd:attribute name="cloud_base_ft_agl" type="xsd:int"/>
+	  		    <xsd:attribute name="cloud_type" type="xsd:string"/> 
+	        </xsd:complexType>
+	         		
+	    </xsd:element>
+	    
+	    <xsd:element name="turbulence_condition">
+	       <xsd:complexType>
+	           <xsd:attribute name="turbulence_intensity" type="xsd:string"/>
+	           <xsd:attribute name="turbulence_min_alt_ft_agl" type="xsd:int"/>
+	           <xsd:attribute name="turbulence_max_alt_ft_agl" type="xsd:int"/>
+	       </xsd:complexType>  
+	    </xsd:element>
+	    
+	  
+	  
+	    <xsd:element name="icing_condition" >
+	        <xsd:complexType>
+	           <xsd:attribute name="icing_intensity" type="xsd:string"/>
+               <xsd:attribute name="icing_min_alt_ft_agl" type="xsd:int"/>
+               <xsd:attribute name="icing_max_alt_ft_agl" type="xsd:int"/>
+	        </xsd:complexType>
+	      
+	    </xsd:element>
+	        
+	    
+	       	    
+	    <xsd:element name="temperature">
+	        <xsd:complexType> 
+	          <xsd:sequence> 
+	           <xsd:element ref="valid_time" />
+	           <xsd:element ref="sfc_temp_c" minOccurs="0"/>
+	           <xsd:element ref="max_temp_c" minOccurs="0" />
+	           <xsd:element ref="min_temp_c" minOccurs="0"/>
+	           </xsd:sequence> 
+	        </xsd:complexType>
+	    </xsd:element>
+	    
+	    <xsd:element name="valid_time" type="xsd:string" />
+	    <xsd:element name="sfc_temp_c"  type="xsd:float"/>
+	    <xsd:element name="max_temp_c" type="xsd:string"/>
+	    <xsd:element name="min_temp_c" type="xsd:string"/>
+	    
+	   
+	    
+	    
+</xsd:schema>

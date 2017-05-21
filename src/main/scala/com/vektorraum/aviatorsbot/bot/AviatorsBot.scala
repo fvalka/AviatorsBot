@@ -8,7 +8,7 @@ import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
 import com.softwaremill.macwire._
 import com.vektorraum.aviatorsbot.bot.weather.FormatMetar
-import com.vektorraum.aviatorsbot.generated.METAR
+import generated.METAR
 
 import scala.collection.mutable
 import scala.io.Source
@@ -54,7 +54,6 @@ trait AviatorsBot extends TelegramBot with Polling with Commands {
       case Some(mt) => FormatMetar(mt)
       case None => s"<strong>$station</strong> No METAR received for station"
     }) mkString "\n"
-    //metars.values.map(values => FormatMetar(values)) mkString "\n"
   }
 
 }

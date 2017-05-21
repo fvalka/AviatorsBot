@@ -45,7 +45,8 @@ lazy val root = (project in file(".")).
     }).
   settings(
     scalaxbDispatchVersion in (Compile, scalaxb) := dispatchV,
-    scalaxbPackageName in (Compile, scalaxb)     := "com.vektorraum.aviatorsbot.generated"
+    //scalaxbPackageName in (Compile, scalaxb)     := "com.vektorraum.aviatorsbot.generated"
+    scalaxbAutoPackages := true
     // scalaxbPackageNames in (Compile, scalaxb)    := Map(uri("http://schemas.microsoft.com/2003/10/Serialization/") -> "microsoft.serialization"),
     // logLevel in (Compile, scalaxb) := Level.Debug
   )
