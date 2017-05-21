@@ -1,4 +1,7 @@
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns="https://aviationweather.gov/adds/dataserver/metar"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="https://aviationweather.gov/adds/dataserver/metar"
+			elementFormDefault="qualified">
 		<xsd:element name="response">
 			<xsd:complexType >
 				<xsd:sequence >

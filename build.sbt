@@ -46,8 +46,8 @@ lazy val root = (project in file(".")).
   settings(
     scalaxbDispatchVersion in (Compile, scalaxb) := dispatchV,
     //scalaxbPackageName in (Compile, scalaxb)     := "com.vektorraum.aviatorsbot.generated"
-    scalaxbAutoPackages := true
-    // scalaxbPackageNames in (Compile, scalaxb)    := Map(uri("http://schemas.microsoft.com/2003/10/Serialization/") -> "microsoft.serialization"),
+    //scalaxbAutoPackages := true
+    scalaxbPackageNames in (Compile, scalaxb)    := Map(uri("https://aviationweather.gov/adds/dataserver/metar") -> "com.vektorraum.aviatorsbot.generated.adds.metar")
     // logLevel in (Compile, scalaxb) := Level.Debug
   )
         

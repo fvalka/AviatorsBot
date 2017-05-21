@@ -1,4 +1,4 @@
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema/TAF">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="adds-taf">
 <xsd:element name="response" >
     			<xsd:complexType >
 				<xsd:sequence >
