@@ -47,7 +47,7 @@ trait AviatorsBot extends TelegramBot with Polling with Commands {
   }
 
   def buildWxMessage(stations: List[String], metars: Map[String, Seq[METAR]]): String = {
-    val inputStationsSet = mutable.LinkedHashSet[String](stations.filter(StationUtil.isActualStation): _*)
+    val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isActualStation): _*)
     val stationSet = inputStationsSet ++ metars.keySet
 
     stationSet.map(station => metars.get(station) match {
