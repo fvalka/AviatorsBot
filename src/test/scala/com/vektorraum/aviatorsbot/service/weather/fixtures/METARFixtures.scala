@@ -1,6 +1,6 @@
 package com.vektorraum.aviatorsbot.service.weather.fixtures
 
-import com.vektorraum.aviatorsbot.generated.adds.metar.METAR
+import com.vektorraum.aviatorsbot.generated.metar.METAR
 
 
 /**
