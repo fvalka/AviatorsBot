@@ -47,5 +47,19 @@ class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory wi
         bot.replySent shouldEqual "<strong>LOWP</strong> No METAR received for station"
       )
     }
+
+    scenario("Pilot requests weather with an invalid station name") {
+      Given("Aviatorsbot with empty response from weather service")
+      val weatherService = new AddsWeatherServiceForTest(ResponseFixtures.EmptyResponseForStationWhichDoesntExist)
+      val bot = new AviatorsBotForTesting(weatherService)
+
+      When("Pilot uses an invalid station name")
+      bot.receiveMockMessage("wx lowpk")
+
+      Then("Returns error message that the station name is incorrect")
+      eventually(
+        bot.replySent shouldEqual "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\""
+      )
+    }
   }
 }
