@@ -10,14 +10,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by fvalka on 21.05.2017.
   */
-class AddsWeatherServiceForTest(xml: Elem) extends AddsWeatherService {
-  override def callAddsServerMetar(stations: List[String], maxAge: Int): Future[Elem] = {
+class AddsWeatherServiceForTest(metars: Elem, tafs: Elem) extends AddsWeatherService {
+  override protected def callAddsServerMetar(stations: List[String], maxAge: Int): Future[Elem] = {
     Future {
-      xml
+      metars
     }
   }
 
   override protected def callAddsServerTaf(stations: List[String], maxAge: Int): Future[Elem] = {
-    throw new NotImplementedError()
+    Future {
+      tafs
+    }
   }
 }

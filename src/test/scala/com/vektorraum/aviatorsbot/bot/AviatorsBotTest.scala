@@ -1,12 +1,12 @@
 package com.vektorraum.aviatorsbot.bot
 
-import com.vektorraum.aviatorsbot.service.weather.fixtures.METARResponseFixtures
+import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.time.{Millis, Span}
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 /**
   * Created by fvalka on 21.05.2017.
@@ -22,7 +22,8 @@ class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory wi
   feature("Fetch current METAR and TAF information") {
     scenario("Pilot requests weather for a valid station which has METARs available") {
       Given("AviatorsBotForTesting with valid xml")
-      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours)
+      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
+        TAFResponseFixtures.ValidLOWW)
       val bot = new AviatorsBotForTesting(weatherService)
 
       When("Requesting weather for a valid station")
@@ -36,7 +37,8 @@ class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory wi
 
     scenario("Pilot requests weather for a station which doesn't exist") {
       Given("Aviatorsbot with empty response from weather service")
-      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.EmptyResponseForStationWhichDoesntExist)
+      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.EmptyResponseForStationWhichDoesntExist,
+        TAFResponseFixtures.ValidLOWW)
       val bot = new AviatorsBotForTesting(weatherService)
 
       When("Pilot requests the current weather")
@@ -50,7 +52,8 @@ class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory wi
 
     scenario("Pilot requests weather with an invalid station name") {
       Given("Aviatorsbot with empty response from weather service")
-      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.EmptyResponseForStationWhichDoesntExist)
+      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.EmptyResponseForStationWhichDoesntExist,
+        TAFResponseFixtures.ValidLOWW)
       val bot = new AviatorsBotForTesting(weatherService)
 
       When("Pilot uses an invalid station name")

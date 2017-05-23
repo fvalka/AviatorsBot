@@ -24,7 +24,7 @@ class AddsWeatherServiceProduction extends AddsWeatherService {
       blocking {
         xml.XML.load(
           "https://aviationweather.gov/adds/dataserver_current/httpparam?" +
-          "dataSource=tafs&requestType=retrieve&format=xml&" +
+          "dataSource=tafs&requestType=retrieve&format=xml&mostRecentForEachStation=constraint&" +
           s"stationString=${stations mkString ","}&hoursBeforeNow=$maxAge"
         )
       }

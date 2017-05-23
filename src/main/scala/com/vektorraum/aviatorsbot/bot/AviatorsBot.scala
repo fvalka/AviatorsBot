@@ -9,6 +9,7 @@ import info.mukel.telegrambot4s.models._
 import com.softwaremill.macwire._
 import com.vektorraum.aviatorsbot.bot.weather.FormatMetar
 import com.vektorraum.aviatorsbot.generated.metar.METAR
+import com.vektorraum.aviatorsbot.generated.taf.TAF
 
 import scala.collection.mutable
 import scala.io.Source
@@ -19,8 +20,14 @@ import scala.util.{Failure, Success}
   */
 trait AviatorsBot extends TelegramBot with Polling with Commands {
   protected val WelcomeMessage: String = "Welcome to vektorraum AviatorsBot!\n\n" +
-    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n" +
-    "THIS SOFTWARE IS NOT AN OFFICIAL BRIEFING SOURCE. ANY DATA SENT MIGHT BE WRONG, OUT OF DATE OR OTHERWISE UNUSABLE OR MISLEADING, NO GUARANTEES CAN BE MADE ABOUT THE AVAILABILITY OF THIS SERVICE, ESPECIALLY THE POLLING/SUBSCRIPTION MECHANISM\n" +
+    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, " +
+    "INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR " +
+    "PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES " +
+    "OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, " +
+    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n" +
+    "THIS SOFTWARE IS NOT AN OFFICIAL BRIEFING SOURCE. ANY DATA SENT MIGHT BE WRONG, " +
+    "OUT OF DATE OR OTHERWISE UNUSABLE OR MISLEADING, NO GUARANTEES CAN BE MADE ABOUT THE " +
+    "AVAILABILITY OF THIS SERVICE, ESPECIALLY THE POLLING/SUBSCRIPTION MECHANISM\n" +
     "USE PURELY AT YOUR OWN RISK!"
 
   lazy val token: String = scala.util.Properties
@@ -38,15 +45,21 @@ trait AviatorsBot extends TelegramBot with Polling with Commands {
       reply("Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\"")
     } else {
       val stations = args.toList.map(station => station.toUpperCase())
-      weatherService.getMetars(stations) onComplete {
-        case Success(metars) =>
-          reply(buildWxMessage(stations, metars), parseMode = ParseMode.HTML)
+      val message = for {
+        metars <- weatherService.getMetars(stations)
+        tafs <- weatherService.getTafs(stations)
+      } yield { buildWxMessage(stations, metars, tafs) }
+
+      message onComplete {
+        case Success(m) => reply(m, parseMode = ParseMode.HTML)
         case Failure(t) => reply("Could not retrieve METARs")
       }
     }
   }
 
-  def buildWxMessage(stations: List[String], metars: Map[String, Seq[METAR]]): String = {
+  def buildWxMessage(stations: List[String],
+                     metars: Map[String, Seq[METAR]],
+                     tafs: Map[String, Seq[TAF]]): String = {
     val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isActualStation): _*)
     val stationSet = inputStationsSet ++ metars.keySet
 
