@@ -22,8 +22,9 @@ class AddsWeatherServiceProduction extends AddsWeatherService {
   override protected def callAddsServerTaf(stations: List[String], maxAge: Int): Future[Elem] = {
     Future {
       blocking {
-        xml.XML.load("https://aviationweather.gov/adds/dataserver_current/httpparam?" +
-          "dataSource=metars&requestType=retrieve&format=xml&" +
+        xml.XML.load(
+          "https://aviationweather.gov/adds/dataserver_current/httpparam?" +
+          "dataSource=tafs&requestType=retrieve&format=xml&" +
           s"stationString=${stations mkString ","}&hoursBeforeNow=$maxAge"
         )
       }
