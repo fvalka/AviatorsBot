@@ -1,4 +1,4 @@
-package com.vektorraum.aviatorsbot.bot
+package com.vektorraum.aviatorsbot.bot.util
 
 import scala.util.matching.Regex
 

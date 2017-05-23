@@ -7,6 +7,8 @@ import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
 import com.softwaremill.macwire._
+import com.typesafe.scalalogging.Logger
+import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, StationUtil}
 import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
@@ -18,7 +20,7 @@ import scala.util.{Failure, Success}
 /**
   * Created by fvalka on 18.05.2017.
   */
-trait AviatorsBot extends TelegramBot with Polling with Commands {
+trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected val WelcomeMessage: String = "Welcome to vektorraum AviatorsBot!\n\n" +
     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, " +
     "INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR " +
