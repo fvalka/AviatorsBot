@@ -31,7 +31,10 @@ class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory wi
 
       Then("Correctly formated weather is returned")
       eventually {
-        bot.replySent shouldEqual "<strong>LOWW</strong> ✅ 211150Z 31018KT 9999 FEW030 SCT060 19/11 Q1023 NOSIG"
+        bot.replySent shouldEqual "<strong>LOWW</strong> ✅ 211150Z 31018KT 9999 FEW030 SCT060 19/11 Q1023 NOSIG\n" +
+          "<strong>TAF LOWW</strong> 231715Z 2318/2424 18004KT CAVOK TX22/2318Z TN12/2500Z FM240300 " +
+          "29015G25KT 9999 BKN040 TEMPO 2403/2408 30018G30KT 6000 SHRA FEW030 FEW030CB BKN040 PROB30 2404/2407 " +
+          "4000 TSRA FM241000 32015G25KT CAVOK TEMPO 2410/2416 33022G32KT BECMG 2416/2418 34012KT"
       }
     }
 
@@ -46,7 +49,7 @@ class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory wi
 
       Then("Returns error message that weather could not be retrieved for this station")
       eventually(
-        bot.replySent shouldEqual "<strong>LOWP</strong> No METAR received for station"
+        bot.replySent should include ("<strong>LOWP</strong> No METAR received for station")
       )
     }
 
@@ -61,7 +64,7 @@ class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory wi
 
       Then("Returns error message that the station name is incorrect")
       eventually(
-        bot.replySent shouldEqual "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\""
+        bot.replySent should include ("Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\"")
       )
     }
   }

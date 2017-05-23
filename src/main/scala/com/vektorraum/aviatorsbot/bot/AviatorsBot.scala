@@ -7,7 +7,7 @@ import info.mukel.telegrambot4s.api._
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
 import com.softwaremill.macwire._
-import com.vektorraum.aviatorsbot.bot.weather.FormatMetar
+import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
 
@@ -63,9 +63,16 @@ trait AviatorsBot extends TelegramBot with Polling with Commands {
     val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isActualStation): _*)
     val stationSet = inputStationsSet ++ metars.keySet
 
-    stationSet.map(station => metars.get(station) match {
-      case Some(mt) => FormatMetar(mt)
-      case None => s"<strong>$station</strong> No METAR received for station"
+    stationSet.map(station => {
+      val metar = metars.get(station) match {
+        case Some(mt) => FormatMetar(mt)
+        case None => s"<strong>$station</strong> No METAR received for station"
+      }
+      val taf = tafs.get(station) match {
+        case Some(tf) => FormatTaf(tf)
+        case None => s"<strong>TAF $station</strong> No TAF received for station"
+      }
+      metar + "\n" + taf
     }) mkString "\n"
   }
 
