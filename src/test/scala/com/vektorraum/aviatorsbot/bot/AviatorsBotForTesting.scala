@@ -15,15 +15,15 @@ import scala.xml.Elem
 class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends AviatorsBot with MockFactory {
   var replySent: String = ""
   override lazy val weatherService: AddsWeatherService = weatherServiceStub
+  override lazy val token: String = "TESTONLY"
 
-  override def reply(text                  : String,
-                     parseMode             : Option[ParseMode] = None,
-                     disableWebPagePreview : Option[Boolean] = None,
-                     disableNotification   : Option[Boolean] = None,
-                     replyToMessageId      : Option[Long] = None,
-                     replyMarkup           : Option[ReplyMarkup] = None)
-                    (implicit message: Message): Future[Message] =
-  {
+  override def reply(text: String,
+                     parseMode: Option[ParseMode] = None,
+                     disableWebPagePreview: Option[Boolean] = None,
+                     disableNotification: Option[Boolean] = None,
+                     replyToMessageId: Option[Long] = None,
+                     replyMarkup: Option[ReplyMarkup] = None)
+                    (implicit message: Message): Future[Message] = {
     replySent = text
     Future {
       val chat = Chat(123L, ChatType.Private)
