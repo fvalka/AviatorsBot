@@ -5,6 +5,7 @@ package com.vektorraum.aviatorsbot.bot
   */
 object AviatorsBotProduction extends AviatorsBot {
   def main(args: Array[String]): Unit = {
+    logger.info("Starting production instance of AviatorsBot")
     this.run()
   }
 

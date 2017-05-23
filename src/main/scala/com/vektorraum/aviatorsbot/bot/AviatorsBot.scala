@@ -12,8 +12,10 @@ import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, StationUtil}
 import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
+import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 
 import scala.collection.mutable
+import scala.concurrent.Future
 import scala.io.Source
 import scala.util.{Failure, Success}
 
@@ -21,6 +23,8 @@ import scala.util.{Failure, Success}
   * Created by fvalka on 18.05.2017.
   */
 trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
+  protected val trafficLog = Logger("traffic-log")
+
   protected val WelcomeMessage: String = "Welcome to vektorraum AviatorsBot!\n\n" +
     "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, " +
     "INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR " +
@@ -78,4 +82,14 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
     }) mkString "\n"
   }
 
+  override def reply(text: String, parseMode: Option[ParseMode],
+                     disableWebPagePreview: Option[Boolean],
+                     disableNotification: Option[Boolean],
+                     replyToMessageId: Option[Long],
+                     replyMarkup: Option[ReplyMarkup])
+                    (implicit message: Message): Future[Message] = {
+    trafficLog.info(s"Outbound messageId=${message.messageId} - chatId=${message.chat.id} - " +
+      s"chatUserName=${message.chat.username} - inboundMessage=${message.text} - text=$text")
+    super.reply(text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup)
+  }
 }
