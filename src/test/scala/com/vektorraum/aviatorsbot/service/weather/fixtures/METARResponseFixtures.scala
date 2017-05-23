@@ -5,7 +5,7 @@ import scala.xml.Elem
 /**
   * Created by fvalka on 21.05.2017.
   */
-object ResponseFixtures {
+object METARResponseFixtures {
 
   val ValidLOWW7Hours: Elem = <response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/metar1_2.xsd">
     <request_index>141238726</request_index>

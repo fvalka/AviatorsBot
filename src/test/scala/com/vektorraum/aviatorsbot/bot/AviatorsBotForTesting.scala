@@ -1,6 +1,6 @@
 package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
-import com.vektorraum.aviatorsbot.service.weather.fixtures.ResponseFixtures
+import com.vektorraum.aviatorsbot.service.weather.fixtures.METARResponseFixtures
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.models._

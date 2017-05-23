@@ -15,15 +15,18 @@ import scala.xml.Elem
 trait AddsWeatherService {
   val MetarMaxAge = 7
 
-  def callAddsServer(stations: List[String], maxAge: Int): Future[Elem]
+  protected def callAddsServerMetar(stations: List[String], maxAge: Int): Future[Elem]
+  protected def callAddsServerTaf(stations: List[String], maxAge: Int): Future[Elem]
 
   def getMetars(stations: List[String]): Future[Map[String, Seq[METAR]]] = {
-    callAddsServer(stations, MetarMaxAge) map { xml =>
+    callAddsServerMetar(stations, MetarMaxAge) map { xml =>
       scalaxb.fromXML[Response](xml)
     } map { response =>
       val metars = response.data.datasequence1.map(dataseq => dataseq.METAR)
       metars.groupBy(_.station_id.getOrElse(throw new Exception("Invalid XML, station id is not set")))
     }
   }
+
+
 
 }
