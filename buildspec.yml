@@ -17,4 +17,4 @@ phases:
       - sbt debian:packageBin
 artifacts:
   files:
-    - target/scala-2.12/aviatorsbot-scala-1.0.deb
+    - target/aviatorsbot-scala_1.0_all.deb
