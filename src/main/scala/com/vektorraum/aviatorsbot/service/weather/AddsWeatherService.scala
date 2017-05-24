@@ -16,7 +16,7 @@ import scala.xml.Elem
   */
 trait AddsWeatherService {
   val MetarMaxAge = 7
-  val TafMaxAge = 12
+  val TafMaxAge = 16
 
   protected def callAddsServerMetar(stations: List[String], maxAge: Int): Future[Elem]
   protected def callAddsServerTaf(stations: List[String], maxAge: Int): Future[Elem]
