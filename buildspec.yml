@@ -4,7 +4,7 @@ phases:
   install:
     commands:
       - echo Installing additional packages
-      - apt-get install dpkg-deb dpkg-sig dpkg-genchanges lintian fakeroot
+      - apt-get install dpkg-sig lintian fakeroot
   build:
     commands:
       - echo Build started on `date`
