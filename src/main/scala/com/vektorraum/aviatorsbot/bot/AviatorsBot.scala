@@ -46,21 +46,25 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
 
   on("/start") { implicit msg => _ => reply(WelcomeMessage) }
 
-  on("wx", "METAR for multiple stations") { implicit msg => args =>
-    if(!args.forall(arg => StationUtil.isValidInput(arg))) {
-      reply("Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\"")
-    } else {
-      val stations = args.toList.map(station => station.toUpperCase())
-      val message = for {
-        metars <- weatherService.getMetars(stations)
-        tafs <- weatherService.getTafs(stations)
-      } yield { buildWxMessage(stations, metars, tafs) }
+  on("wx", "METAR for multiple stations") { implicit msg =>
+    args =>
+      if (!args.forall(arg => StationUtil.isValidInput(arg))) {
+        reply("Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\"")
+      } else {
+        val stations = args.toList.map(station => station.toUpperCase())
+        val message = for {
+          metars <- weatherService.getMetars(stations)
+          tafs <- weatherService.getTafs(stations)
+        } yield {
+          buildWxMessage(stations, metars, tafs)
+        }
 
-      message onComplete {
-        case Success(m) => reply(m, parseMode = ParseMode.HTML)
-        case Failure(t) => reply("Could not retrieve METARs")
+        message onComplete {
+          case Success(m) => reply(m, parseMode = ParseMode.HTML)
+          case Failure(t) => logger.warn(s"Exception thrown while running command=wx with args=$args", t)
+            reply("Could not retrieve METARs")
+        }
       }
-    }
   }
 
   def buildWxMessage(stations: List[String],
