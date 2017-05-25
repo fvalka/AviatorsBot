@@ -48,7 +48,17 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     Then("result contains all variations of the wind")
     result shouldEqual "<strong>18</strong> ➡11KT ⬇9KT varying between ➡14KT and ➡2KT ⬇14KT\n" +
       "<strong>36</strong> ⬅11KT ⬆9KT varying between ⬅14KT and ⬅2KT ⬆14KT"
+  }
 
+  test("Fully variable wind (=VRBXX) gives error message") {
+    Given("METAR with fully variable wind")
+    val metar = METARFixtures.WindCases.fullyVariable
+
+    When("crosswind is calculated")
+    val result = XWindCalculator(metar, List(Fixtures.NorthSouthRunway))
+
+    Then("Error message is returned")
+    result shouldEqual "⚠ Wind variable! No calculation possible."
   }
 
 }
