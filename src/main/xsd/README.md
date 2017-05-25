@@ -1,0 +1,1 @@
+These files have been used to generate the case classes in the scalaxb-generated folder.
