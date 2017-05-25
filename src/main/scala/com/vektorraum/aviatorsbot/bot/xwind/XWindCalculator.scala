@@ -43,13 +43,13 @@ object XWindCalculator {
         if (VariableWindPattern.pattern.matcher(metar.raw_text.get.trim).matches()) {
           val VariableWindPattern(windVLeft, windVRight) = metar.raw_text.get.trim
 
-          s"varying between ${formatForWindDirection(windVLeft.toInt)} and " +
+          s"varying btw ${formatForWindDirection(windVLeft.toInt)} and " +
             s"${formatForWindDirection(windVRight.toInt)} "
         } else {
           ""
         }
 
-      val runwayText = math.round((dir - airfield.magVar) / 10.0)
+      val runwayText = "%02d".format(math.round(math.round(dir - airfield.magVar) / 10.0))
 
       s"<strong>$runwayText</strong> $normalWind $variableWind".trim
     } mkString "\n"
