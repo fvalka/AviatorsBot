@@ -14,7 +14,7 @@ object StationUtil {
     ValidationPattern.pattern.matcher(input).matches()
   }
 
-  def isActualStation(input: String): Boolean = {
+  def isICAOAptIdentifier(input: String): Boolean = {
     ActualStationPattern.pattern.matcher(input).matches()
   }
 

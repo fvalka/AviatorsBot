@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.xwind
 
 import com.vektorraum.aviatorsbot.generated.metar.METAR
-import com.vektorraum.aviatorsbot.persistence.airportdata.model.Runway
+import com.vektorraum.aviatorsbot.persistence.airfielddata.model.Runway
 
 import scala.collection.SortedSet
 import scala.util.matching.Regex
@@ -71,7 +71,7 @@ object XWindCalculator {
       } else if (windSpeed < 0) {
         s"$emojiNegative" + (-1 * windSpeed) + "KT"
       } else {
-        s"${emojiPositive}${windSpeed}KT"
+        s"$emojiPositive${windSpeed}KT"
       }
     }
 

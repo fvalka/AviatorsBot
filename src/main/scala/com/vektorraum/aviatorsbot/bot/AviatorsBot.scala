@@ -10,8 +10,10 @@ import com.softwaremill.macwire._
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, StationUtil}
 import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
+import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
+import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 
 import scala.collection.mutable
@@ -67,10 +69,35 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
       }
   }
 
+  on("xwind", "Crosswind for a station") { implicit msg =>
+    args =>
+      val station = args.head.toUpperCase
+      if (args.size != 1 || !StationUtil.isICAOAptIdentifier(station)) {
+        reply("Please provide a valid ICAO airport identifier")
+      } else {
+        AirfieldDAO.findByIcao(station) map {
+          case Some(airfield) => weatherService.getMetars(List(station)) map { metars =>
+            val metar = metars.get(station)
+
+            metar match {
+              case Some(m) => reply(XWindCalculator(m.head, airfield.runways))
+              case None => reply("Could not retrieve weather for station")
+            }
+          }
+          case None => reply("Airfield not found")
+        } onComplete {
+          case Success(_) => logger.info(s"XWind calculation performed successfully for station=$station")
+          case Failure(t) => reply("Could not perform crosswind calculation for this station")
+            logger.warn(s"Error during xwindCalculation for station=$station", t)
+        }
+
+      }
+  }
+
   def buildWxMessage(stations: List[String],
                      metars: Map[String, Seq[METAR]],
                      tafs: Map[String, Seq[TAF]]): String = {
-    val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isActualStation): _*)
+    val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isICAOAptIdentifier): _*)
     val stationSet = inputStationsSet ++ metars.keySet
 
     stationSet.map(station => {

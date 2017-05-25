@@ -1,6 +1,6 @@
 package com.vektorraum.aviatorsbot.bot.xwind
 
-import com.vektorraum.aviatorsbot.persistence.airportdata.model.Runway
+import com.vektorraum.aviatorsbot.persistence.airfielddata.model.Runway
 import com.vektorraum.aviatorsbot.service.weather.fixtures.METARFixtures
 import org.scalatest.{FunSuite, GivenWhenThen}
 import org.scalatest.Matchers._

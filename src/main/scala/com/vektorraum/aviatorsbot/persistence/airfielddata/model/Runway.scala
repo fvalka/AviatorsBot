@@ -1,4 +1,4 @@
-package com.vektorraum.aviatorsbot.persistence.airportdata.model
+package com.vektorraum.aviatorsbot.persistence.airfielddata.model
 
 /**
   * Created by fvalka on 25.05.2017.
