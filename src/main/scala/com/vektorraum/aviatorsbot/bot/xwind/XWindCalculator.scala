@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.xwind
 
 import com.vektorraum.aviatorsbot.generated.metar.METAR
-import com.vektorraum.aviatorsbot.persistence.airfielddata.model.Runway
+import com.vektorraum.aviatorsbot.persistence.airfielddata.model.{Airfield, Runway}
 
 import scala.collection.SortedSet
 import scala.util.matching.Regex
@@ -15,7 +15,7 @@ import scala.util.matching.Regex
 object XWindCalculator {
   private val VariableWindPattern = ".*(\\d{3})V(\\d{3}).*".r
 
-  def apply(metar: METAR, runways: Seq[Runway]): String = {
+  def apply(metar: METAR, airfield: Airfield): String = {
     // Variable wind is defined as 0 degrees according to
     // https://aviationweather.gov/adds/dataserver/metars/MetarFieldDescription.php
     // Should no wind direction be present, also assume variable wind
@@ -24,7 +24,7 @@ object XWindCalculator {
       return "⚠ Wind variable! No calculation possible."
     }
 
-    val directions = SortedSet(runways flatMap { runway => runway.directions }: _*)
+    val directions = SortedSet(airfield.runways flatMap { runway => runway.directions }: _*)
 
     directions map { dir =>
       def formatForWindDirection(windDir: Int): String = {
@@ -49,7 +49,7 @@ object XWindCalculator {
           ""
         }
 
-      val runwayText = math.round(dir / 10.0)
+      val runwayText = math.round((dir - airfield.magVar) / 10.0)
 
       s"<strong>$runwayText</strong> $normalWind $variableWind".trim
     } mkString "\n"

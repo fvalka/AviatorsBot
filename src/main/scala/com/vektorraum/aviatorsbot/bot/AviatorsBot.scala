@@ -80,7 +80,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
             val metar = metars.get(station)
 
             metar match {
-              case Some(m) => reply(XWindCalculator(m.head, airfield.runways))
+              case Some(m) => reply(XWindCalculator(m.head, airfield))
               case None => reply("Could not retrieve weather for station")
             }
           }
