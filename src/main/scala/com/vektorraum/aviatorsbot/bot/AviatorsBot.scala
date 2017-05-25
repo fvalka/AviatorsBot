@@ -38,13 +38,13 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
 
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
-    .getOrElse(Source.fromResource("bot.token").getLines().mkString)
+    .getOrElse(Source.fromFile("conf/bot.token").getLines().mkString)
 
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
 
   on("hello") { implicit msg => _ => reply("My token is SAFE!") }
 
-  on("/start") { implicit msg => _ => reply(WelcomeMessage) }
+  on("start") { implicit msg => _ => reply(WelcomeMessage) }
 
   on("wx", "METAR for multiple stations") { implicit msg =>
     args =>
