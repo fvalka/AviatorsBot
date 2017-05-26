@@ -11,7 +11,7 @@ import org.scalatest.{FeatureSpec, GivenWhenThen}
 /**
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
+class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
   info("As a pilot I want to")
   info("Be able to retrieve up to date METAR and TAF weather information")
   info("Enhanced with mark up for faster recognition of the current flight conditions and trend")

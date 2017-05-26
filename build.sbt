@@ -25,7 +25,7 @@ libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.0"
 libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.0"
 
 // Scala Mock
-libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.5.0" % Test
+libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0" % Test
 
 // Mongodb
 libraryDependencies += "org.reactivemongo" % "reactivemongo_2.12" % "0.12.3"// https://mvnrepository.com/artifact/org.scala-lang/scala-xml

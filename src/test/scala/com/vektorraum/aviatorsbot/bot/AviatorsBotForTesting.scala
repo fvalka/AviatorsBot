@@ -1,4 +1,5 @@
 package com.vektorraum.aviatorsbot.bot
+import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import com.vektorraum.aviatorsbot.service.weather.fixtures.METARResponseFixtures
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
@@ -15,6 +16,7 @@ import scala.xml.Elem
 class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends AviatorsBot with MockFactory {
   var replySent: String = ""
   override lazy val weatherService: AddsWeatherService = weatherServiceStub
+  override lazy val airfieldDAO: AirfieldDAO = stub[AirfieldDAO]
   override lazy val token: String = "TESTONLY"
 
   override def reply(text: String,
@@ -24,6 +26,9 @@ class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends Avia
                      replyToMessageId: Option[Long] = None,
                      replyMarkup: Option[ReplyMarkup] = None)
                     (implicit message: Message): Future[Message] = {
+    if (replySent != "") {
+      throw new IllegalArgumentException()
+    }
     replySent = text
     Future {
       val chat = Chat(123L, ChatType.Private)

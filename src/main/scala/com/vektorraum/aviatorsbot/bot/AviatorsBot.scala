@@ -13,7 +13,7 @@ import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
-import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
+import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 
 import scala.collection.mutable
@@ -43,6 +43,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
     .getOrElse(Source.fromFile("conf/bot.token").getLines().mkString)
 
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
+  protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
 
   on("hello") { implicit msg => _ => reply("My token is SAFE!") }
 
@@ -75,7 +76,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
       if (args.size != 1 || !StationUtil.isICAOAptIdentifier(station)) {
         reply("Please provide a valid ICAO airport identifier")
       } else {
-        AirfieldDAO.findByIcao(station) map {
+        airfieldDAO.findByIcao(station) map {
           case Some(airfield) => weatherService.getMetars(List(station)) map { metars =>
             val metar = metars.get(station)
 

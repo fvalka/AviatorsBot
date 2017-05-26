@@ -1,25 +1,21 @@
 package com.vektorraum.aviatorsbot.bot.xwind
 
 import com.vektorraum.aviatorsbot.persistence.airfielddata.model.{Airfield, Runway}
-import com.vektorraum.aviatorsbot.service.weather.fixtures.METARFixtures
-import org.scalatest.{FunSuite, GivenWhenThen}
+import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARFixtures}
 import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 25.05.2017.
   */
 class XWindCalculatorTest extends FunSuite with GivenWhenThen {
-  object Fixtures {
-    val NorthSouthRunway = Runway("18/36", List(180, 360))
-    val AirfieldNorthSouthRwy = Airfield("XXXX", "XXXX", 0.0, List(NorthSouthRunway))
-  }
 
   test("Normal wind") {
     Given("METAR containing normal wind, with no variation or gusts")
     val metar = METARFixtures.WindCases.normal
 
     When("crosswind is calculated")
-    val result = XWindCalculator(metar, Fixtures.AirfieldNorthSouthRwy)
+    val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("result matches precalculated values")
     result shouldEqual "<strong>18</strong> ⬅3KT ⬆5KT\n" +
@@ -29,7 +25,7 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
   test("Magnetic variation is considered correctly in runway names") {
     Given("METAR containing normal wind and Airfield with +10 deg magnetic variation")
     val metar = METARFixtures.WindCases.normal
-    val airfield = Airfield("XXXX", "XXXX", 10.0, List(Fixtures.NorthSouthRunway))
+    val airfield = Airfield("XXXX", "XXXX", 10.0, List(AirfieldFixtures.RunwayFixtures.NorthSouthRunway))
 
     When("crosswind is calculated")
     val result = XWindCalculator(metar, airfield)
@@ -44,7 +40,7 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val metar = METARFixtures.WindCases.gusting
 
     When("crosswind is calculated")
-    val result = XWindCalculator(metar, Fixtures.AirfieldNorthSouthRwy)
+    val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("result matches precalculated values and doesn't contain a head/tailwind")
     result shouldEqual "<strong>18</strong> ⬅37KT gusting ⬅47KT\n" +
@@ -57,7 +53,7 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val metar = METARFixtures.WindCases.varying090V170
 
     When("crosswind is calculated")
-    val result = XWindCalculator(metar, Fixtures.AirfieldNorthSouthRwy)
+    val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("result contains all variations of the wind")
     result shouldEqual "<strong>18</strong> ➡11KT ⬇9KT varying btw ➡14KT and ➡2KT ⬇14KT\n" +
@@ -69,7 +65,7 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val metar = METARFixtures.WindCases.fullyVariable
 
     When("crosswind is calculated")
-    val result = XWindCalculator(metar, Fixtures.AirfieldNorthSouthRwy)
+    val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("Error message is returned")
     result shouldEqual "⚠ Wind variable! No calculation possible."
