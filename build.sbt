@@ -47,4 +47,6 @@ maintainer in Linux := "Fabian Valka <fvalka@vektorraum.com>"
 packageSummary in Linux := "AviatorsBot"
 packageDescription := "A telegram bot for aviators. Focused on providing up to date weather information."
 serverLoading in Debian := Some(ServerLoader.Systemd)
+startRunlevels  :=Option("3")
+stopRunlevels :=Option("3")
 
