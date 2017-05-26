@@ -1,5 +1,3 @@
-enablePlugins(JavaServerAppPackaging)
-
 name := "aviatorsbot-scala"
 
 version := "1.0"
@@ -44,3 +42,6 @@ packageSummary in Linux := "AviatorsBot"
 packageDescription := "A telegram bot for aviators. Focused on providing up to date weather information."
 
 linuxPackageMappings in Debian := linuxPackageMappings.value
+
+enablePlugins(JavaServerAppPackaging)
+enablePlugins(DebianPlugin)
