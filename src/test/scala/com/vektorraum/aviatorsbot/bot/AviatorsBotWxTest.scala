@@ -17,7 +17,7 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
   info("Enhanced with mark up for faster recognition of the current flight conditions and trend")
 
   implicit override val patienceConfig =
-    PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(30, Millis)))
+    PatienceConfig(timeout = scaled(Span(1000, Millis)), interval = scaled(Span(60, Millis)))
 
   feature("Fetch current METAR and TAF information") {
     scenario("Pilot requests weather for a valid station which has METARs available") {

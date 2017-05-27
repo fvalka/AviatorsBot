@@ -20,5 +20,5 @@ object AliasCommandParser extends CommandParser {
     CommandParser.Default.unapply(msg)
 
   override def matchCommands(fromParser: String, target: String): Boolean =
-    super.matchCommands(fromParser.stripPrefix("/"), target)
+    super.matchCommands(fromParser.stripPrefix("/"), target.stripPrefix("/"))
 }
