@@ -17,8 +17,14 @@ class AirfieldDAOProduction extends AirfieldDAO {
   implicit def runwayReader: BSONDocumentReader[Runway] = Macros.reader[Runway]
   implicit def airfieldsReader: BSONDocumentReader[Airfield] = Macros.reader[Airfield]
 
+  /**
+    * Search for an airfield based upon its ICAO identifier (e.g. LOWW)
+    *
+    * @param icao Four letter uppercase ICAO identifier
+    * @return One or no airfield with this ICAO identifier
+    */
   override def findByIcao(icao: String): Future[Option[Airfield]] = {
-    val query = BSONDocument("icao" -> icao)
+    val query = BSONDocument("icao" -> icao.toUpperCase)
     airfieldCollection.flatMap(_.find(query).one[Airfield])
   }
 
