@@ -91,5 +91,21 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
         bot.replySent shouldEqual "Please provide a valid ICAO airport identifier"
       }
     }
+
+    scenario("Pilot requests xwind and an exception occurs") {
+      Given("AviatorsBotForTesting with valid metar and DAO throws an exception")
+      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
+        TAFResponseFixtures.ValidLOWW)
+      val bot = new AviatorsBotForTesting(weatherService)
+      bot.airfieldDAO.findByIcao _ when "LOWW" returns Future.failed(new RuntimeException())
+
+      When("Requesting xwind")
+      bot.receiveMockMessage("xwind loww")
+
+      Then("Error message is returned")
+      eventually {
+        bot.replySent shouldEqual "Could not perform crosswind calculation for this station"
+      }
+    }
   }
 }

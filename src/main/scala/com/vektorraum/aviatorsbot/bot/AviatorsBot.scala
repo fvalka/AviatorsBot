@@ -14,6 +14,7 @@ import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
+import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction}
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 
 import scala.collection.mutable
@@ -44,6 +45,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
 
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
+  protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
 
   on("hello") { implicit msg => _ => reply("My token is SAFE!") }
 
@@ -95,6 +97,11 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
         }
 
       }
+  }
+
+  on("add", "Subscribe to stations") { implicit msg =>
+    args =>
+      
   }
 
   def buildWxMessage(stations: List[String],

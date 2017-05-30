@@ -23,7 +23,7 @@ import scala.concurrent.Future
   *
   * Created by fvalka on 27.05.2017.
   */
-class SubscriptionDAOProduction {
+class SubscriptionDAOProduction  extends SubscriptionDAO {
   def airfieldCollection: Future[BSONCollection] = Db.aviatorsDb.map(_.collection("subscriptions"))
 
   // Reading
@@ -34,18 +34,19 @@ class SubscriptionDAOProduction {
   implicit def subscriptionWriter: BSONDocumentWriter[Subscription] = Macros.writer[Subscription]
   implicit def latestInfoWriter: BSONDocumentWriter[LatestInfo] = Macros.writer[LatestInfo]
 
+
   /**
     * Inserts a new subscriptions or updates the validUntil field of the already existing subscription
     *
     * @param subscription Subscription DTO, combination of chatId and icao must be unique
     * @return The result of either the update or insert operation
     */
-  def addOrUpdate(subscription: Subscription): Future[WriteResult] = {
+  override def addOrUpdate(subscription: Subscription): Future[WriteResult] = {
     find(subscription.chatId, subscription.icao) flatMap {
       case Some(sub) =>
         val selector = findByChatIdAndIcaoQuery(subscription.chatId, subscription.icao)
         val update = BSONDocument("$set" -> BSONDocument("validUntil" -> new Date()))
-        airfieldCollection.flatMap(_.update(selector , update))
+        airfieldCollection.flatMap(_.update(selector, update))
       case None => airfieldCollection.flatMap(_.insert(subscription))
     }
   }
@@ -57,10 +58,10 @@ class SubscriptionDAOProduction {
     * @param icao
     * @return One or no subscription matching the query parameters
     */
-  def find(chatId: Long, icao: String): Future[Option[Subscription]] = {
-    purgeOld() flatMap {_ =>
-        val query = findByChatIdAndIcaoQuery(chatId, icao)
-        airfieldCollection.flatMap(_.find(query).one[Subscription])
+  override def find(chatId: Long, icao: String): Future[Option[Subscription]] = {
+    purgeOld() flatMap { _ =>
+      val query = findByChatIdAndIcaoQuery(chatId, icao)
+      airfieldCollection.flatMap(_.find(query).one[Subscription])
     }
   }
 
@@ -69,12 +70,12 @@ class SubscriptionDAOProduction {
     *
     * @return Write result of the remove operation
     */
-  def purgeOld(): Future[WriteResult] = {
+  override def purgeOld(): Future[WriteResult] = {
     val query = BSONDocument("validUntil" -> BSONDocument("$gt" -> new Date()))
     airfieldCollection.flatMap(_.remove(query))
   }
 
-  private def findByChatIdAndIcaoQuery(chatId: Long, icao: String) = {
+  protected def findByChatIdAndIcaoQuery(chatId: Long, icao: String) = {
     BSONDocument("chatId" -> chatId, "icao" -> icao)
   }
 
