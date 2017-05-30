@@ -15,6 +15,6 @@ import java.util.Date
   * Created by fvalka on 27.05.2017.
   */
 case class Subscription(chatId: Long, icao: String, validUntil: Date, metar: Boolean = true, taf: Boolean = true,
-                        latestMetar: Option[LatestInfo], latestTaf: Option[LatestInfo]) {
+                        latestMetar: Option[LatestInfo] = None, latestTaf: Option[LatestInfo] = None) {
 
 }

@@ -1,5 +1,6 @@
 package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
+import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import com.vektorraum.aviatorsbot.service.weather.fixtures.METARResponseFixtures
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
@@ -17,6 +18,7 @@ class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends Avia
   var replySent: String = ""
   override lazy val weatherService: AddsWeatherService = weatherServiceStub
   override lazy val airfieldDAO: AirfieldDAO = stub[AirfieldDAO]
+  override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
   override lazy val token: String = "TESTONLY"
 
   override def reply(text: String,
