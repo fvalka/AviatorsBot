@@ -1,5 +1,9 @@
 package com.vektorraum.aviatorsbot.bot
 
+import java.time.{ZoneOffset, ZonedDateTime}
+import java.util.Date
+
+import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
 import org.scalamock.scalatest.MockFactory
@@ -30,24 +34,32 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
 
   feature("Add subscriptions") {
     scenario("Pilot subscribes to a single station") {
+      def checkDate(date: Date): Boolean = {
+        val convDate = ZonedDateTime.ofInstant(date.toInstant, ZoneOffset.UTC)
+        convDate.isBefore(ZonedDateTime.now().plusHours(7)) && convDate.isAfter(ZonedDateTime.now().plusHours(5))
+      }
+
       Given("AviatorsBotForTesting with valid metar")
       val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
         TAFResponseFixtures.ValidLOWW)
       val bot = new AviatorsBotForTesting(weatherService)
-      bot.subscriptionDAO.addOrUpdate _ when * returns Future {Fixtures.WriteResultOk}
-      //bot.subscriptionDAO.addOrUpdate
+
+      bot.subscriptionDAO.addOrUpdate _ expects where {
+        (subscription: Subscription) => subscription.icao == "LOWW" && subscription.metar && subscription.taf &&
+          subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty// && checkDate(subscription.validUntil)
+      } returns Future { Fixtures.WriteResultOk }
 
       When("Adding subscription for single station")
       bot.receiveMockMessage("add loww")
 
       Then("Correct message is returned and mock is called")
       eventually {
-        bot.replySent shouldEqual "METAR issued at: 2017-05-21T11:50:00Z\n" +
-          "<strong>11</strong> ➡4KT ⬆17KT\n" +
-          "<strong>16</strong> ⬅10KT ⬆15KT\n" +
-          "<strong>29</strong> ⬅4KT ⬇17KT\n" +
-          "<strong>34</strong> ➡10KT ⬇15KT"
+        bot.replySent should startWith ("Subscription is active until:")
       }
+    }
+
+    scenario("Pilot enters an invalid ICAO station") {
+      Given("AviatorsbotForTesting with valid backend services")
     }
   }
 }

@@ -38,16 +38,15 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected val ERROR_INVALID_ICAO_LIST = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\""
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
 
-  protected val WelcomeMessage: String = "Welcome to vektorraum AviatorsBot!\n\n" +
-    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, " +
-    "INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR " +
-    "PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES " +
-    "OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, " +
-    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n" +
-    "THIS SOFTWARE IS NOT AN OFFICIAL BRIEFING SOURCE. ANY DATA SENT MIGHT BE WRONG, " +
-    "OUT OF DATE OR OTHERWISE UNUSABLE OR MISLEADING, NO GUARANTEES CAN BE MADE ABOUT THE " +
-    "AVAILABILITY OF THIS SERVICE, ESPECIALLY THE POLLING/SUBSCRIPTION MECHANISM\n" +
-    "USE PURELY AT YOUR OWN RISK!"
+  protected object HelpMessages {
+    private def load(resource: String): String = {
+      Source.fromResource(resource).getLines().mkString("\n")
+    }
+
+    val Welcome: String = load("help/welcome.html")
+    val Add: String = load("help/add.html")
+    val Wx: String = load("help/wx.html")
+  }
 
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
@@ -59,14 +58,12 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
 
-  on("hello") { implicit msg => _ => reply("My token is SAFE!") }
+  on("/start") { implicit msg => _ => reply(HelpMessages.Welcome) }
 
-  on("start") { implicit msg => _ => reply(WelcomeMessage) }
-
-  on("wx", "METAR for multiple stations") { implicit msg =>
+  on("/wx", "Current weather") { implicit msg =>
     args =>
-      if (!args.forall(StationUtil.isValidInput)) {
-        reply(ERROR_INVALID_ICAO_LIST)
+      if (!args.forall(StationUtil.isValidInput) || args.isEmpty) {
+        reply(HelpMessages.Wx)
       } else {
         val stations = args.toList.map(station => station.toUpperCase())
         val message = for {
@@ -79,12 +76,12 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
         message onComplete {
           case Success(m) => reply(m, parseMode = ParseMode.HTML)
           case Failure(t) => logger.warn(s"Exception thrown while running command=wx with args=$args", t)
-            reply("Could not retrieve METARs")
+            reply("Could not retrieve weather")
         }
       }
   }
 
-  on("xwind", "Crosswind for a station") { implicit msg =>
+  on("/xwind", "Current crosswind") { implicit msg =>
     args =>
       val station = args.head.toUpperCase
       if (args.size != 1 || !StationUtil.isICAOAptIdentifier(station)) {
@@ -111,15 +108,16 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
       }
   }
 
-  on("add", "Subscribe to stations") { implicit msg =>
+  on("/add", "Subscribe to stations") { implicit msg =>
     args =>
-      if (!args.forall(StationUtil.isICAOAptIdentifier)) {
-        reply(ERROR_INVALID_ICAO_LIST)
+      if (!args.forall(StationUtil.isICAOAptIdentifier) || args.isEmpty) {
+        reply(HelpMessages.Add, ParseMode.HTML)
       } else {
+        val stations = args.map(_.toUpperCase)
         val validHours = config.getConfig("subscriptions").getInt("validHoursDefault")
         val validUntil = ZonedDateTime.now(ZoneOffset.UTC).plusHours(validHours)
-        val insertFutures: Seq[Future[WriteResult]] = args map { arg =>
-          subscriptionDAO.addOrUpdate(Subscription(msg.chat.id, arg, Date.from(validUntil.toInstant)))
+        val insertFutures: Seq[Future[WriteResult]] = stations map { station =>
+          subscriptionDAO.addOrUpdate(Subscription(msg.chat.id, station, Date.from(validUntil.toInstant)))
         }
 
         // double check that the insertion worked
@@ -155,10 +153,6 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
       }
       metar + "\n" + taf
     }) mkString "\n"
-  }
-
-  protected def formatDateTime(zonedDateTime: ZonedDateTime) = {
-
   }
 
   override def reply(text: String, parseMode: Option[ParseMode],

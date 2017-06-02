@@ -79,7 +79,7 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
 
       Then("Returns error message that the station name is incorrect")
       eventually(
-        bot.replySent should include ("Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\"")
+        bot.replySent should include ("<strong>usage:</strong> /wx &lt;stations&gt;\nGet the current METAR and TAF for these stations\n\n<strong>Examples:</strong>\n/wx loww eddm ... METAR and TAF for these airfields")
       )
     }
   }

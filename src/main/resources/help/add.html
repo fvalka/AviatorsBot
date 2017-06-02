@@ -1,0 +1,12 @@
+<strong>usage:</strong> /add [&lt;valid-until&gt;] [metar] [taf] &lt;stations&gt;
+Subscribe to weather updates of these station(s)
+
+<strong>Options:</strong>
+ valid-until - UTC time in HHmm format or number of hours
+ metar - Receive only METAR updates
+ taf - Receive only TAF updates
+
+<strong>Examples:</strong>
+/add loww eddm ... subscribe to METARs and TAFs using the default expiration time of 6 hours
+/add 1507 metar lowg ... subscribe only to METARs of LOWG until 1507Z
+/add 6 kjfk ... subscribe to METARS and TAFs of KJFK for 6 hours
