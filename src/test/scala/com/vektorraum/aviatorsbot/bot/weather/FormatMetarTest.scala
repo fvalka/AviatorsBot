@@ -24,4 +24,15 @@ class FormatMetarTest extends FunSuite with GivenWhenThen {
     FormatMetar(List()) shouldEqual ""
   }
 
+  test("FormatMetar can deal with unkown flight categories") {
+    Given("Valid METAR without flight category object")
+    val metar = METARFixtures.ValidAndCompleteLOWW.copy(flight_category = None)
+
+    When("Formatting without sparklines")
+    val result = FormatMetar(List(metar))
+
+    Then("Result contains question mark and doesn't throw an error")
+    result shouldEqual "<strong>LOWW</strong> ❔ 201920Z 32019KT 9999 FEW032 BKN036 16/09 Q1019 NOSIG"
+  }
+
 }

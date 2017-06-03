@@ -15,8 +15,9 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 
 // Telegram Bot
 libraryDependencies += "info.mukel" %% "telegrambot4s" % "2.2.8-SNAPSHOT"
-libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
-"org.slf4j" % "slf4j-simple" % "1.7.5")
+/*libraryDependencies ++= Seq("org.slf4j" % "slf4j-api" % "1.7.5",
+"org.slf4j" % "slf4j-simple" % "1.7.5")*/
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7"
 
 // Wire Scala CDI
 libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided"
@@ -50,8 +51,10 @@ serverLoading in Debian := Some(ServerLoader.Systemd)
 startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
 
-mappings in Universal <+= (packageBin in Compile, baseDirectory ) map { (_, base) =>
-  val conf = base / "conf" / "aviatorsbot.conf"
-  conf -> "conf/aviatorsbot.conf"
-}
+mappings in Universal <+=
+  (packageBin in Compile, baseDirectory) map { (_, base) =>
+    val conf = base / "conf" / "aviatorsbot.conf"
+    conf -> "conf/aviatorsbot.conf"
+  }
+
 

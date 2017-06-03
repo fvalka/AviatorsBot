@@ -17,7 +17,7 @@ object FormatMetar extends ((Seq[METAR], Option[METAR], Boolean) => String) {
     }
 
     val raw_without_station = history.head.raw_text.get.trim.substring(4).trim
-    val emoji = flightCategoryToEmoji(history.head.flight_category.get)
+    val emoji = flightCategoryToEmoji(history.head.flight_category.getOrElse("UNK"))
     val station_name = history.head.station_id.get
     s"<strong>$station_name</strong> $emoji $raw_without_station"
   }
