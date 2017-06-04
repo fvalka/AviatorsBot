@@ -32,6 +32,12 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
   implicit override val patienceConfig =
     PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(30, Millis)))
 
+  val HELP_ADD: String = "<strong>usage:</strong> /add [&lt;valid-until&gt;] [metar] [taf] &lt;stations&gt;" +
+    "\nSubscribe to weather updates of these station(s)\n\n<strong>Options:</strong>\n valid-until - UTC time " +
+    "in HHmm format or number of hours\n metar - Receive only METAR updates\n taf - Receive only TAF " +
+    "updates\n\n<strong>Examples:</strong>\n/add loww eddm ... subscribe to METARs and TAFs using the default " +
+    "expiration time of 6 hours\n/add 1507 metar lowg ... subscribe only to METARs of LOWG until 1507Z\n/add 6 " +
+    "kjfk ... subscribe to METARS and TAFs of KJFK for 6 hours"
   feature("Add subscriptions") {
     scenario("Pilot subscribes to a single station") {
       def checkDate(date: Date): Boolean = {
@@ -59,7 +65,41 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
     }
 
     scenario("Pilot enters an invalid ICAO station") {
-      Given("AviatorsbotForTesting with valid backend services")
+      Given("AviatorsbotForTesting with valid backend services, expecting no call")
+      val bot: AviatorsBotForTesting = initBotForErrorCase
+
+      When("Using invalid input")
+      bot.receiveMockMessage("add lowwx")
+
+      Then("Help message is returned to the pilot")
+      eventually {
+        bot.replySent shouldEqual HELP_ADD
+      }
     }
+
+    scenario("Pilot provides no input") {
+      Given("AviatorBotForTesting with valid backend services, expecting no call")
+      val bot: AviatorsBotForTesting = initBotForErrorCase
+
+      When("Only sending the command with no input")
+      bot.receiveMockMessage("add")
+
+      Then("A help message is returned")
+      eventually {
+        bot.replySent shouldEqual HELP_ADD
+      }
+    }
+  }
+
+  private def initBotForErrorCase: AviatorsBotForTesting = {
+    val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
+      TAFResponseFixtures.ValidLOWW)
+    val bot = new AviatorsBotForTesting(weatherService)
+
+    (bot.subscriptionDAO.addOrUpdate _ expects * returns Future {
+      Fixtures.WriteResultOk
+    }).never()
+
+    bot
   }
 }
