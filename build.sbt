@@ -30,6 +30,9 @@ libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.6.0
 // Mongodb
 libraryDependencies += "org.reactivemongo" % "reactivemongo_2.12" % "0.12.3"// https://mvnrepository.com/artifact/org.scala-lang/scala-xml
 
+// Caching
+libraryDependencies += "com.github.cb372" %% "scalacache-caffeine" % "0.9.3"
+
 enablePlugins(JavaServerAppPackaging)
 enablePlugins(DebianPlugin)
 enablePlugins(SystemdPlugin)

@@ -13,7 +13,7 @@ import info.mukel.telegrambot4s.models._
 import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
-import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, StationUtil, TimeFormatter}
+import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, HelpMessages, StationUtil, TimeFormatter}
 import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.generated.metar.METAR
@@ -38,16 +38,6 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected val ERROR_INVALID_ICAO_LIST = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\""
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
 
-  protected object HelpMessages {
-    private def load(resource: String): String = {
-      Source.fromResource(resource).getLines().mkString("\n")
-    }
-
-    val Welcome: String = load("help/welcome.html")
-    val Add: String = load("help/add.html")
-    val Wx: String = load("help/wx.html")
-    val Xwind: String = load("help/xwind.html")
-  }
 
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
@@ -59,12 +49,12 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
 
-  on("/start") { implicit msg => _ => reply(HelpMessages.Welcome) }
+  on("/start") { implicit msg => _ => reply(HelpMessages("welcome")) }
 
   on("/wx", "Current weather") { implicit msg =>
     args =>
       if (!args.forall(StationUtil.isValidInput) || args.isEmpty) {
-        reply(HelpMessages.Wx, ParseMode.HTML)
+        reply(HelpMessages("wx"), ParseMode.HTML)
       } else {
         val stations = args.toList.map(station => station.toUpperCase())
         val message = for {
@@ -86,7 +76,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
     args =>
       val station = args.head.toUpperCase
       if (args.size != 1 || !StationUtil.isICAOAptIdentifier(station)) {
-        reply(HelpMessages.Xwind, ParseMode.HTML)
+        reply(HelpMessages("xwind"), ParseMode.HTML)
       } else {
         airfieldDAO.findByIcao(station) map {
           case Some(airfield) => weatherService.getMetars(List(station)) map { metars =>
@@ -112,7 +102,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   on("/add", "Subscribe to stations") { implicit msg =>
     args =>
       if (!args.forall(StationUtil.isICAOAptIdentifier) || args.isEmpty) {
-        reply(HelpMessages.Add, ParseMode.HTML)
+        reply(HelpMessages("add"), ParseMode.HTML)
       } else {
         val stations = args.map(_.toUpperCase)
         val validHours = config.getConfig("subscriptions").getInt("validHoursDefault")
