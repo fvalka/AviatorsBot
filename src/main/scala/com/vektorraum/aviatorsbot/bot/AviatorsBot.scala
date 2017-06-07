@@ -46,6 +46,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
     val Welcome: String = load("help/welcome.html")
     val Add: String = load("help/add.html")
     val Wx: String = load("help/wx.html")
+    val Xwind: String = load("help/xwind.html")
   }
 
   lazy val token: String = scala.util.Properties
@@ -63,7 +64,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   on("/wx", "Current weather") { implicit msg =>
     args =>
       if (!args.forall(StationUtil.isValidInput) || args.isEmpty) {
-        reply(HelpMessages.Wx)
+        reply(HelpMessages.Wx, ParseMode.HTML)
       } else {
         val stations = args.toList.map(station => station.toUpperCase())
         val message = for {
@@ -85,7 +86,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
     args =>
       val station = args.head.toUpperCase
       if (args.size != 1 || !StationUtil.isICAOAptIdentifier(station)) {
-        reply("Please provide a valid ICAO airport identifier")
+        reply(HelpMessages.Xwind, ParseMode.HTML)
       } else {
         airfieldDAO.findByIcao(station) map {
           case Some(airfield) => weatherService.getMetars(List(station)) map { metars =>

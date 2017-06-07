@@ -16,6 +16,7 @@ import scala.xml.Elem
   */
 class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends AviatorsBot with MockFactory {
   var replySent: String = ""
+  var parseMode: Option[ParseMode] = None
   override lazy val weatherService: AddsWeatherService = weatherServiceStub
   override lazy val airfieldDAO: AirfieldDAO = stub[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
@@ -32,6 +33,7 @@ class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends Avia
       throw new IllegalArgumentException()
     }
     replySent = text
+    this.parseMode = parseMode
     Future {
       val chat = Chat(123L, ChatType.Private)
       Message(messageId = 123L, chat = chat, date = 1234444)

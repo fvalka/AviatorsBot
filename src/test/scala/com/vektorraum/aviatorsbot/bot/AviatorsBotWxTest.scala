@@ -2,6 +2,7 @@ package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
+import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._
@@ -35,6 +36,7 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
           "<strong>TAF LOWW</strong> 231715Z 2318/2424 18004KT CAVOK TX22/2318Z TN12/2500Z FM240300 " +
           "29015G25KT 9999 BKN040 TEMPO 2403/2408 30018G30KT 6000 SHRA FEW030 FEW030CB BKN040 PROB30 2404/2407 " +
           "4000 TSRA FM241000 32015G25KT CAVOK TEMPO 2410/2416 33022G32KT BECMG 2416/2418 34012KT"
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
       }
     }
 
@@ -50,6 +52,7 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       Then("Weather is returned")
       eventually {
         bot.replySent should include ("<strong>LOWW</strong>")
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
       }
     }
 
@@ -63,9 +66,10 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("wx lowp")
 
       Then("Returns error message that weather could not be retrieved for this station")
-      eventually(
-        bot.replySent should include ("<strong>LOWP</strong> No METAR received for station")
-      )
+      eventually {
+        bot.replySent should include("<strong>LOWP</strong> No METAR received for station")
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
+      }
     }
 
     scenario("Pilot requests weather with an invalid station name") {
@@ -78,9 +82,12 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("wx lowpk")
 
       Then("Returns error message that the station name is incorrect")
-      eventually(
-        bot.replySent should include ("<strong>usage:</strong> /wx &lt;stations&gt;\nGet the current METAR and TAF for these stations\n\n<strong>Examples:</strong>\n/wx loww eddm ... METAR and TAF for these airfields")
-      )
+      eventually {
+        bot.replySent should include("<strong>usage:</strong> /wx &lt;stations&gt;\nGet the current METAR and TAF for" +
+          " these stations\n\n<strong>Examples:</strong>\n/wx loww eddm ... METAR and TAF for these airfields")
+
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
+      }
     }
   }
 }

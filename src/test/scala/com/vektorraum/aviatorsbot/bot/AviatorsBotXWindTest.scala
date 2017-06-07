@@ -3,6 +3,7 @@ package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
+import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._
@@ -41,6 +42,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
           "<strong>16</strong> ⬅10KT ⬆15KT\n" +
           "<strong>29</strong> ⬅4KT ⬇17KT\n" +
           "<strong>34</strong> ➡10KT ⬇15KT"
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
       }
     }
 
@@ -88,7 +90,10 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
 
       Then("Error message is returned")
       eventually {
-        bot.replySent shouldEqual "Please provide a valid ICAO airport identifier"
+        bot.replySent shouldEqual "<strong>usage:</strong> /xwind &lt;station&gt;\nCalculate the crosswind for all " +
+          "runways of the airfield based upon the current METAR\n\n<strong>Example:</strong>\n/xwind LOWW ... " +
+          "Crosswind for LOWW"
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
       }
     }
 

@@ -6,6 +6,7 @@ import java.util.Date
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
 import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
+import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._
@@ -27,6 +28,7 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
   object Fixtures {
 
     val WriteResultOk = DefaultWriteResult(ok = true, 1, List(), None, None, None)
+    val WriteResultFailed = DefaultWriteResult(ok = false, 1, List(), None, None, None)
   }
 
   implicit override val patienceConfig =
@@ -74,6 +76,7 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
       Then("Help message is returned to the pilot")
       eventually {
         bot.replySent shouldEqual HELP_ADD
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
       }
     }
 
@@ -87,6 +90,41 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
       Then("A help message is returned")
       eventually {
         bot.replySent shouldEqual HELP_ADD
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
+      }
+    }
+
+    scenario("Database writing fails with exception") {
+      Given("AviatorsBotForTesting with backend throwing exception")
+      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
+        TAFResponseFixtures.ValidLOWW)
+      val bot = new AviatorsBotForTesting(weatherService)
+
+      bot.subscriptionDAO.addOrUpdate _ expects * returns Future{ throw new Exception() }
+
+      When("Trying to add a valid station")
+      bot.receiveMockMessage("/add LOWW")
+
+      Then("An error message is returned")
+      eventually {
+        bot.replySent shouldEqual "Subscriptions could not be stored. Please try again!"
+      }
+    }
+
+    scenario("Database writing fails with write result failed") {
+      Given("AviatorsBotForTesting with backend throwing exception")
+      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
+        TAFResponseFixtures.ValidLOWW)
+      val bot = new AviatorsBotForTesting(weatherService)
+
+      bot.subscriptionDAO.addOrUpdate _ expects * returns Future{ Fixtures.WriteResultFailed }
+
+      When("Trying to add a valid station")
+      bot.receiveMockMessage("/add KJFK")
+
+      Then("An error message is returned")
+      eventually {
+        bot.replySent shouldEqual "Subscriptions could not be stored. Please try again!"
       }
     }
   }
