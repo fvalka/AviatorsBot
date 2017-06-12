@@ -4,6 +4,7 @@ import java.util.Date
 
 import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.{LatestInfo, Subscription}
+import reactivemongo.api.Cursor
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, Macros}
@@ -41,7 +42,7 @@ class SubscriptionDAOProduction  extends SubscriptionDAO {
     * @param subscription Subscription DTO, combination of chatId and icao must be unique
     * @return The result of either the update or insert operation
     */
-  override def addOrUpdate(subscription: Subscription): Future[WriteResult] = {
+  override def addOrExtend(subscription: Subscription): Future[WriteResult] = {
     find(subscription.chatId, subscription.icao) flatMap {
       case Some(sub) =>
         val selector = findByChatIdAndIcaoQuery(subscription.chatId, subscription.icao)
@@ -66,12 +67,27 @@ class SubscriptionDAOProduction  extends SubscriptionDAO {
   }
 
   /**
+    * Find all subscriptions for a chatId
+    *
+    * @param chatId Id of the chat with the user
+    * @return First 100 subscriptions found for this chat id
+    */
+  override def findAllByChatId(chatId: Long): Future[List[Subscription]] = {
+    purgeOld() flatMap { _ =>
+      val query = BSONDocument("chatId" -> chatId)
+      val errorHandler = Cursor.FailOnError[List[Subscription]]()
+
+      airfieldCollection.flatMap(_.find(query).cursor[Subscription]().collect[List](100, errorHandler))
+    }
+  }
+
+  /**
     * Remove all subscriptions which are no longer active (validUntil is in the past)
     *
     * @return Write result of the remove operation
     */
   override def purgeOld(): Future[WriteResult] = {
-    val query = BSONDocument("validUntil" -> BSONDocument("$gt" -> new Date()))
+    val query = BSONDocument("validUntil" -> BSONDocument("$lt" -> new Date()))
     airfieldCollection.flatMap(_.remove(query))
   }
 

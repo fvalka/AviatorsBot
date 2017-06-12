@@ -15,7 +15,7 @@ trait SubscriptionDAO {
     * @param subscription Subscription DTO, combination of chatId and icao must be unique
     * @return The result of either the update or insert operation
     */
-  def addOrUpdate(subscription: Subscription): Future[WriteResult]
+  def addOrExtend(subscription: Subscription): Future[WriteResult]
 
   /**
     * Searches for a subcription using the chatId and ICAO identifier
@@ -25,6 +25,14 @@ trait SubscriptionDAO {
     * @return One or no subscription matching the query parameters
     */
   def find(chatId: Long, icao: String): Future[Option[Subscription]]
+
+  /**
+    * Find all subscriptions for a chatId
+    *
+    * @param chatId Id of the chat with the user
+    * @return First 100 subscriptions found for this chat id
+    */
+  def findAllByChatId(chatId: Long): Future[List[Subscription]]
 
   /**
     * Remove all subscriptions which are no longer active (validUntil is in the past)

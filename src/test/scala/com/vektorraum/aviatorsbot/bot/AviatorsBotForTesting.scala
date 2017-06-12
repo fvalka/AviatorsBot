@@ -32,6 +32,9 @@ class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends Avia
     if (replySent != "") {
       throw new IllegalArgumentException()
     }
+    if (text.length > 4096) {
+      throw new IllegalArgumentException("Text is too long and can not be sent to the real Telegram API!")
+    }
     replySent = text
     this.parseMode = parseMode
     Future {

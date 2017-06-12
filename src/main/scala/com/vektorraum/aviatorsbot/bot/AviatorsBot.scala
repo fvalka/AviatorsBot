@@ -35,8 +35,10 @@ import scala.util.{Failure, Success}
 trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected val trafficLog = Logger("traffic-log")
 
-  protected val ERROR_INVALID_ICAO_LIST = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW LOAV\""
+  protected val ERROR_INVALID_ICAO_LIST = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW " +
+    "LOAV\""
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
+  protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED = "Subscriptions could not be listed. Please try again!"
 
 
   lazy val token: String = scala.util.Properties
@@ -85,7 +87,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
             metar match {
               case Some(m) => reply(
                 s"METAR issued at: ${m.head.observation_time.get}\n" +
-                XWindCalculator(m.head, airfield), ParseMode.HTML)
+                  XWindCalculator(m.head, airfield), ParseMode.HTML)
               case None => reply("Could not retrieve weather for station")
             }
           }
@@ -108,7 +110,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
         val validHours = config.getConfig("subscriptions").getInt("validHoursDefault")
         val validUntil = ZonedDateTime.now(ZoneOffset.UTC).plusHours(validHours)
         val insertFutures: Seq[Future[WriteResult]] = stations map { station =>
-          subscriptionDAO.addOrUpdate(Subscription(msg.chat.id, station, Date.from(validUntil.toInstant)))
+          subscriptionDAO.addOrExtend(Subscription(msg.chat.id, station, Date.from(validUntil.toInstant)))
         }
 
         // double check that the insertion worked
@@ -117,7 +119,8 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
             if (writeResults.forall(_.ok)) {
               reply(s"Subscription is active until:\n${TimeFormatter.shortUTCDateTimeFormat(validUntil)}")
             } else {
-              logger.warn(s"Write failed for some stations (writeResult.ok==false) msg=$msg args=$args writeResults=$writeResults")
+              logger.warn(s"Write failed for some stations (writeResult.ok==false) msg=$msg args=$args " +
+                s"writeResults=$writeResults")
               reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED)
             }
           case Failure(t) =>
@@ -127,9 +130,34 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
       }
   }
 
+  on("/ls", "List all subscriptions") { implicit msg =>
+    args =>
+      subscriptionDAO.findAllByChatId(msg.chat.id) onComplete {
+        case Success(subscriptions) =>
+          val subsFormatted = (subscriptions map { sub =>
+            val icao = sub.icao.toUpperCase
+            val validUntil = TimeFormatter.shortUTCDateTimeFormat(
+              ZonedDateTime.ofInstant(sub.validUntil.toInstant, ZoneOffset.UTC))
+
+            s"<strong>$icao</strong> - $validUntil"
+          }) mkString "\n"
+
+          val result = if (!subsFormatted.isEmpty) {
+            "<strong>ICAO  - valid until</strong>\n" + subsFormatted
+          } else {
+            "No active subscriptions"
+          }
+
+          reply(result, ParseMode.HTML)
+        case Failure(t) => logger.warn(s"Could not retrieve subscriptions for chatId=${msg.chat.id}, " +
+          s"msg=$msg args=$args", t)
+          reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED)
+      }
+  }
+
   protected def buildWxMessage(stations: List[String],
-                     metars: Map[String, Seq[METAR]],
-                     tafs: Map[String, Seq[TAF]]): String = {
+                               metars: Map[String, Seq[METAR]],
+                               tafs: Map[String, Seq[TAF]]): String = {
     val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isICAOAptIdentifier): _*)
     val stationSet = inputStationsSet ++ metars.keySet
 

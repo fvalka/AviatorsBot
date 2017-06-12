@@ -52,7 +52,7 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
         TAFResponseFixtures.ValidLOWW)
       val bot = new AviatorsBotForTesting(weatherService)
 
-      bot.subscriptionDAO.addOrUpdate _ expects where {
+      bot.subscriptionDAO.addOrExtend _ expects where {
         (subscription: Subscription) => subscription.icao == "LOWW" && subscription.metar && subscription.taf &&
           subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty// && checkDate(subscription.validUntil)
       } returns Future { Fixtures.WriteResultOk }
@@ -100,7 +100,7 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
         TAFResponseFixtures.ValidLOWW)
       val bot = new AviatorsBotForTesting(weatherService)
 
-      bot.subscriptionDAO.addOrUpdate _ expects * returns Future{ throw new Exception() }
+      bot.subscriptionDAO.addOrExtend _ expects * returns Future{ throw new Exception() }
 
       When("Trying to add a valid station")
       bot.receiveMockMessage("/add LOWW")
@@ -117,7 +117,7 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
         TAFResponseFixtures.ValidLOWW)
       val bot = new AviatorsBotForTesting(weatherService)
 
-      bot.subscriptionDAO.addOrUpdate _ expects * returns Future{ Fixtures.WriteResultFailed }
+      bot.subscriptionDAO.addOrExtend _ expects * returns Future{ Fixtures.WriteResultFailed }
 
       When("Trying to add a valid station")
       bot.receiveMockMessage("/add KJFK")
@@ -134,7 +134,7 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
       TAFResponseFixtures.ValidLOWW)
     val bot = new AviatorsBotForTesting(weatherService)
 
-    (bot.subscriptionDAO.addOrUpdate _ expects * returns Future {
+    (bot.subscriptionDAO.addOrExtend _ expects * returns Future {
       Fixtures.WriteResultOk
     }).never()
 
