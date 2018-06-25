@@ -9,7 +9,7 @@ import scala.xml.Elem
   */
 class AddsWeatherServiceProduction extends AddsWeatherService {
   /**
-    * Calls the live adds server for retrieving metars
+    * Calls the live adds server for retrieving METARs
     *
     * @param stations List of station ICAO ids
     * @param maxAge Maximum age of the retrieved weather info in hours
@@ -27,7 +27,7 @@ class AddsWeatherServiceProduction extends AddsWeatherService {
   }
 
   /**
-    * Calls the live adds server for retrieving metars
+    * Calls the live adds server for retrieving TAFs
     *
     * @param stations List of station ICAO ids
     * @param maxAge Maximum age of the retrieved weather info in hours
