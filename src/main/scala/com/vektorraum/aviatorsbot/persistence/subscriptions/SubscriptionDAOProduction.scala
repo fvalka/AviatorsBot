@@ -8,6 +8,7 @@ import reactivemongo.api.Cursor
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, Macros}
+import com.softwaremill.macwire._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -25,7 +26,8 @@ import scala.concurrent.Future
   * Created by fvalka on 27.05.2017.
   */
 class SubscriptionDAOProduction  extends SubscriptionDAO {
-  def airfieldCollection: Future[BSONCollection] = Db.aviatorsDb.map(_.collection("subscriptions"))
+  protected lazy val db: Db = wire[Db]
+  def airfieldCollection: Future[BSONCollection] = db.aviatorsDb.map(_.collection("subscriptions"))
 
   // Reading
   implicit def subscriptionReader: BSONDocumentReader[Subscription] = Macros.reader[Subscription]
@@ -82,6 +84,17 @@ class SubscriptionDAOProduction  extends SubscriptionDAO {
   }
 
   /**
+    * Find all stations which have any subscriptions
+    *
+    * @return A set of all ICAO codes to which at least one user has subscribed
+    */
+  override def findAllStations(): Future[Set[String]] = {
+    purgeOld() flatMap { _ =>
+      airfieldCollection.flatMap(_.distinct[String, Set]("icao"))
+    }
+  }
+
+  /**
     * Remove all subscriptions which are no longer active (validUntil is in the past)
     *
     * @return Write result of the remove operation
@@ -91,7 +104,7 @@ class SubscriptionDAOProduction  extends SubscriptionDAO {
     airfieldCollection.flatMap(_.remove(query))
   }
 
-  protected def findByChatIdAndIcaoQuery(chatId: Long, icao: String) = {
+  protected def findByChatIdAndIcaoQuery(chatId: Long, icao: String): BSONDocument = {
     BSONDocument("chatId" -> chatId, "icao" -> icao)
   }
 

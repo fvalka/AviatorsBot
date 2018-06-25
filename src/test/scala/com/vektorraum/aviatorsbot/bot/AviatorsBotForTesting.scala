@@ -12,6 +12,13 @@ import scala.concurrent.Future
 import scala.xml.Elem
 
 /**
+  * AviatorsBot subclass used exclusively in unit tests.
+  *
+  * Injects stubs and mocks instead of actual backend services and records the
+  * response sent to the user instead of sending it over the Telegram API.
+  *
+  * The response can be retrieved from the replySent field.
+  *
   * Created by fvalka on 21.05.2017.
   */
 class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends AviatorsBot with MockFactory {

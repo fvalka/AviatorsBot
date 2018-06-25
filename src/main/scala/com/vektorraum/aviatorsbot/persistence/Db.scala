@@ -12,7 +12,7 @@ import scala.util.Try
 /**
   * Created by fvalka on 25.05.2017.
   */
-object Db {
+class Db {
   protected val dbConfig: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf")).getConfig("db")
   protected val mongoUri: String = dbConfig.getString("url")
 

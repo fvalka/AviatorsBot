@@ -35,6 +35,13 @@ trait SubscriptionDAO {
   def findAllByChatId(chatId: Long): Future[List[Subscription]]
 
   /**
+    * Find all stations which have any subscriptions
+    *
+    * @return A set of all ICAO codes to which at least one user has subscribed
+    */
+  def findAllStations(): Future[Set[String]]
+
+  /**
     * Remove all subscriptions which are no longer active (validUntil is in the past)
     *
     * @return Write result of the remove operation

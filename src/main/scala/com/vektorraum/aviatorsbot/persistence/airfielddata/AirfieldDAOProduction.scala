@@ -4,6 +4,7 @@ import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.airfielddata.model.{Airfield, Runway}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, Macros}
+import com.softwaremill.macwire._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -13,7 +14,8 @@ import scala.concurrent.Future
   * Created by fvalka on 25.05.2017.
   */
 class AirfieldDAOProduction extends AirfieldDAO {
-  def airfieldCollection: Future[BSONCollection] = Db.aviatorsDb.map(_.collection("airfields"))
+  protected lazy val db: Db = wire[Db]
+  def airfieldCollection: Future[BSONCollection] = db.aviatorsDb.map(_.collection("airfields"))
   implicit def runwayReader: BSONDocumentReader[Runway] = Macros.reader[Runway]
   implicit def airfieldsReader: BSONDocumentReader[Airfield] = Macros.reader[Airfield]
 

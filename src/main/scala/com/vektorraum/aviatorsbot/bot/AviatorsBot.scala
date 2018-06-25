@@ -40,7 +40,6 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED = "Subscriptions could not be listed. Please try again!"
 
-
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromFile("conf/bot.token").getLines().mkString)
@@ -158,6 +157,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected def buildWxMessage(stations: List[String],
                                metars: Map[String, Seq[METAR]],
                                tafs: Map[String, Seq[TAF]]): String = {
+    // Support for wild-cards in station lists
     val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isICAOAptIdentifier): _*)
     val stationSet = inputStationsSet ++ metars.keySet
 
