@@ -12,8 +12,8 @@ import scala.util.Try
 /**
   * Created by fvalka on 25.05.2017.
   */
-class Db {
-  protected val dbConfig: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf")).getConfig("db")
+class Db(config: Config) {
+  protected val dbConfig: Config = config.getConfig("db")
   protected val mongoUri: String = dbConfig.getString("url")
 
   import scala.concurrent.ExecutionContext.Implicits.global // use any appropriate context
@@ -26,6 +26,6 @@ class Db {
   // Database and collections: Get references
   val futureConnection: Future[MongoConnection] = Future.fromTry(connection)
 
-  def aviatorsDb: Future[DefaultDB] = futureConnection.flatMap(_.database("aviatorsbot"))
+  def aviatorsDb: Future[DefaultDB] = futureConnection.flatMap(_.database(dbConfig.getString("database")))
 
 }

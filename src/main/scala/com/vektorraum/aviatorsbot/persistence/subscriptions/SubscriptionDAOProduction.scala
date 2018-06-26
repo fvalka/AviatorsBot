@@ -25,8 +25,7 @@ import scala.concurrent.Future
   *
   * Created by fvalka on 27.05.2017.
   */
-class SubscriptionDAOProduction  extends SubscriptionDAO {
-  protected lazy val db: Db = wire[Db]
+class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
   def airfieldCollection: Future[BSONCollection] = db.aviatorsDb.map(_.collection("subscriptions"))
 
   // Reading

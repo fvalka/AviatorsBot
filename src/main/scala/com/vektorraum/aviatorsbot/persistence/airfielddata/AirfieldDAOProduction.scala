@@ -13,8 +13,7 @@ import scala.concurrent.Future
 /**
   * Created by fvalka on 25.05.2017.
   */
-class AirfieldDAOProduction extends AirfieldDAO {
-  protected lazy val db: Db = wire[Db]
+class AirfieldDAOProduction(db: Db) extends AirfieldDAO {
   def airfieldCollection: Future[BSONCollection] = db.aviatorsDb.map(_.collection("airfields"))
   implicit def runwayReader: BSONDocumentReader[Runway] = Macros.reader[Runway]
   implicit def airfieldsReader: BSONDocumentReader[Airfield] = Macros.reader[Airfield]
