@@ -32,9 +32,7 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
       val subscription = Subscription(chatId, icao, validUntil)
 
       When("No subscription exists for the current user and a new one is added")
-
-      Then("Test")
-
+      // TODO implement the clean up for the whole class
       cleanDb flatMap { _ =>
         dao.find(chatId, icao)
       } flatMap { result =>
@@ -43,6 +41,14 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
         dao.addOrExtend(subscription)
       } flatMap { result =>
         result.ok shouldEqual true
+
+        dao.find(chatId, icao)
+      } flatMap { result =>
+        Then("The dao should return the correct subscription when find is used")
+        result should not be empty
+        result.get.chatId shouldEqual chatId
+        result.get.icao shouldEqual icao
+        result.get.validUntil shouldEqual validUntil
       }
     }
   }
