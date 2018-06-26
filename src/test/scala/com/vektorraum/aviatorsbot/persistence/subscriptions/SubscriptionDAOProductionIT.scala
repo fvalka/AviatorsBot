@@ -25,8 +25,8 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
 
   val chatId = 1234567
   val icao = "LOWW"
-  val validUntil = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).toInstant)
-  val validUntilExpired = Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusHours(1).toInstant)
+  val validUntil: Date = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).toInstant)
+  val validUntilExpired: Date = Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusHours(1).toInstant)
   val subscription1 = Subscription(chatId, icao, validUntil)
   val subscription2 = Subscription(1233333, "KJFK", validUntil)
   val subscriptionExpired = Subscription(2222222, "KJAX", validUntilExpired)
@@ -64,12 +64,38 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
         dao.addOrExtend(subscription2)
         dao.addOrExtend(subscriptionExpired)
       } flatMap { _ =>
+        When("Finding all stations/obtaining a list of all subscribed stations")
         dao.findAllStations()
       } flatMap { stations =>
+        Then("All stations with non expired subscriptions are included")
         stations should contain (subscription1.icao)
         stations should contain (subscription2.icao)
         stations should not contain subscriptionExpired.icao
       }
+    }
+
+    scenario("AddOrExtend automatically extends the validity if a station is added again") {
+      Given("A subscription which is valid for one more hour and a copy of this subscription" +
+        "which is valid for 2 hours")
+      val validUntilLonger = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusHours(2).toInstant)
+      val subscriptionShortValidity = subscription1
+      val subscriptionValidLonger = subscriptionShortValidity.copy(validUntil = validUntilLonger)
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscriptionShortValidity)
+      } flatMap { writeResult =>
+        When("Adding a subscription for the same chatId/Icao station with different validity")
+        writeResult.ok should be (true)
+        dao.addOrExtend(subscriptionValidLonger)
+      } flatMap { writeResult =>
+        Then("Find will return the longer validity")
+        writeResult.ok should be (true)
+        dao.find(subscriptionShortValidity.chatId, subscriptionShortValidity.icao)
+      } flatMap { subscription =>
+        subscription should not be empty
+        subscription.get.validUntil shouldEqual validUntilLonger
+      }
+
     }
   }
 

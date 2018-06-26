@@ -47,17 +47,17 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     find(subscription.chatId, subscription.icao) flatMap {
       case Some(sub) =>
         val selector = findByChatIdAndIcaoQuery(subscription.chatId, subscription.icao)
-        val update = BSONDocument("$set" -> BSONDocument("validUntil" -> new Date()))
+        val update = BSONDocument("$set" -> BSONDocument("validUntil" -> subscription.validUntil))
         airfieldCollection.flatMap(_.update(selector, update))
       case None => airfieldCollection.flatMap(_.insert(subscription))
     }
   }
 
   /**
-    * Searches for a subcription using the chatId and ICAO identifier
+    * Searches for a subscription using the chatId and ICAO identifier
     *
-    * @param chatId
-    * @param icao
+    * @param chatId Id of the chat with the user
+    * @param icao ICAO Code of the station for which this subscription is
     * @return One or no subscription matching the query parameters
     */
   override def find(chatId: Long, icao: String): Future[Option[Subscription]] = {
