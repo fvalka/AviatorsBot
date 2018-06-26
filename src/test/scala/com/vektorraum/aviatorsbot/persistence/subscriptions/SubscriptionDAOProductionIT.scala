@@ -21,24 +21,28 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
 
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot-test.conf"))
   val db: Db = wire[Db]
+  val dao: SubscriptionDAOProduction = new SubscriptionDAOProduction(db)
+
+  val chatId = 1234567
+  val icao = "LOWW"
+  val validUntil = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).toInstant)
+  val validUntilExpired = Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusHours(1).toInstant)
+  val subscription1 = Subscription(chatId, icao, validUntil)
+  val subscription2 = Subscription(1233333, "KJFK", validUntil)
+  val subscriptionExpired = Subscription(2222222, "KJAX", validUntilExpired)
 
   feature("Store subscriptions in the backend database using the DAO") {
     scenario("New subscription is added to the database") {
       Given("The DAO with an empty database")
-      val dao: SubscriptionDAOProduction = new SubscriptionDAOProduction(db)
-      val chatId = 1234567
-      val icao = "LOWW"
-      val validUntil = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).toInstant)
-      val subscription = Subscription(chatId, icao, validUntil)
 
       When("No subscription exists for the current user and a new one is added")
-      // TODO implement the clean up for the whole class
+
       cleanDb flatMap { _ =>
         dao.find(chatId, icao)
       } flatMap { result =>
         result shouldEqual None
 
-        dao.addOrExtend(subscription)
+        dao.addOrExtend(subscription1)
       } flatMap { result =>
         result.ok shouldEqual true
 
@@ -49,6 +53,22 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
         result.get.chatId shouldEqual chatId
         result.get.icao shouldEqual icao
         result.get.validUntil shouldEqual validUntil
+      }
+    }
+
+    scenario("All stations ICAO codes of all stations with active subscriptions can be listed") {
+      Given("A database with stored subscriptions")
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscription1)
+        dao.addOrExtend(subscription2)
+        dao.addOrExtend(subscriptionExpired)
+      } flatMap { _ =>
+        dao.findAllStations()
+      } flatMap { stations =>
+        stations should contain (subscription1.icao)
+        stations should contain (subscription2.icao)
+        stations should not contain subscriptionExpired.icao
       }
     }
   }
