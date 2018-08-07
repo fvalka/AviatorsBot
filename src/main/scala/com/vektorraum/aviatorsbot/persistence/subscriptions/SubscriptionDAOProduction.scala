@@ -94,6 +94,19 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
   }
 
   /**
+    * Removes a subscription for a specific chatId and station from the
+    * database.
+    *
+    * @param chatId Id of the chat with the user
+    * @param station ICAO identifier of the station to be removed
+    * @return Future of the write result
+    */
+  override def remove(chatId: Long, station: String): Future[WriteResult] = {
+    val query = findByChatIdAndIcaoQuery(chatId, station)
+    airfieldCollection.flatMap(_.remove(query))
+  }
+
+  /**
     * Remove all subscriptions which are no longer active (validUntil is in the past)
     *
     * @return Write result of the remove operation

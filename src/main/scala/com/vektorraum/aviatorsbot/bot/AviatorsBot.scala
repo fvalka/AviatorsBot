@@ -4,12 +4,6 @@ import java.io.File
 import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
 
-import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
-import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
-import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.api._
-import info.mukel.telegrambot4s.methods._
-import info.mukel.telegrambot4s.models._
 import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
@@ -22,7 +16,12 @@ import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction}
+import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
+import info.mukel.telegrambot4s.Implicits._
+import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
+import info.mukel.telegrambot4s.methods._
+import info.mukel.telegrambot4s.models._
 import reactivemongo.api.commands.WriteResult
 
 import scala.collection.mutable
@@ -31,16 +30,19 @@ import scala.io.Source
 import scala.util.{Failure, Success}
 
 /**
-  * Created by fvalka on 18.05.2017.
+  * Main Bot trait which is both used for testing and production
+  *
+  * Handles all the commands received by the bot using the on..() functions
   */
 trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected val trafficLog = Logger("traffic-log")
 
-  protected val ERROR_INVALID_ICAO_LIST = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW " +
+  protected val ERROR_INVALID_ICAO_LIST: String = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW " +
     "LOAV\""
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED = "Subscriptions could not be listed. Please try again!"
 
+  // separated from the main configuration for security reasons
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromFile("conf/bot.token").getLines().mkString)
@@ -54,81 +56,76 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
 
   on("/start") { implicit msg => _ => reply(HelpMessages("welcome")) }
 
-  on("/wx", "Current weather") { implicit msg =>
-    args =>
-      if (!args.forall(StationUtil.isValidInput) || args.isEmpty) {
-        reply(HelpMessages("wx"), ParseMode.HTML)
-      } else {
-        val stations = args.toList.map(station => station.toUpperCase())
-        val message = for {
-          metars <- weatherService.getMetars(stations)
-          tafs <- weatherService.getTafs(stations)
-        } yield {
-          buildWxMessage(stations, metars, tafs)
-        }
+  onStations("/wx", "Current weather") { implicit msg =>
+    stations =>
+      val message = for {
+        metars <- weatherService.getMetars(stations.toList)
+        tafs <- weatherService.getTafs(stations.toList)
+      } yield {
+        buildWxMessage(stations.toList, metars, tafs)
+      }
 
-        message onComplete {
-          case Success(m) => reply(m, parseMode = ParseMode.HTML)
-          case Failure(t) => logger.warn(s"Exception thrown while running command=wx with args=$args", t)
-            reply("Could not retrieve weather")
-        }
+      message onComplete {
+        case Success(m) => reply(m, parseMode = ParseMode.HTML)
+        case Failure(t) => logger.warn(s"Exception thrown while running command=wx with stations=$stations", t)
+          reply("Could not retrieve weather")
       }
   }
 
-  on("/xwind", "Current crosswind") { implicit msg =>
-    args =>
-      val station = args.head.toUpperCase
-      if (args.size != 1 || !StationUtil.isICAOAptIdentifier(station)) {
-        reply(HelpMessages("xwind"), ParseMode.HTML)
-      } else {
-        airfieldDAO.findByIcao(station) map {
-          case Some(airfield) => weatherService.getMetars(List(station)) map { metars =>
-            val metar = metars.get(station)
+  onStation("/xwind", "Current crosswind") { implicit msg =>
+    stations =>
+      val station = stations.head
+      airfieldDAO.findByIcao(station) map {
+        case Some(airfield) => weatherService.getMetars(List(station)) map { metars =>
+          val metar = metars.get(station)
 
-            metar match {
-              case Some(m) => reply(
-                s"METAR issued at: ${m.head.observation_time.get}\n" +
-                  XWindCalculator(m.head, airfield), ParseMode.HTML)
-              case None => reply("Could not retrieve weather for station")
-            }
+          metar match {
+            case Some(m) => reply(
+              s"METAR issued at: ${m.head.observation_time.get}\n" +
+                XWindCalculator(m.head, airfield), ParseMode.HTML)
+            case None => reply("Could not retrieve weather for station")
           }
-          case None => reply("Airfield not found")
-        } onComplete {
-          case Success(_) => logger.info(s"XWind calculation performed successfully for station=$station")
-          case Failure(t) => reply("Could not perform crosswind calculation for this station")
-            logger.warn(s"Error during xwindCalculation for station=$station", t)
         }
-
+        case None => reply("Airfield not found")
+      } onComplete {
+        case Success(_) => logger.info(s"XWind calculation performed successfully for station=$station")
+        case Failure(t) => reply("Could not perform crosswind calculation for this station")
+          logger.warn(s"Error during xwindCalculation for station=$station", t)
       }
   }
 
-  on("/add", "Subscribe to stations") { implicit msg =>
+  onStations("/add", "Subscribe to stations") { implicit msg =>
+    stations =>
+      val validHours = config.getConfig("subscriptions").getInt("validHoursDefault")
+      val validUntil = ZonedDateTime.now(ZoneOffset.UTC).plusHours(validHours)
+      val insertFutures: Seq[Future[WriteResult]] = stations map { station =>
+        subscriptionDAO.addOrExtend(Subscription(msg.chat.id, station, Date.from(validUntil.toInstant)))
+      }
+
+      // double check that the insertion worked
+      Future.sequence(insertFutures) onComplete {
+        case Success(writeResults) =>
+          if (writeResults.forall(_.ok)) {
+            reply(s"Subscription is active until:\n${TimeFormatter.shortUTCDateTimeFormat(validUntil)}")
+          } else {
+            logger.warn(s"Write failed for some stations (writeResult.ok==false) msg=$msg stations=$stations " +
+              s"writeResults=$writeResults")
+            reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED)
+          }
+        case Failure(t) =>
+          logger.warn(s"Write failed for some stations (Future failed) msg=$msg stations=$stations", t)
+          reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED)
+      }
+  }
+
+  on("/rm", "Unsubscribe from a station") { implicit msg =>
     args =>
       if (!args.forall(StationUtil.isICAOAptIdentifier) || args.isEmpty) {
-        reply(HelpMessages("add"), ParseMode.HTML)
+        reply(HelpMessages("rm"), ParseMode.HTML)
       } else {
         val stations = args.map(_.toUpperCase)
-        val validHours = config.getConfig("subscriptions").getInt("validHoursDefault")
-        val validUntil = ZonedDateTime.now(ZoneOffset.UTC).plusHours(validHours)
-        val insertFutures: Seq[Future[WriteResult]] = stations map { station =>
-          subscriptionDAO.addOrExtend(Subscription(msg.chat.id, station, Date.from(validUntil.toInstant)))
-        }
-
-        // double check that the insertion worked
-        Future.sequence(insertFutures) onComplete {
-          case Success(writeResults) =>
-            if (writeResults.forall(_.ok)) {
-              reply(s"Subscription is active until:\n${TimeFormatter.shortUTCDateTimeFormat(validUntil)}")
-            } else {
-              logger.warn(s"Write failed for some stations (writeResult.ok==false) msg=$msg args=$args " +
-                s"writeResults=$writeResults")
-              reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED)
-            }
-          case Failure(t) =>
-            logger.warn(s"Write failed for some stations (Future failed) msg=$msg args=$args", t)
-            reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED)
-        }
       }
+
   }
 
   on("/ls", "List all subscriptions") { implicit msg =>
@@ -154,6 +151,54 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
           s"msg=$msg args=$args", t)
           reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED)
       }
+  }
+
+  /**
+    * Registers a func handling the command with only valid ICAO stations as its argument
+    *
+    * @param command Bot command e.g. "/wx", "/add", etc.
+    * @param description Description shown to the user in the help command
+    * @param func Function called with the message and stations
+    */
+  protected def onStations(command: String, description: String)
+                             (func: Message => Seq[String] => Unit): Unit =
+    onVerifyInput(args => args.forall(StationUtil.isICAOAptIdentifier) && args.nonEmpty,
+      _.map(_.toUpperCase))(command, description)(func)
+
+  /**
+    * Registers a func handling the command with only exactly 1 ICAO station as its argument
+    *
+    * @param command Bot command e.g. "/wx", "/add", etc.
+    * @param description Description shown to the user in the help command
+    * @param func Function called with the message and stations
+    */
+  protected def onStation(command: String, description: String)
+                          (func: Message => Seq[String] => Unit): Unit =
+    onVerifyInput(args => args.length == 1 && StationUtil.isICAOAptIdentifier(args.head),
+      _.map(_.toUpperCase))(command, description)(func)
+
+  /**
+    * Verifies that all the args are valid and sends the
+    * help message for this command if
+    *
+    * @param verifier Function which verifies that the args are valid
+    * @param transformer Transforms the args before they are passed to func
+    * @param command Bot command e.g. "/ls", "/rm", etc.
+    * @param description Description given in the overall help message
+    * @param func Curried function which is executed if all stations are valid
+    */
+  protected def onVerifyInput(verifier: Seq[String] => Boolean, transformer: Seq[String] => Seq[String])
+                             (command: String, description: String)
+                          (func: Message => Seq[String] => Unit): Unit = {
+    on(command, description) { implicit msg =>
+      args =>
+        if (!verifier(args)) {
+          val helpFileName = command.replace("/", "")
+          reply(HelpMessages(helpFileName), ParseMode.HTML)
+        } else {
+          func(msg)(transformer(args))
+        }
+    }
   }
 
   protected def buildWxMessage(stations: List[String],

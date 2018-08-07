@@ -44,7 +44,8 @@ part.
 
 ### Production Ready, High Code Quality
 The codebase has highly relevant unit and integration tests and a 
-high coverage written using ScalaTests FunSuite.
+high coverage written mostly using ScalaTests FunSuite which doubles
+as a specification of the bots feature set and error handling strategies.
 
 To enable seamless testing a macro based DI library is used for 
 Inversion of Control.  

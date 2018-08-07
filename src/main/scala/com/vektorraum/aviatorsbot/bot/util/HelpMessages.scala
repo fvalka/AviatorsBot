@@ -4,13 +4,15 @@ import scala.io.Source
 import scalacache._
 import caffeine._
 import memoization._
+
 import concurrent.duration._
+import scala.language.postfixOps
 
 /**
   * Created by fvalka on 07.06.2017.
   */
 object HelpMessages {
-  implicit val scalaCache = ScalaCache(CaffeineCache())
+  implicit val scalaCache: ScalaCache[NoSerialization] = ScalaCache(CaffeineCache())
 
   private val safeFileNames = "[a-zA-Z0-9]*".r
 

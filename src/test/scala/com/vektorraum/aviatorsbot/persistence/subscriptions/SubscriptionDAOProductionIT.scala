@@ -28,8 +28,8 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
   val validUntil: Date = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).toInstant)
   val validUntilExpired: Date = Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusHours(1).toInstant)
   val subscription1 = Subscription(chatId, icao, validUntil)
-  val subscription2 = Subscription(1233333, "KJFK", validUntil)
-  val subscriptionExpired = Subscription(2222222, "KJAX", validUntilExpired)
+  val subscription2 = Subscription(chatId, "KJFK", validUntil)
+  val subscriptionExpired = Subscription(chatId, "KJAX", validUntilExpired)
 
   feature("Store subscriptions in the backend database using the DAO") {
     scenario("New subscription is added to the database") {
@@ -97,8 +97,34 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
       }
 
     }
+
+    scenario("FindAllByChatId returns all stations with non expired subscriptions") {
+      Given("Two subscriptions for the same chatId")
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscription1)
+        dao.addOrExtend(subscription2)
+        dao.addOrExtend(subscriptionExpired)
+      } flatMap { _ =>
+        When("Finding all subscriptions for a specific chatId")
+        dao.findAllByChatId(subscription1.chatId)
+      } flatMap { subs =>
+        Then("The non expired subscriptions are contained in the list and the expired one is not part" +
+          "of the result")
+        subs should contain (subscription1)
+        subs should contain (subscription2)
+        subs should not contain subscriptionExpired
+      }
+    }
   }
 
+  /**
+    * Used instead of before/after methods because it is also async which
+    * is not supported by ScalaTest in the current version
+    *
+    * @return Future, which when completed means that the db is ready for
+    *         testing
+    */
   private def cleanDb = {
     db.aviatorsDb flatMap { aviatorsDb =>
       aviatorsDb.drop()

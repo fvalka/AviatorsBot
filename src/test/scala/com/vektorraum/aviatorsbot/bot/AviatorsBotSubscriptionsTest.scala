@@ -31,7 +31,7 @@ class AviatorsBotSubscriptionsTest extends FeatureSpec with GivenWhenThen with M
     val WriteResultFailed = DefaultWriteResult(ok = false, 1, List(), None, None, None)
   }
 
-  implicit override val patienceConfig =
+  implicit override val patienceConfig: PatienceConfig =
     PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(30, Millis)))
 
   val HELP_ADD: String = "<strong>usage:</strong> /add [&lt;valid-until&gt;] [metar] [taf] &lt;stations&gt;" +
