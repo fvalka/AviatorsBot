@@ -1,8 +1,8 @@
 package com.vektorraum.aviatorsbot.bot.weather
 
 import com.vektorraum.aviatorsbot.service.weather.fixtures.TAFFixtures
-import org.scalatest.{FunSuite, GivenWhenThen}
 import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 25.05.2017.

@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.util
 
-import org.scalatest.{FunSuite, GivenWhenThen}
 import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 23.05.2017.

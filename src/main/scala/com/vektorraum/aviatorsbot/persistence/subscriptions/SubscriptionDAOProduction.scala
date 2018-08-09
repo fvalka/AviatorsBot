@@ -2,12 +2,11 @@ package com.vektorraum.aviatorsbot.persistence.subscriptions
 
 import java.util.Date
 
-import com.vektorraum.aviatorsbot.persistence.{Db, subscriptions}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.{LatestInfo, Subscription}
-import reactivemongo.api.{Cursor, commands}
+import com.vektorraum.aviatorsbot.persistence.{Db, subscriptions}
 import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.api.{Cursor, commands}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, Macros}
-import com.softwaremill.macwire._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

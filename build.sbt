@@ -1,4 +1,4 @@
-import com.typesafe.sbt.SbtNativePackager.packageArchetype
+
 
 name := "aviatorsbot-scala"
 

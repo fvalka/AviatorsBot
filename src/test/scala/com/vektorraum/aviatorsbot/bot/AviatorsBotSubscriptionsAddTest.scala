@@ -5,14 +5,12 @@ import java.util.Date
 
 import com.vektorraum.aviatorsbot.persistence.WriteResultFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
-import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
 import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
-import reactivemongo.api.commands.DefaultWriteResult
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,6 +32,8 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
     "updates\n\n<strong>Examples:</strong>\n/add loww eddm ... subscribe to METARs and TAFs using the default " +
     "expiration time of 6 hours\n/add 1507 metar lowg ... subscribe only to METARs of LOWG until 1507Z\n/add 6 " +
     "kjfk ... subscribe to METARS and TAFs of KJFK for 6 hours"
+
+
   feature("Add subscriptions") {
     scenario("Pilot subscribes to a single station") {
       def checkDate(date: Date): Boolean = {

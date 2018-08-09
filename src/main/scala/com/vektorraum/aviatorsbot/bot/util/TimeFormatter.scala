@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.util
 
-import java.time.{ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
+import java.time.{ZoneOffset, ZonedDateTime}
 
 /**
   * Created by fvalka on 30.05.2017.

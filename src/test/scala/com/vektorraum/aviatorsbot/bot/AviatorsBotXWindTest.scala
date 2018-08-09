@@ -1,6 +1,5 @@
 package com.vektorraum.aviatorsbot.bot
 
-import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
 import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory

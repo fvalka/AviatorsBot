@@ -2,8 +2,6 @@ package com.vektorraum.aviatorsbot.service.weather.fixtures
 
 import com.vektorraum.aviatorsbot.generated.taf.{Response, TAF}
 
-import scala.xml.Elem
-
 /**
   * Created by fvalka on 23.05.2017.
   */

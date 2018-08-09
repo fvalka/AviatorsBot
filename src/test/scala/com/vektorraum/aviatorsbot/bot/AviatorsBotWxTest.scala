@@ -1,6 +1,5 @@
 package com.vektorraum.aviatorsbot.bot
 
-import com.vektorraum.aviatorsbot.generated.metar.{METAR, Response}
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
 import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
@@ -9,7 +8,6 @@ import org.scalatest.concurrent._
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**

@@ -1,14 +1,12 @@
 package com.vektorraum.aviatorsbot.bot
-import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
+import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
-import com.vektorraum.aviatorsbot.service.weather.fixtures.METARResponseFixtures
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.models._
 import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
-import scala.xml.Elem
 
 /**
   * AviatorsBot subclass used exclusively in unit tests.
@@ -26,6 +24,8 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
   override lazy val airfieldDAO: AirfieldDAO = stub[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
+
+  // ensures that the bot can not connect to the real Telegram API
   override lazy val token: String = "TESTONLY"
 
   override def reply(text: String,
@@ -49,6 +49,11 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
     }
   }
 
+  /**
+    * Used to simulate an incoming Telegram message
+    *
+    * @param text Simulated text sent by the user
+    */
   def receiveMockMessage(text: String): Unit = {
     val chatStub = Chat(119771589, ChatType.Private, None, Some("test_user"), Some("Test"), Some("User"), None)
     val messageStub = Message(messageId = 75,
@@ -60,5 +65,12 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
       message = Some(messageStub))
 
     onUpdate(updateStub)
+  }
+
+  /**
+    * Ensures that the bot can not be started
+    */
+  override def run(): Unit = {
+    throw new RuntimeException("The testing bot must never be started!")
   }
 }

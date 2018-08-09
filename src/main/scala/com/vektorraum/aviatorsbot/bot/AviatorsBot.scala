@@ -8,10 +8,8 @@ import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, HelpMessages, StationUtil, TimeFormatter}
-import com.vektorraum.aviatorsbot.bot.weather.{BuildWxMessage, FormatMetar, FormatTaf}
+import com.vektorraum.aviatorsbot.bot.weather.BuildWxMessage
 import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
-import com.vektorraum.aviatorsbot.generated.metar.METAR
-import com.vektorraum.aviatorsbot.generated.taf.TAF
 import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
@@ -23,7 +21,6 @@ import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
 
-import scala.collection.mutable
 import scala.concurrent.Future
 import scala.io.Source
 import scala.util.{Failure, Success}

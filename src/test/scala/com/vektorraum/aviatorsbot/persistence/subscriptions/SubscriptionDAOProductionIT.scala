@@ -6,10 +6,10 @@ import java.util.Date
 
 import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
-import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.persistence.Db
+import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import org.scalatest.Matchers._
-import org.scalatest.{AsyncFeatureSpec, GivenWhenThen, _}
+import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 
 import scala.language.postfixOps
 

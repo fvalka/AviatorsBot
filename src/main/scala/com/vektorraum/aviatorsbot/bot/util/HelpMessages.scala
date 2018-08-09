@@ -1,11 +1,11 @@
 package com.vektorraum.aviatorsbot.bot.util
 
-import scala.io.Source
 import scalacache._
-import caffeine._
-import memoization._
+import scalacache.caffeine._
+import scalacache.memoization._
 
-import concurrent.duration._
+import scala.concurrent.duration._
+import scala.io.Source
 import scala.language.postfixOps
 
 /**

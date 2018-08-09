@@ -2,8 +2,8 @@ package com.vektorraum.aviatorsbot.bot.util
 
 import java.time.{ZoneOffset, ZonedDateTime}
 
-import org.scalatest.{FunSuite, GivenWhenThen}
 import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 30.05.2017.

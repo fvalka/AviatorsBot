@@ -4,7 +4,6 @@ import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.airfielddata.model.{Airfield, Runway}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, Macros}
-import com.softwaremill.macwire._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.service.weather
 
-import scala.concurrent.{Future, blocking}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Future, blocking}
 import scala.xml.Elem
 
 /**

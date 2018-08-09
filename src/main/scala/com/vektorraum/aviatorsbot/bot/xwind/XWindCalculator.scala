@@ -1,10 +1,9 @@
 package com.vektorraum.aviatorsbot.bot.xwind
 
 import com.vektorraum.aviatorsbot.generated.metar.METAR
-import com.vektorraum.aviatorsbot.persistence.airfielddata.model.{Airfield, Runway}
+import com.vektorraum.aviatorsbot.persistence.airfielddata.model.Airfield
 
 import scala.collection.SortedSet
-import scala.util.matching.Regex
 
 /**
   * Calculates the crosswind component based upon the provided METAR

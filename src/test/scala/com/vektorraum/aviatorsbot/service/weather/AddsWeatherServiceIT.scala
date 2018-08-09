@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.service.weather
 
+import org.scalatest.Matchers._
 import org.scalatest._
-import Matchers._
 
 /**
   * Created by fvalka on 20.05.2017.

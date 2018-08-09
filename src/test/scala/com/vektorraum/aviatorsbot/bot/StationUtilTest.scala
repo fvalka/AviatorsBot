@@ -1,9 +1,9 @@
 package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.bot.util.StationUtil
+import org.scalatest.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FunSuite, GivenWhenThen}
-import org.scalatest.Matchers._
 
 /**
   * Created by fvalka on 20.05.2017.
