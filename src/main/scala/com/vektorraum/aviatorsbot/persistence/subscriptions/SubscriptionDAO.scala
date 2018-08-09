@@ -1,6 +1,5 @@
 package com.vektorraum.aviatorsbot.persistence.subscriptions
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
-import reactivemongo.api.commands.WriteResult
 
 import scala.concurrent.Future
 
@@ -20,8 +19,8 @@ trait SubscriptionDAO {
   /**
     * Searches for a subcription using the chatId and ICAO identifier
     *
-    * @param chatId
-    * @param icao
+    * @param chatId Id of the chat with the user
+    * @param icao ICAO identifier of the station
     * @return One or no subscription matching the query parameters
     */
   def find(chatId: Long, icao: String): Future[Option[Subscription]]

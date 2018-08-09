@@ -2,11 +2,10 @@ package com.vektorraum.aviatorsbot.persistence.subscriptions
 
 import java.util.Date
 
-import com.vektorraum.aviatorsbot.persistence.Db
+import com.vektorraum.aviatorsbot.persistence.{Db, subscriptions}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.{LatestInfo, Subscription}
-import reactivemongo.api.Cursor
+import reactivemongo.api.{Cursor, commands}
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, Macros}
 import com.softwaremill.macwire._
 
@@ -48,8 +47,8 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
       case Some(sub) =>
         val selector = findByChatIdAndIcaoQuery(subscription.chatId, subscription.icao)
         val update = BSONDocument("$set" -> BSONDocument("validUntil" -> subscription.validUntil))
-        airfieldCollection.flatMap(_.update(selector, update))
-      case None => airfieldCollection.flatMap(_.insert(subscription))
+        airfieldCollection.flatMap(_.update(selector, update)) map convertWriteResult
+      case None => airfieldCollection.flatMap(_.insert(subscription)) map convertWriteResult
     }
   }
 
@@ -103,7 +102,7 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     */
   override def remove(chatId: Long, station: String): Future[WriteResult] = {
     val query = findByChatIdAndIcaoQuery(chatId, station)
-    airfieldCollection.flatMap(_.remove(query))
+    airfieldCollection.flatMap(_.remove(query)) map convertWriteResult
   }
 
   /**
@@ -113,11 +112,21 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     */
   override def purgeOld(): Future[WriteResult] = {
     val query = BSONDocument("validUntil" -> BSONDocument("$lt" -> new Date()))
-    airfieldCollection.flatMap(_.remove(query))
+    airfieldCollection.flatMap(_.remove(query)) map convertWriteResult
   }
 
   protected def findByChatIdAndIcaoQuery(chatId: Long, icao: String): BSONDocument = {
     BSONDocument("chatId" -> chatId, "icao" -> icao)
+  }
+
+  /**
+    * Converts a database writeResult into an encapsulated one
+    *
+    * @param original ReactiveMongo WriteResult
+    * @return Encapsulated WriteResult
+    */
+  protected def convertWriteResult(original: commands.WriteResult): WriteResult = {
+    subscriptions.WriteResult(original.ok)
   }
 
 

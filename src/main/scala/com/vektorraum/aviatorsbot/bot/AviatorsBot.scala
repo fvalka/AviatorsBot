@@ -15,14 +15,13 @@ import com.vektorraum.aviatorsbot.generated.taf.TAF
 import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
-import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction}
+import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction, WriteResult}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
-import reactivemongo.api.commands.WriteResult
 
 import scala.collection.mutable
 import scala.concurrent.Future
