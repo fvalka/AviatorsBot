@@ -8,7 +8,7 @@ import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, HelpMessages, StationUtil, TimeFormatter}
-import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
+import com.vektorraum.aviatorsbot.bot.weather.{BuildWxMessage, FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
@@ -62,7 +62,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
         metars <- weatherService.getMetars(stations.toList)
         tafs <- weatherService.getTafs(stations.toList)
       } yield {
-        buildWxMessage(stations.toList, metars, tafs)
+        BuildWxMessage(stations.toList, metars, tafs)
       }
 
       message onComplete {
@@ -220,26 +220,6 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
           func(msg)(transformer(args))
         }
     }
-  }
-
-  protected def buildWxMessage(stations: List[String],
-                               metars: Map[String, Seq[METAR]],
-                               tafs: Map[String, Seq[TAF]]): String = {
-    // Support for wild-cards in station lists
-    val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isICAOAptIdentifier): _*)
-    val stationSet = inputStationsSet ++ metars.keySet
-
-    stationSet.map(station => {
-      val metar = metars.get(station) match {
-        case Some(mt) => FormatMetar(mt)
-        case None => s"<strong>$station</strong> No METAR received for station"
-      }
-      val taf = tafs.get(station) match {
-        case Some(tf) => FormatTaf(tf)
-        case None => s"<strong>TAF $station</strong> No TAF received for station"
-      }
-      metar + "\n" + taf
-    }) mkString "\n"
   }
 
   override def reply(text: String, parseMode: Option[ParseMode],
