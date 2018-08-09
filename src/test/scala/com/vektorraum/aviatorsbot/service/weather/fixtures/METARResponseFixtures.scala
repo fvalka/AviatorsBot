@@ -1,5 +1,7 @@
 package com.vektorraum.aviatorsbot.service.weather.fixtures
 
+import com.vektorraum.aviatorsbot.generated.metar.{METAR, Response}
+
 import scala.xml.Elem
 
 /**
@@ -7,7 +9,7 @@ import scala.xml.Elem
   */
 object METARResponseFixtures {
 
-  val ValidLOWW7Hours: Elem = <response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/metar1_2.xsd">
+  val ValidLOWW7Hours: Map[String, Seq[METAR]] = scalaxb.fromXML[Response](<response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/metar1_2.xsd">
     <request_index>141238726</request_index>
     <data_source name="metars"/>
     <request type="retrieve"/>
@@ -320,7 +322,9 @@ object METARResponseFixtures {
         <elevation_m>190.0</elevation_m>
       </METAR>
     </data>
-  </response>
+  </response>).data.datasequence1
+    .map(dataseq => dataseq.METAR)
+    .groupBy(_.station_id.getOrElse(throw new Exception("Invalid XML, station id is not set")))
 
 
   val EmptyResponseForStationWhichDoesntExist: Elem = <response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/metar1_2.xsd">
@@ -333,7 +337,7 @@ object METARResponseFixtures {
     <data num_results="0"/>
   </response>
 
-  val validLOWWandLOWG: Elem = <response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/metar1_2.xsd">
+  val validLOWWandLOWG: Map[String, Seq[METAR]] = scalaxb.fromXML[Response](<response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/metar1_2.xsd">
     <request_index>138785354</request_index>
     <data_source name="metars"/>
     <request type="retrieve"/>
@@ -957,5 +961,7 @@ object METARResponseFixtures {
         <elevation_m>347.0</elevation_m>
       </METAR>
     </data>
-  </response>
+  </response>).data.datasequence1
+    .map(dataseq => dataseq.METAR)
+    .groupBy(_.station_id.getOrElse(throw new Exception("Invalid XML, station id is not set")))
 }

@@ -136,7 +136,6 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
       case Failure(t) =>
         logger.warn(s"Removing subscriptions failed with Future failed msg=$msg stations=$stations", t)
     }
-
   }
 
   onNoArguments("/ls", "List all subscriptions") { implicit msg =>

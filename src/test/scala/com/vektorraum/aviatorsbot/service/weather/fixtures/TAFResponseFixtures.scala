@@ -1,12 +1,18 @@
 package com.vektorraum.aviatorsbot.service.weather.fixtures
 
+import com.vektorraum.aviatorsbot.generated.taf.{Response, TAF}
+
 import scala.xml.Elem
 
 /**
   * Created by fvalka on 23.05.2017.
   */
 object TAFResponseFixtures {
-  val ValidLOWW: Elem  = <response xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance" version="1.2" xsi:noNamespaceSchemaLocation="http://aviationweather.gov/adds/schema/taf1_2.xsd">
+  val ValidLOWW: Map[String, Seq[TAF]] = scalaxb.fromXML[Response](<response xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                                                                             xmlns:xsi="http://www.w3.org/2001/XML-Schema-instance"
+                                                                             version="1.2"
+                                                                             xsi:noNamespaceSchemaLocation="http://aviationweather
+                                                      .gov/adds/schema/taf1_2.xsd">
     <request_index>154745311</request_index>
     <data_source name="tafs"/>
     <request type="retrieve"/>
@@ -98,6 +104,8 @@ object TAFResponseFixtures {
         </forecast>
       </TAF>
     </data>
-  </response>
+  </response>).data.datasequence1
+    .map(dataseq => dataseq.TAF)
+    .groupBy(_.station_id.getOrElse(throw new Exception("Invalid XML, station id is not set")))
 
 }

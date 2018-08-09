@@ -3,7 +3,6 @@ import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, Airfiel
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import com.vektorraum.aviatorsbot.service.weather.fixtures.METARResponseFixtures
-import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.models._
 import org.scalamock.scalatest.MockFactory
@@ -21,10 +20,10 @@ import scala.xml.Elem
   *
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends AviatorsBot with MockFactory {
+class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
   var replySent: String = ""
   var parseMode: Option[ParseMode] = None
-  override lazy val weatherService: AddsWeatherService = weatherServiceStub
+  override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
   override lazy val airfieldDAO: AirfieldDAO = stub[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
   override lazy val token: String = "TESTONLY"
@@ -37,7 +36,7 @@ class AviatorsBotForTesting(weatherServiceStub: AddsWeatherService) extends Avia
                      replyMarkup: Option[ReplyMarkup] = None)
                     (implicit message: Message): Future[Message] = {
     if (replySent != "") {
-      throw new IllegalArgumentException()
+      throw new IllegalArgumentException("This object must not be reused")
     }
     if (text.length > 4096) {
       throw new IllegalArgumentException("Text is too long and can not be sent to the real Telegram API!")

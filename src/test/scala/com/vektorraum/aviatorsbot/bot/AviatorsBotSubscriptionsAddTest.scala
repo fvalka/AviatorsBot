@@ -6,7 +6,6 @@ import java.util.Date
 import com.vektorraum.aviatorsbot.persistence.WriteResultFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
-import com.vektorraum.aviatorsbot.service.weather.mocks.AddsWeatherServiceForTest
 import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
@@ -43,9 +42,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
       }
 
       Given("AviatorsBotForTesting with valid metar")
-      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
-        TAFResponseFixtures.ValidLOWW)
-      val bot = new AviatorsBotForTesting(weatherService)
+      val bot = new AviatorsBotForTesting()
 
       bot.subscriptionDAO.addOrExtend _ expects where {
         subscription: Subscription => subscription.icao == "LOWW" && subscription.metar && subscription.taf &&
@@ -91,9 +88,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
 
     scenario("Database writing fails with exception") {
       Given("AviatorsBotForTesting with backend throwing exception")
-      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
-        TAFResponseFixtures.ValidLOWW)
-      val bot = new AviatorsBotForTesting(weatherService)
+      val bot = new AviatorsBotForTesting()
 
       bot.subscriptionDAO.addOrExtend _ expects * returns Future{ throw new Exception() }
 
@@ -108,9 +103,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
 
     scenario("Database writing fails with write result failed") {
       Given("AviatorsBotForTesting with backend throwing exception")
-      val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
-        TAFResponseFixtures.ValidLOWW)
-      val bot = new AviatorsBotForTesting(weatherService)
+      val bot = new AviatorsBotForTesting()
 
       bot.subscriptionDAO.addOrExtend _ expects * returns Future{ WriteResultFixtures.WriteResultFailed }
 
@@ -125,11 +118,9 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
   }
 
   private def initBotForErrorCase: AviatorsBotForTesting = {
-    val weatherService = new AddsWeatherServiceForTest(METARResponseFixtures.ValidLOWW7Hours,
-      TAFResponseFixtures.ValidLOWW)
-    val bot = new AviatorsBotForTesting(weatherService)
+    val bot = new AviatorsBotForTesting()
 
-    (bot.subscriptionDAO.addOrExtend _ expects * returns Future {
+    (bot.subscriptionDAO.addOrExtend _ expects * returns Future.successful {
       WriteResultFixtures.WriteResultOk
     }).never()
 
