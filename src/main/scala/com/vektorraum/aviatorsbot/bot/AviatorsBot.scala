@@ -41,6 +41,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
     "LOAV\""
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED = "Subscriptions could not be listed. Please try again!"
+  protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_REMOVED = "Could not unsubscribe from all stations. Please try again!"
 
   // separated from the main configuration for security reasons
   lazy val token: String = scala.util.Properties
@@ -118,17 +119,28 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
       }
   }
 
-  on("/rm", "Unsubscribe from a station") { implicit msg =>
-    args =>
-      if (!args.forall(StationUtil.isICAOAptIdentifier) || args.isEmpty) {
-        reply(HelpMessages("rm"), ParseMode.HTML)
-      } else {
-        val stations = args.map(_.toUpperCase)
+  onStations("/rm", "Unsubscribe from a station") { implicit msg =>
+    stations =>
+      val removeFutures = stations map { station =>
+        subscriptionDAO.remove(msg.chat.id, station)
       }
+
+    Future.sequence(removeFutures) onComplete {
+      case Success(writeResults) =>
+        if(writeResults.forall(_.ok)) {
+          reply("Unsubscribed successfully")
+        } else {
+          logger.warn(s"Could not remove some subscriptions (writeResults.ok==false) msg=$msg " +
+            s"stations=$stations writeResults=$writeResults")
+          reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_REMOVED)
+        }
+      case Failure(t) =>
+        logger.warn(s"Removing subscriptions failed with Future failed msg=$msg stations=$stations", t)
+    }
 
   }
 
-  on("/ls", "List all subscriptions") { implicit msg =>
+  onNoArguments("/ls", "List all subscriptions") { implicit msg =>
     args =>
       subscriptionDAO.findAllByChatId(msg.chat.id) onComplete {
         case Success(subscriptions) =>
@@ -152,6 +164,17 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
           reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED)
       }
   }
+
+  /**
+    * Registers a func handling the command without arguments
+    *
+    * @param command Bot command e.g. "/wx", "/add", etc.
+    * @param description Description shown to the user in the help command
+    * @param func Function called with the message and stations
+    */
+  protected def onNoArguments(command: String, description: String)
+                          (func: Message => Seq[String] => Unit): Unit =
+    onVerifyInput(_.isEmpty, identity)(command, description)(func)
 
   /**
     * Registers a func handling the command with only valid ICAO stations as its argument

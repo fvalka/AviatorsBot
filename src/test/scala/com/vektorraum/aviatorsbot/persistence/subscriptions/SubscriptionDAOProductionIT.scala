@@ -116,6 +116,34 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
         subs should not contain subscriptionExpired
       }
     }
+
+    scenario("Remove of a subscription which doesn't exist returns the correct writeResult") {
+      Given("No subscriptions in the database")
+
+      cleanDb flatMap { _ =>
+        When("Removing a subscription which doesnt exist")
+        dao.remove(subscription1.chatId, subscription1.icao)
+      } flatMap { result =>
+        result.ok shouldBe true
+      }
+    }
+
+    scenario("Adding a subscription and then removing it actually removes it from the database") {
+      Given("A subscription stored in the database")
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscription1)
+      } flatMap { _ =>
+        When("Removing the subscription from the database")
+        dao.remove(subscription1.chatId, subscription1.icao)
+      } flatMap { writeResult =>
+        writeResult.ok shouldBe true
+        dao.find(subscription1.chatId, subscription1.icao)
+      } flatMap { result =>
+        Then("The dao should no longer find this subscription")
+        result shouldEqual None
+      }
+    }
   }
 
   /**

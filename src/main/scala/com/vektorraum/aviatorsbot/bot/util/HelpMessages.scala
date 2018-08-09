@@ -9,6 +9,8 @@ import concurrent.duration._
 import scala.language.postfixOps
 
 /**
+  * Loads help messages from local resource files
+  *
   * Created by fvalka on 07.06.2017.
   */
 object HelpMessages {
