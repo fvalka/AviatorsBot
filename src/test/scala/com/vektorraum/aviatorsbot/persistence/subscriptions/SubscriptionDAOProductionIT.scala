@@ -7,13 +7,14 @@ import java.util.Date
 import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vektorraum.aviatorsbot.persistence.Db
+import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.SubscriptionFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import org.scalatest.Matchers._
 import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 
 import scala.language.postfixOps
 
-class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
+class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen with SubscriptionFixtures {
   info("As a pilot I want to be able to subscribe to weather stations")
   info("and make sure that those subscriptions will lead to reliable")
   info("weather updates and don't want to have to take care of restarts or technical details")
@@ -22,14 +23,6 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen {
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot-test.conf"))
   val db: Db = wire[Db]
   val dao: SubscriptionDAOProduction = new SubscriptionDAOProduction(db)
-
-  val chatId = 1234567
-  val icao = "LOWW"
-  val validUntil: Date = Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusHours(1).toInstant)
-  val validUntilExpired: Date = Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusHours(1).toInstant)
-  val subscription1 = Subscription(chatId, icao, validUntil)
-  val subscription2 = Subscription(chatId, "KJFK", validUntil)
-  val subscriptionExpired = Subscription(chatId, "KJAX", validUntilExpired)
 
   feature("Store subscriptions in the backend database using the DAO") {
     scenario("New subscription is added to the database") {

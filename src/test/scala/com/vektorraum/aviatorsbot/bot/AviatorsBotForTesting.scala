@@ -28,6 +28,9 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
   // ensures that the bot can not connect to the real Telegram API
   override lazy val token: String = "TESTONLY"
 
+  // Fixed values only used for testing
+  val testChatId = 119771589
+
   override def reply(text: String,
                      parseMode: Option[ParseMode] = None,
                      disableWebPagePreview: Option[Boolean] = None,
@@ -55,9 +58,9 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
     * @param text Simulated text sent by the user
     */
   def receiveMockMessage(text: String): Unit = {
-    val chatStub = Chat(119771589, ChatType.Private, None, Some("test_user"), Some("Test"), Some("User"), None)
+    val chatStub = Chat(testChatId, ChatType.Private, None, Some("test_user"), Some("Test"), Some("User"), None)
     val messageStub = Message(messageId = 75,
-      from = Some(User(119771589, "Test")),
+      from = Some(User(testChatId, "Test")),
       date = 1495371318,
       chat = chatStub,
       text = Some(text))

@@ -41,7 +41,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
         convDate.isBefore(ZonedDateTime.now().plusHours(7)) && convDate.isAfter(ZonedDateTime.now().plusHours(5))
       }
 
-      Given("AviatorsBotForTesting with valid metar")
+      Given("AviatorsBotForTesting")
       val bot = new AviatorsBotForTesting()
 
       bot.subscriptionDAO.addOrExtend _ expects where {

@@ -154,7 +154,8 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
           }
 
           reply(result, ParseMode.HTML)
-        case Failure(t) => logger.warn(s"Could not retrieve subscriptions for chatId=${msg.chat.id}, " +
+        case Failure(t) =>
+          logger.warn(s"Could not retrieve subscriptions for chatId=${msg.chat.id}, " +
           s"msg=$msg args=$args", t)
           reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED)
       }
