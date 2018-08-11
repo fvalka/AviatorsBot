@@ -132,6 +132,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
         }
       case Failure(t) =>
         logger.warn(s"Removing subscriptions failed with Future failed msg=$msg stations=$stations", t)
+        reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_REMOVED)
     }
   }
 
