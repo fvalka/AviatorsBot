@@ -12,8 +12,8 @@ import scala.concurrent.Future
 
 class AviatorsBotSubscriptionsRmTest extends FeatureSpec
   with GivenWhenThen with MockFactory with Eventually with SubscriptionFixtures {
-  info("As a pilot I want to ")
-  info("be able to no longer receive weather updates by ")
+  info("As a pilot I want to")
+  info("be able to no longer receive weather updates by")
   info("removing my subscriptions from the bot")
 
   implicit override val patienceConfig: PatienceConfig =
