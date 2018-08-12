@@ -3,8 +3,10 @@ version: 0.2
 phases:
   install:
     commands:
+      - echo Updating package database
+      - apt-get update
       - echo Installing additional packages
-      - apt-get -y install dpkg-sig lintian fakeroot
+      - apt-get -y install dpkg-sig lintian fakeroot mongod
   build:
     commands:
       - echo Build started on `date`
