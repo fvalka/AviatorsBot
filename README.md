@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/fvalka/AviatorsBot.svg?branch=master)](https://travis-ci.org/fvalka/AviatorsBot)
+
 # AviatorsBot
 
 This Telegram bot provides a METAR and TAF aviation weather 
