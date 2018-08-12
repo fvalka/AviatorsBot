@@ -6,7 +6,7 @@ phases:
       - echo Updating package database
       - apt-get update
       - echo Installing additional packages
-      - apt-get -y install dpkg-sig lintian fakeroot mongod
+      - apt-get -y install dpkg-sig lintian fakeroot mongodb-server
   build:
     commands:
       - echo Build started on `date`
