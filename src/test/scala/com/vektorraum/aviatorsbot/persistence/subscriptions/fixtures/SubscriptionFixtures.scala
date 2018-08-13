@@ -13,5 +13,6 @@ trait SubscriptionFixtures {
   val validUntilExpired: Date = Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusHours(1).toInstant)
   val subscription1 = Subscription(chatId, icao, validUntil)
   val subscription2 = Subscription(chatId, "KJFK", validUntil)
+  val subscription3 = Subscription(445445445, icao, validUntil)
   val subscriptionExpired = Subscription(chatId, "KJAX", validUntilExpired)
 }

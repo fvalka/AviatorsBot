@@ -139,6 +139,39 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
     }
   }
 
+  feature("Listing all subscriptions for a specific station") {
+    scenario("When subscriptions are stored in the database all " +
+      "subscriptions are returned when querying for this station") {
+      Given("Subscriptions stored in the database")
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscription1)
+        dao.addOrExtend(subscription2)
+        dao.addOrExtend(subscription3)
+      } flatMap { _ =>
+        When("Finding all stations by ICAO code")
+        dao.findAllSubscriptionsForStation(subscription1.icao)
+      } flatMap { result =>
+        Then("All subscriptions with this icao id should be found")
+        result should contain (subscription1)
+        result should contain (subscription3)
+        result should not contain subscription2
+      }
+    }
+
+    scenario("No subscriptions for station") {
+      Given("Empty database")
+
+      cleanDb flatMap { _ =>
+        When("Finding all stations by ICAO code")
+        dao.findAllSubscriptionsForStation(subscription1.icao)
+      } flatMap { result =>
+        Then("The list should be empty")
+        result.isEmpty shouldEqual true
+      }
+    }
+  }
+
   /**
     * Used instead of before/after methods because it is also async which
     * is not supported by ScalaTest in the current version

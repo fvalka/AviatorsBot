@@ -7,6 +7,7 @@ import java.util.Date
 import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
+import com.vektorraum.aviatorsbot.bot.subscriptions.SubscriptionHandler
 import com.vektorraum.aviatorsbot.bot.util.{AliasCommands, HelpMessages, StationUtil, TimeFormatter}
 import com.vektorraum.aviatorsbot.bot.weather.BuildWxMessage
 import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
@@ -50,6 +51,11 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
+
+  // Needed so that macwire can find the send function which has to be passed into the constructor
+  // of SubscriptionHandler
+  protected lazy val sendFunc: (Long, String) => Future[Message] = send
+  protected lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
 
   on("/start") { implicit msg => _ => reply(HelpMessages("welcome")) }
 
@@ -227,9 +233,22 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
                      replyToMessageId: Option[Long],
                      replyMarkup: Option[ReplyMarkup])
                     (implicit message: Message): Future[Message] = {
-    trafficLog.info(s"Outbound messageId=${message.messageId} - chatId=${message.chat.id} - " +
+    trafficLog.info(s"Outbound reply messageId=${message.messageId} - chatId=${message.chat.id} - " +
       s"chatUserName=${message.chat.username} - inboundMessage=${message.text} - text=$text")
     super.reply(text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup)
+  }
+
+
+  def send(chatId: Long, text: String): Future[Message] = {
+    logger.debug(s"Sending message from AviatorsBot to chatId=$chatId with text=$text")
+    trafficLog.info(s"Outbound send - chatId=$chatId - text=$text")
+    request(
+      SendMessage(
+        chatId,
+        text,
+        ParseMode.HTML
+      )
+    )
   }
 
 

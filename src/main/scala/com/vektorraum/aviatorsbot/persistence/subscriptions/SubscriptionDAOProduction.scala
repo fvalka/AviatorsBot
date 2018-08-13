@@ -69,14 +69,29 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     * Find all subscriptions for a chatId
     *
     * @param chatId Id of the chat with the user
-    * @return First 100 subscriptions found for this chat id
+    * @return All subscriptions found for this chat id
     */
   override def findAllByChatId(chatId: Long): Future[List[Subscription]] = {
     purgeOld() flatMap { _ =>
       val query = BSONDocument("chatId" -> chatId)
       val errorHandler = Cursor.FailOnError[List[Subscription]]()
 
-      airfieldCollection.flatMap(_.find(query).cursor[Subscription]().collect[List](100, errorHandler))
+      airfieldCollection.flatMap(_.find(query).cursor[Subscription]().collect[List](-1, errorHandler))
+    }
+  }
+
+  /**
+    * Finds all subscriptions for a specific stations ICAO code
+    *
+    * @param icao ICAO code of the station for which all subscribers should be found
+    * @return List of subscriptions for this station
+    */
+  override def findAllSubscriptionsForStation(icao: String): Future[List[Subscription]] = {
+    purgeOld() flatMap { _ =>
+      val query = BSONDocument("icao" -> icao)
+      val errorHandler = Cursor.FailOnError[List[Subscription]]()
+
+      airfieldCollection.flatMap(_.find(query).cursor[Subscription]().collect[List](-1, errorHandler))
     }
   }
 

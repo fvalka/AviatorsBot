@@ -15,7 +15,7 @@ class AddsWeatherServiceProduction extends AddsWeatherService {
     * @param maxAge Maximum age of the retrieved weather info in hours
     * @return Future of the XML Response Elem
     */
-  override protected def callAddsServerMetar(stations: List[String], maxAge: Int): Future[Elem] = {
+  override protected def callAddsServerMetar(stations: Iterable[String], maxAge: Int): Future[Elem] = {
     Future {
       blocking {
         xml.XML.load("https://aviationweather.gov/adds/dataserver_current/httpparam?" +
@@ -33,7 +33,7 @@ class AddsWeatherServiceProduction extends AddsWeatherService {
     * @param maxAge Maximum age of the retrieved weather info in hours
     * @return Future of the XML Response Elem
     */
-  override protected def callAddsServerTaf(stations: List[String], maxAge: Int): Future[Elem] = {
+  override protected def callAddsServerTaf(stations: Iterable[String], maxAge: Int): Future[Elem] = {
     Future {
       blocking {
         xml.XML.load(

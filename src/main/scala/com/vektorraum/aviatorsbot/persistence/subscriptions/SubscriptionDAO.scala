@@ -34,6 +34,14 @@ trait SubscriptionDAO {
   def findAllByChatId(chatId: Long): Future[List[Subscription]]
 
   /**
+    * Finds all subscriptions for a specific stations ICAO code
+    *
+    * @param icao ICAO code of the station for which all subscribers should be found
+    * @return List of subscriptions for this station
+    */
+  def findAllSubscriptionsForStation(icao: String): Future[List[Subscription]]
+
+  /**
     * Find all stations which have any subscriptions
     *
     * @return A set of all ICAO codes to which at least one user has subscribed
