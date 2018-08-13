@@ -28,11 +28,11 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
-        stations: List[String] => stations.head == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { METARResponseFixtures.ValidLOWW7Hours }
 
       bot.weatherService.getTafs _ expects where {
-        stations: List[String] => stations.head == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { TAFResponseFixtures.ValidLOWW }
 
       bot.airfieldDAO.findByIcao _ when "LOWW" returns Future {Some(AirfieldFixtures.LOWW)}
@@ -56,11 +56,11 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
-        stations: List[String] => stations.head == "LNPP" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LNPP"
       } returns Future.successful { Map()}
 
       bot.weatherService.getTafs _ expects where {
-        stations: List[String] => stations.head == "LNPP" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LNPP"
       } returns Future.successful { Map()}
 
       bot.airfieldDAO.findByIcao _ when "LNPP" returns Future.successful {None}
@@ -79,11 +79,11 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
-        stations: List[String] => stations.head == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { Map() }
 
       bot.weatherService.getTafs _ expects where {
-        stations: List[String] => stations.head == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { Map() }
 
       bot.airfieldDAO.findByIcao _ when "LOWW" returns Future.successful {Some(AirfieldFixtures.LOWW)}

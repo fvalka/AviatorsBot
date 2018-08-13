@@ -28,11 +28,11 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
-        stations: List[String] => stations.head.toUpperCase == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head.toUpperCase == "LOWW"
       } returns Future.successful { METARResponseFixtures.ValidLOWW7Hours }
 
       bot.weatherService.getTafs _ expects where {
-        stations: List[String] => stations.head.toUpperCase == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head.toUpperCase == "LOWW"
       } returns Future.successful { TAFResponseFixtures.ValidLOWW }
 
       When("Requesting weather for a valid station")
@@ -54,11 +54,11 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
-        stations: List[String] => stations.head == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { METARResponseFixtures.ValidLOWW7Hours }
 
       bot.weatherService.getTafs _ expects where {
-        stations: List[String] => stations.head == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { TAFResponseFixtures.ValidLOWW }
 
 
@@ -77,11 +77,11 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
-        stations: List[String] => stations.head.toUpperCase == "LOWP" && stations.length == 1
+        stations: Iterable[String] => stations.head.toUpperCase == "LOWP"
       } returns Future.successful { Map()}
 
       bot.weatherService.getTafs _ expects where {
-        stations: List[String] => stations.head.toUpperCase == "LOWP" && stations.length == 1
+        stations: Iterable[String] => stations.head.toUpperCase == "LOWP"
       } returns Future.successful { Map()}
 
 
@@ -116,11 +116,11 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
-        stations: List[String] => stations.head.toUpperCase == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head.toUpperCase == "LOWW"
       } returns Future.failed(new RuntimeException())
 
       bot.weatherService.getTafs _ expects where {
-        stations: List[String] => stations.head.toUpperCase == "LOWW" && stations.length == 1
+        stations: Iterable[String] => stations.head.toUpperCase == "LOWW"
       } returns Future.successful { TAFResponseFixtures.ValidLOWW }
 
       When("Pilot requests the weather")
