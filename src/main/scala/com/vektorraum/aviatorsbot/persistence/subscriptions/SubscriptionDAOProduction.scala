@@ -45,7 +45,11 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     find(subscription.chatId, subscription.icao) flatMap {
       case Some(sub) =>
         val selector = findByChatIdAndIcaoQuery(subscription.chatId, subscription.icao)
-        val update = BSONDocument("$set" -> BSONDocument("validUntil" -> subscription.validUntil))
+        val update = BSONDocument("$set" ->
+          BSONDocument("validUntil" -> subscription.validUntil,
+            "latestMetar" -> subscription.latestMetar,
+            "latestTaf" -> subscription.latestTaf)
+        )
         airfieldCollection.flatMap(_.update(selector, update)) map convertWriteResult
       case None => airfieldCollection.flatMap(_.insert(subscription)) map convertWriteResult
     }

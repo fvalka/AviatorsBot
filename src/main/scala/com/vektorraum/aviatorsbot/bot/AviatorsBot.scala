@@ -188,7 +188,7 @@ trait AviatorsBot extends TelegramBot with Polling with AliasCommands {
     */
   protected def onStations(command: String, description: String)
                              (func: Message => Seq[String] => Unit): Unit =
-    onVerifyInput(args => args.forall(StationUtil.isICAOAptIdentifier) && args.nonEmpty,
+    onVerifyInput(args => args.forall(StationUtil.isValidInput) && args.nonEmpty,
       _.map(_.toUpperCase))(command, description)(func)
 
   /**
