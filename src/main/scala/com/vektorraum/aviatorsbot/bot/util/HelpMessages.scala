@@ -1,5 +1,6 @@
 package com.vektorraum.aviatorsbot.bot.util
 
+import com.typesafe.scalalogging.Logger
 import scalacache._
 import scalacache.caffeine._
 import scalacache.memoization._
@@ -18,6 +19,8 @@ object HelpMessages {
 
   private val safeFileNames = "[a-zA-Z0-9]*".r
 
+  val logger = Logger(getClass)
+
 
   /**
     * Retrieve a help message based upon the command name.
@@ -27,6 +30,7 @@ object HelpMessages {
     * @return The stored static HTML file
     */
   def apply(command: String): String = memoizeSync(1 hour) {
+    logger.debug(s"Loading help file for command=$command")
     if(!safeFileNames.pattern.matcher(command).matches) {
       throw new IllegalArgumentException("Could not load help, unsafe filename")
     }
@@ -34,7 +38,14 @@ object HelpMessages {
   }
 
   private def load(resource: String): String = {
-    Source.fromResource(resource).getLines().mkString("\n")
+    val file = Source.fromResource(resource)
+
+    if(file.isEmpty) {
+      logger.error("Help file not found or empty")
+      "Error while loading help file"
+    } else {
+      file.getLines().mkString("\n")
+    }
   }
 
 }

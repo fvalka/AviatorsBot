@@ -14,8 +14,8 @@ USE PURELY AT YOUR OWN RISK!
 ___
 
 ## Using the Bot
-AviatorsBot is currently under development but will be available in Telegram 
-under the name: `@AviatorsBot`
+AviatorsBot is currently under development but will be available on Telegram 
+under the name: [`@AviatorsBot`](https://t.me/AviatorsBot)
 
 ## Features
 ### METAR and TAF Subscriptions
@@ -54,3 +54,14 @@ Inversion of Control.
 
 Extensive logging and configurability add to the production readiness 
 of the bot. 
+
+### METAR and TAF Change Detection ###
+METARs and TAFs are considered changed if the MurmurHash3 of the raw text 
+changes or for METARs the observation time and for TAFs the issue time. 
+
+This means that the user will get an update if either the issuance time
+changes or the content. 
+
+MurmurHash3 is used because a cryptographic hash function is not necessary
+for this application. It generates only a 32bit hash which requires for less
+storage space is fast and available in the scala standard libraries. 
