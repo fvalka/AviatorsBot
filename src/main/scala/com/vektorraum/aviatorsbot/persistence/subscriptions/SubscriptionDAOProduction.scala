@@ -5,7 +5,7 @@ import java.util.Date
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.{LatestInfo, Subscription}
 import com.vektorraum.aviatorsbot.persistence.{Db, subscriptions}
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.{Cursor, commands}
+import reactivemongo.api.{Cursor, ReadConcern, commands}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, Macros}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -111,6 +111,17 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
   }
 
   /**
+    * Counts all subscriptions in the database
+    *
+    * @return Count of all current subscriptions
+    */
+  override def count(): Future[Long] = {
+    purgeOld() flatMap { _ =>
+      airfieldCollection.flatMap(_.count(None, None, 0, None, ReadConcern.Local))
+    }
+  }
+
+  /**
     * Removes a subscription for a specific chatId and station from the
     * database.
     *
@@ -133,6 +144,13 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     airfieldCollection.flatMap(_.remove(query)) map convertWriteResult
   }
 
+  /**
+    * Creates a BSON query for searching by chatId and ICAO code
+    *
+    * @param chatId Chat Id by which to search
+    * @param icao ICAO code of the station to be queried for
+    * @return BSON query for execution on mongodb
+    */
   protected def findByChatIdAndIcaoQuery(chatId: Long, icao: String): BSONDocument = {
     BSONDocument("chatId" -> chatId, "icao" -> icao)
   }

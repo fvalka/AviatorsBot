@@ -15,6 +15,12 @@ object AviatorsBotProduction extends AviatorsBot {
       5 minutes) {
       this.subscriptionHandler.run()
     }
+
+    import com.codahale.metrics.ConsoleReporter
+    import java.util.concurrent.TimeUnit
+    val reporter = ConsoleReporter.forRegistry(this.metricRegistry).convertRatesTo(TimeUnit.SECONDS)
+      .convertDurationsTo(TimeUnit.MILLISECONDS).build
+    reporter.start(30, TimeUnit.SECONDS)
   }
 
 }

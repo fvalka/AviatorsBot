@@ -9,16 +9,29 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import info.mukel.telegrambot4s.models.Message
+import nl.grons.metrics4.scala.DefaultInstrumented
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
+/**
+  * Handles the sending of weather updates to subscribers.
+  *
+  * @param subscriptionDAO Persistence backend
+  * @param weatherService Weather service providing METARs and TAFs
+  * @param send Updates will be sent using this function
+  */
 class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: AddsWeatherService,
-                          send: (Long, String) => Future[Message]) {
-  val logger = Logger(getClass)
+                          send: (Long, String) => Future[Message]) extends DefaultInstrumented {
+  private val logger = Logger(getClass)
 
-  def run(): Unit = {
+  private val timerAllSubscriptions = metrics.timer("all-subscriptions")
+  private val messagesSent = metrics.meter("messages-sent")
+  private val messageFailures = metrics.meter("messages-sent-failed")
+  private val messagesInTransit = metrics.counter("messages-in-transit")
+
+  def run(): Unit = timerAllSubscriptions.time {
     logger.info("Handling subscriptions")
     subscriptionDAO.findAllStations() onComplete {
       case Success(stations) =>
@@ -70,16 +83,21 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
 
       if(metarToSend.nonEmpty || tafToSend.nonEmpty) {
         logger.debug(s"Sending weather update for sub=$sub")
+        messagesSent.mark()
+        messagesInTransit += 1
         send(sub.chatId, buildWxMessage(metarToSend, tafToSend)) onComplete {
           case Success(msg) =>
             logger.debug(s"Subscription update message successfully sent and udating database for sub=$sub")
+            messagesInTransit -= 1
+
             if(latestMetar.nonEmpty) { sub.latestMetar = latestMetar }
             if(latestTaf.nonEmpty) { sub.latestTaf = latestTaf }
 
             subscriptionDAO.addOrExtend(sub)
-
-          case Failure(e) => logger.warn("Subscription update message could not be " +
-          s"sent for subscription=$sub")
+          case Failure(e) =>
+            logger.warn(s"Subscription update message could not be sent for subscription=$sub")
+            messagesInTransit -= 1
+            messageFailures.mark()
         }
       } else {
         logger.debug(s"No updates to send for sub=$sub since both metarToSend and tafToSend were empty")

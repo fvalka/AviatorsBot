@@ -4,6 +4,7 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.models._
+import nl.grons.metrics4.scala.FreshRegistries
 import org.scalamock.scalatest.MockFactory
 
 import scala.concurrent.Future
@@ -18,7 +19,7 @@ import scala.concurrent.Future
   *
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
+class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshRegistries {
   var replySent: String = ""
   var parseMode: Option[ParseMode] = None
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
@@ -35,7 +36,7 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
                      parseMode: Option[ParseMode] = None,
                      disableWebPagePreview: Option[Boolean] = None,
                      disableNotification: Option[Boolean] = None,
-                     replyToMessageId: Option[Long] = None,
+                     replyToMessageId: Option[Int] = None,
                      replyMarkup: Option[ReplyMarkup] = None)
                     (implicit message: Message): Future[Message] = {
     if (replySent != "") {
@@ -48,7 +49,7 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
     this.parseMode = parseMode
     Future {
       val chat = Chat(123L, ChatType.Private)
-      Message(messageId = 123L, chat = chat, date = 1234444)
+      Message(messageId = 123, chat = chat, date = 1234444)
     }
   }
 
@@ -60,14 +61,14 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory {
   def receiveMockMessage(text: String): Unit = {
     val chatStub = Chat(testChatId, ChatType.Private, None, Some("test_user"), Some("Test"), Some("User"), None)
     val messageStub = Message(messageId = 75,
-      from = Some(User(testChatId, "Test")),
+      from = Some(User(testChatId, isBot = false, "Test")),
       date = 1495371318,
       chat = chatStub,
       text = Some(text))
     val updateStub = Update(updateId = 329618378,
       message = Some(messageStub))
 
-    onUpdate(updateStub)
+    receiveUpdate(updateStub)
   }
 
   /**

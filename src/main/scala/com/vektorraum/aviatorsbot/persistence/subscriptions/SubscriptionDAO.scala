@@ -49,6 +49,13 @@ trait SubscriptionDAO {
   def findAllStations(): Future[Set[String]]
 
   /**
+    * Counts all subscriptions in the database
+    *
+    * @return Count of all current subscriptions
+    */
+  def count(): Future[Long]
+
+  /**
     * Removes a subscription for a specific chatId and station from the
     * database.
     *
