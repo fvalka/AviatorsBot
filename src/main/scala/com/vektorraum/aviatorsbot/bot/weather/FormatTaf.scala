@@ -15,9 +15,11 @@ object FormatTaf extends ((Seq[TAF], Option[TAF], Boolean) => String) {
       throw new NotImplementedError()
     }
 
-    val raw_without_station = history.head.raw_text.get.trim.substring(9).trim
+    val raw = history.head.raw_text.get.trim
     val station_name = history.head.station_id.get
-    s"<strong>TAF $station_name</strong> $raw_without_station"
+
+    val stationEndPos = raw.indexOf(station_name) + 4
+    "<strong>"+ raw.slice(0, stationEndPos) + "</strong>" + raw.slice(stationEndPos, raw.length)
   }
 
 }
