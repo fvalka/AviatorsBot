@@ -137,6 +137,22 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
         result shouldEqual None
       }
     }
+
+    scenario("Count returns correct number of subscriptions") {
+      Given("A database with stored subscriptions")
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscription1)
+        dao.addOrExtend(subscription2)
+        dao.addOrExtend(subscriptionExpired)
+      } flatMap { _ =>
+        When("Counting all subscriptions in the database")
+        dao.count()
+      } flatMap { num =>
+        Then("Count should only include active subscriptions")
+        num shouldEqual 2
+      }
+    }
   }
 
   feature("Listing all subscriptions for a specific station") {
