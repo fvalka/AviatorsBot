@@ -38,13 +38,12 @@ object HelpMessages {
   }
 
   private def load(resource: String): String = {
-    val file = Source.fromResource(resource)
-
-    if(file.isEmpty) {
-      logger.error("Help file not found or empty")
-      "Error while loading help file"
-    } else {
+    try {
+      val file = Source.fromResource(resource)
       file.getLines().mkString("\n")
+    } catch {
+      case npe: NullPointerException => logger.error("Help file not found or empty", npe)
+        "Error while loading help file"
     }
   }
 
