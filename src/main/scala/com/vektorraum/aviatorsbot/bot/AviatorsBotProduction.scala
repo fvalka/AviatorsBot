@@ -11,8 +11,8 @@ object AviatorsBotProduction extends AviatorsBot {
     this.run()
 
     system.scheduler.schedule(
-      0 minutes,
-      5 minutes) {
+      Duration(config.getString("subscriptions.handler.initial_delay")).asInstanceOf[FiniteDuration],
+      Duration(config.getString("subscriptions.handler.interval")).asInstanceOf[FiniteDuration]) {
       this.subscriptionHandler.run()
     }
 
@@ -20,7 +20,7 @@ object AviatorsBotProduction extends AviatorsBot {
     import java.util.concurrent.TimeUnit
     val reporter = ConsoleReporter.forRegistry(this.metricRegistry).convertRatesTo(TimeUnit.SECONDS)
       .convertDurationsTo(TimeUnit.MILLISECONDS).build
-    reporter.start(30, TimeUnit.SECONDS)
+    reporter.start(3, TimeUnit.MINUTES)
   }
 
 }

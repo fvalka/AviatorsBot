@@ -39,6 +39,14 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshReg
                      replyToMessageId: Option[Int] = None,
                      replyMarkup: Option[ReplyMarkup] = None)
                     (implicit message: Message): Future[Message] = {
+    recordSentMessage(text, parseMode)
+  }
+
+  override def send(chatId: Long, text: String): Future[Message] = {
+    recordSentMessage(text, parseMode)
+  }
+
+  private def recordSentMessage(text: String, parseMode: Option[ParseMode]) = {
     if (replySent != "") {
       throw new IllegalArgumentException("This object must not be reused")
     }
@@ -69,6 +77,10 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshReg
       message = Some(messageStub))
 
     receiveUpdate(updateStub)
+  }
+
+  def runSubscriptionHandler(): Unit = {
+    this.subscriptionHandler.run()
   }
 
   /**

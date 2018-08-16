@@ -1,18 +1,22 @@
 package com.vektorraum.aviatorsbot.bot.subscriptions
 
+import java.io.File
+
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.LatestInfoConverter
 import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
-import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
+import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, WriteResult}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import info.mukel.telegrambot4s.models.Message
 import nl.grons.metrics4.scala.DefaultInstrumented
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 /**
@@ -24,39 +28,51 @@ import scala.util.{Failure, Success}
   */
 class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: AddsWeatherService,
                           send: (Long, String) => Future[Message]) extends DefaultInstrumented {
+  // LOGGING
   private val logger = Logger(getClass)
 
+  // METRICS
   private val timerAllSubscriptions = metrics.timer("all-subscriptions")
   private val messagesSent = metrics.meter("messages-sent")
   private val messageFailures = metrics.meter("messages-sent-failed")
   private val messagesInTransit = metrics.counter("messages-in-transit")
 
+  // CONFIGURATION
+  protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
+
   def run(): Unit = timerAllSubscriptions.time {
     logger.info("Handling subscriptions")
-    subscriptionDAO.findAllStations() onComplete {
+    val result = subscriptionDAO.findAllStations() transformWith {
       case Success(stations) =>
         if(stations.nonEmpty) {
-          getWeatherUpdates(stations) onComplete {
+          getWeatherUpdates(stations) transformWith {
             case Success((metars, tafs)) =>
               val allStationNames = metars.keySet ++ tafs.keySet
 
-              allStationNames foreach { station =>
+              val allMsgResults = allStationNames map { station =>
                 val subscriptionsFuture = subscriptionDAO.findAllSubscriptionsForStation(station)
 
-                subscriptionsFuture map { subscriptions =>
+                subscriptionsFuture flatMap { subscriptions =>
                   sendUpdatesForStation(metars, tafs, subscriptions)
                 }
               }
+              Future.sequence(allMsgResults)
             case Failure(t) =>
               logger.warn("Retrieving the weather updates for handling the subscriptions failed", t)
+              Future.failed(t)
           }
         } else {
           logger.info("No current subscriptions found in database, skipping the handling of subscriptions")
+          Future.successful()
         }
       case Failure(t) =>
         logger.warn("Could not get the list of stations from the database " +
           "while trying to handle the subscriptions", t)
+        Future.failed(t)
     }
+
+    // Block so that the poller isn't started twice while futures are still being executed
+    Await.ready(result, Duration(config.getString("subscriptions.handler.run_timeout")))
   }
 
   private def getWeatherUpdates(stations: Set[String]): Future[(Map[String, Seq[METAR]], Map[String, Seq[TAF]])] = {
@@ -69,8 +85,8 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
   }
 
   private def sendUpdatesForStation(metars: Map[String, Seq[METAR]], tafs: Map[String, Seq[TAF]],
-  subscriptions: List[Subscription]): Unit = {
-    subscriptions foreach { sub =>
+  subscriptions: List[Subscription]): Future[Seq[Any]] = {
+    val result: Seq[Future[Any]] = subscriptions map { sub =>
       val metar = metars.get(sub.icao)
       val taf = tafs.get(sub.icao)
 
@@ -85,7 +101,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
         logger.debug(s"Sending weather update for sub=$sub")
         messagesSent.mark()
         messagesInTransit += 1
-        send(sub.chatId, buildWxMessage(metarToSend, tafToSend)) onComplete {
+        send(sub.chatId, buildWxMessage(metarToSend, tafToSend)) transformWith {
           case Success(msg) =>
             logger.debug(s"Subscription update message successfully sent and udating database for sub=$sub")
             messagesInTransit -= 1
@@ -98,11 +114,15 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
             logger.warn(s"Subscription update message could not be sent for subscription=$sub")
             messagesInTransit -= 1
             messageFailures.mark()
+            Future.failed(e)
         }
       } else {
         logger.debug(s"No updates to send for sub=$sub since both metarToSend and tafToSend were empty")
+        Future.successful()
       }
     }
+
+    Future.sequence(result)
   }
 
   private def buildWxMessage(metar: Option[Seq[METAR]], taf: Option[Seq[TAF]]) = {
