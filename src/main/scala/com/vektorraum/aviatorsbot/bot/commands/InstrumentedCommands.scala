@@ -3,13 +3,14 @@ package com.vektorraum.aviatorsbot.bot.commands
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.HelpMessages
 import info.mukel.telegrambot4s.api.declarative.Messages
-import info.mukel.telegrambot4s.methods.{ParseMode, SendMessage}
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
+import info.mukel.telegrambot4s.methods.{ParseMode, SendMessage}
 import info.mukel.telegrambot4s.models.{Message, ReplyMarkup}
 import nl.grons.metrics4.scala.{DefaultInstrumented, Meter}
 
-import scala.concurrent.Future
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Provides hooks which can be used for easier handling of commands with
@@ -20,6 +21,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
   *
   */
 trait InstrumentedCommands extends Messages with DefaultInstrumented {
+  // COMMAND REGISTRY
+  protected val commandRegistry: mutable.SortedSet[Command] = new mutable.TreeSet[Command]()
+
   // LOGGING
   protected val trafficLog = Logger("traffic-log")
 
@@ -51,6 +55,7 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
   def onCommand(command: Command)
                (func: Message => Map[String, Seq[String]] => Future[Any]): Unit = {
     val timer = metrics.timer(s"command-${command.command}")
+    commandRegistry += command
 
     onMessage { implicit message =>
       val text = message.text.getOrElse("")
@@ -68,6 +73,15 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
         }
       }
     }
+  }
+
+  onCommand(Command("help", "Overview of commands", Set(Argument("any", _ => true)))) {
+    implicit message =>
+      _ =>
+        reply(commandRegistry map { command =>
+          s"/${command.command} - ${command.description}"
+        } mkString "\n"
+        )
   }
 
   /**

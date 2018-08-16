@@ -7,8 +7,10 @@ package com.vektorraum.aviatorsbot.bot.commands
   * @param description Description for help command
   * @param arguments All arguments this command expects
   */
-case class Command(command: String, description: String, arguments: Set[Argument] = Set.empty) {
-
+case class Command(command: String, description: String, arguments: Set[Argument] = Set.empty) extends Ordered[Command] {
+  def compare(other: Command): Int = {
+    this.command.compareTo(other.command)
+  }
 }
 
 object Command {
