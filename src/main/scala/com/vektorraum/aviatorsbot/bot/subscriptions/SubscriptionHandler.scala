@@ -68,7 +68,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
     } yield (metars, tafs)
   }
 
-  protected def sendUpdatesForStation(metars: Map[String, Seq[METAR]], tafs: Map[String, Seq[TAF]],
+  private def sendUpdatesForStation(metars: Map[String, Seq[METAR]], tafs: Map[String, Seq[TAF]],
   subscriptions: List[Subscription]): Unit = {
     subscriptions foreach { sub =>
       val metar = metars.get(sub.icao)

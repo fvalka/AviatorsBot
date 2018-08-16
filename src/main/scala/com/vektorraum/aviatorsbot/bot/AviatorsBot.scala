@@ -18,7 +18,6 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, Su
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
-import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.methods._
 import info.mukel.telegrambot4s.models._
 import nl.grons.metrics4.scala.DefaultInstrumented
@@ -193,30 +192,6 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
               s"msg=$msg args=$args", t)
             reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED)
         }
-  }
-
-  override def reply(text: String, parseMode: Option[ParseMode],
-                     disableWebPagePreview: Option[Boolean],
-                     disableNotification: Option[Boolean],
-                     replyToMessageId: Option[Int],
-                     replyMarkup: Option[ReplyMarkup])
-                    (implicit message: Message): Future[Message] = {
-    trafficLog.info(s"Outbound reply messageId=${message.messageId} - chatId=${message.chat.id} - " +
-      s"chatUserName=${message.chat.username} - inboundMessage=${message.text} - text=$text")
-    super.reply(text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup)
-  }
-
-
-  def send(chatId: Long, text: String): Future[Message] = {
-    logger.debug(s"Sending message from AviatorsBot to chatId=$chatId with text=$text")
-    trafficLog.info(s"Outbound send - chatId=$chatId - text=$text")
-    request(
-      SendMessage(
-        chatId,
-        text,
-        ParseMode.HTML
-      )
-    )
   }
 
 
