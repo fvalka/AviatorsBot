@@ -37,6 +37,15 @@ enhances the METAR with an icon for the flight category provided by
 the aviationweather.gov API. 
 
 ## Technical
+### System Architecture Overview
+MongoDB is used as the persistence backend. Weather updates are 
+retrieved from the aviationweather.gov/NOAA ADDS Textserver in XML format. 
+Crosswind calculations are based upon the airfield and runway information 
+in the openAIP database. 
+
+
+![System overview](doc/images/system-overview.png "System overview")
+
 ### Technology Stack
 AviatorsBot is written in Scala using akka for non-blocking IO. 
 
