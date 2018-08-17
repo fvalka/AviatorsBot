@@ -36,6 +36,8 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
   private val messagesSent = metrics.meter("messages-sent")
   private val messageFailures = metrics.meter("messages-sent-failed")
   private val messagesInTransit = metrics.counter("messages-in-transit")
+  private val weatherServiceFailures = metrics.meter("weather-service-failed")
+  private val databaseFailures = metrics.meter("db-failures")
 
   // CONFIGURATION
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
@@ -59,6 +61,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
               Future.sequence(allMsgResults)
             case Failure(t) =>
               logger.warn("Retrieving the weather updates for handling the subscriptions failed", t)
+              weatherServiceFailures.mark()
               Future.failed(t)
           }
         } else {
@@ -68,6 +71,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
       case Failure(t) =>
         logger.warn("Could not get the list of stations from the database " +
           "while trying to handle the subscriptions", t)
+        databaseFailures.mark()
         Future.failed(t)
     }
 
