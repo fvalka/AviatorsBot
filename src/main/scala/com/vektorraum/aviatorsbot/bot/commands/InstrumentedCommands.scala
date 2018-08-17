@@ -77,11 +77,17 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
 
   onCommand(Command("help", "Overview of commands", Set(Argument("any", _ => true)))) {
     implicit message =>
-      _ =>
-        reply(commandRegistry map { command =>
-          s"/${command.command} - ${command.description}"
-        } mkString "\n"
-        )
+      args =>
+        val cmd = args.values.headOption
+          .map(_.head.replace("/",""))
+          .flatMap(arg => commandRegistry.find(_.command == arg))
+
+        cmd match {
+          case Some(command) => reply(HelpMessages(command.command), Some(ParseMode.HTML))
+          case _ => reply(commandRegistry map {
+            command => s"/${command.command} - ${command.description}"
+          } mkString "\n")
+        }
   }
 
   /**
