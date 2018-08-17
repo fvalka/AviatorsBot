@@ -1,4 +1,5 @@
 package com.vektorraum.aviatorsbot.bot
+import com.vektorraum.aviatorsbot.bot.subscriptions.SubscriptionHandler
 import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
@@ -6,8 +7,9 @@ import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.models._
 import nl.grons.metrics4.scala.FreshRegistries
 import org.scalamock.scalatest.MockFactory
+import com.softwaremill.macwire._
 
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 
 /**
   * AviatorsBot subclass used exclusively in unit tests.
@@ -22,6 +24,7 @@ import scala.concurrent.Future
 class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshRegistries {
   var replySent: String = ""
   var parseMode: Option[ParseMode] = None
+
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
   override lazy val airfieldDAO: AirfieldDAO = stub[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
@@ -55,6 +58,7 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshReg
     }
     replySent = text
     this.parseMode = parseMode
+
     Future {
       val chat = Chat(123L, ChatType.Private)
       Message(messageId = 123, chat = chat, date = 1234444)

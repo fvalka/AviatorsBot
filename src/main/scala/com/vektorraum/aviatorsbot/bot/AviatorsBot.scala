@@ -8,7 +8,7 @@ import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vektorraum.aviatorsbot.bot.commands.{Argument, Command, InstrumentedCommands}
 import com.vektorraum.aviatorsbot.bot.subscriptions.SubscriptionHandler
-import com.vektorraum.aviatorsbot.bot.util.{HelpMessages, StationUtil, TimeFormatter}
+import com.vektorraum.aviatorsbot.bot.util.{HelpMessages, StationUtil, TimeFormatter, TimeUtil}
 import com.vektorraum.aviatorsbot.bot.weather.BuildWxMessage
 import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.persistence.Db
@@ -70,6 +70,8 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   // Requires exactly one actual ICAO code
   protected val oneStationArgs = Set(Argument("station", StationUtil.isICAOAptIdentifier,
     min = 1, max = 1, preprocessor = _.toUpperCase))
+  // Time or duration argument
+  protected val oneTimeArgs = Set(Argument("time", TimeUtil.isTimeOrDuration, max = 1))
 
 
   onCommand(Command("start", "Information about this bot")) {
@@ -117,13 +119,18 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
         }
   }
 
-  onCommand(Command("add", "Subscribe to stations", stationsArgs)) {
+  onCommand(Command("add", "Subscribe to stations", stationsArgs ++ oneTimeArgs)) {
     implicit msg =>
       args =>
         val stations = args("stations")
+        val validUntil = args.get("time")
+          .flatMap(_.headOption)
+          .map(TimeUtil.parseDurationOrTime)
+          .getOrElse {
+            val validHours = config.getConfig("subscriptions").getInt("validHoursDefault")
+            ZonedDateTime.now(ZoneOffset.UTC).plusHours(validHours)
+          }
 
-        val validHours = config.getConfig("subscriptions").getInt("validHoursDefault")
-        val validUntil = ZonedDateTime.now(ZoneOffset.UTC).plusHours(validHours)
         val insertFutures: Seq[Future[WriteResult]] = stations map { station =>
           subscriptionDAO.addOrExtend(Subscription(msg.chat.id, station, Date.from(validUntil.toInstant)))
         }
