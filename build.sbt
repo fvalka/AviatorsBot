@@ -1,3 +1,5 @@
+import NativePackagerHelper._
+
 name := "aviatorsbot-scala"
 
 version := "1.0"
@@ -62,8 +64,4 @@ serverLoading in Debian := Some(ServerLoader.Systemd)
 startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
 
-linuxPackageMappings += {
-  val file = baseDirectory.value / "conf" / "aviatorsbot.conf"
-  packageMapping( (file, "/conf/aviatorsbot.conf") )
-}
-
+mappings in Universal ++= directory("conf")
