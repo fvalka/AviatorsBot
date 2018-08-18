@@ -62,5 +62,8 @@ serverLoading in Debian := Some(ServerLoader.Systemd)
 startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
 
-
+linuxPackageMappings += {
+  val file = sourceDirectory.value / "conf" / "aviatorsbot.conf"
+  packageMapping( (file, "conf/aviatorsbot.conf") )
+}
 
