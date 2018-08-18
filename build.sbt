@@ -64,6 +64,6 @@ stopRunlevels :=Option("3")
 
 linuxPackageMappings += {
   val file = baseDirectory.value / "conf" / "aviatorsbot.conf"
-  packageMapping( (file, "conf/aviatorsbot.conf") )
+  packageMapping( (file, "/conf/aviatorsbot.conf") )
 }
 
