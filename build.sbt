@@ -62,10 +62,5 @@ serverLoading in Debian := Some(ServerLoader.Systemd)
 startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
 
-mappings in Universal <+=
-  (packageBin in Compile, baseDirectory) map { (_, base) =>
-    val conf = base / "conf" / "aviatorsbot.conf"
-    conf -> "conf/aviatorsbot.conf"
-  }
 
 
