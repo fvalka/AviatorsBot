@@ -55,6 +55,20 @@ class AviatorsBotHelpTest extends FeatureSpec with GivenWhenThen with MockFactor
         bot.replySent should include ("/ls")
       }
     }
+
+    scenario("Help also returns help on other commands") {
+      Given("AviatorsBot without any mocks")
+      val bot = new AviatorsBotForTesting()
+
+      When("Pilot request help on add command")
+      bot.receiveMockMessage("/help add")
+
+      Then("Usage information for this command is returned")
+      eventually {
+        bot.replySent should include ("/add")
+        bot.replySent should include ("usage")
+      }
+    }
   }
 
 }
