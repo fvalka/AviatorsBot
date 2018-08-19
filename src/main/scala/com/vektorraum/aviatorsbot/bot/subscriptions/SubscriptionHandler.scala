@@ -8,7 +8,7 @@ import com.vektorraum.aviatorsbot.bot.util.LatestInfoConverter
 import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
-import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, WriteResult}
+import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import info.mukel.telegrambot4s.models.Message
@@ -73,6 +73,8 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
           "while trying to handle the subscriptions", t)
         databaseFailures.mark()
         Future.failed(t)
+    } recover {
+      case _ => logger.warn("Exception thrown during subscription handling", _)
     }
 
     // Block so that the poller isn't started twice while futures are still being executed
@@ -98,8 +100,13 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
       val latestTaf = taf.map { in => LatestInfoConverter.fromTaf(in.head) }
 
       // Only send the metar if the date and hash do not match the ones already stored in the db
-      val metarToSend = metar.flatMap { in => if (latestMetar == sub.latestMetar) { None } else { Some(in) } }
-      val tafToSend = taf.flatMap { in => if (latestTaf == sub.latestTaf) { None } else { Some(in) } }
+      // and if the user has subscribed to the metar and taf
+      val metarToSend = metar.flatMap { in =>
+        if (latestMetar == sub.latestMetar || !sub.metar) { None } else { Some(in) }
+      }
+      val tafToSend = taf.flatMap { in =>
+        if (latestTaf == sub.latestTaf || !sub.taf) { None } else { Some(in) }
+      }
 
       if(metarToSend.nonEmpty || tafToSend.nonEmpty) {
         logger.debug(s"Sending weather update for sub=$sub")
