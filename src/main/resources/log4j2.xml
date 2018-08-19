@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %p %c{1.} [%t] %replace{%msg}{\r?\n}{↵}%n"/>
+        </Console>
+
+        <RollingFile name="RollingFileGeneral"
+                     append="true"
+                     fileName="logs/aviatorsbot.log"
+                     filePattern="logs/aviatorsbot-%d{yyyy-MM-dd}-%i.log.gz"
+                     filePermissions="rw-------">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %replace{%msg}{\r?\n}{↵}%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <CronTriggeringPolicy schedule="0 0 0 ? * SUN"/>
+                <SizeBasedTriggeringPolicy size="512 MB"/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="RollingFileTrafficLog"
+                     append="true"
+                     fileName="logs/traffic.log"
+                     filePattern="logs/traffic-%d{yyyy-MM-dd}-%i.log.gz"
+                     filePermissions="rw-------">
+            <PatternLayout>
+                <Pattern>%d %replace{%msg}{\r?\n}{↵}%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <CronTriggeringPolicy schedule="0 0 0 ? * SUN"/>
+                <SizeBasedTriggeringPolicy size="512 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="traffic-log" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFileTrafficLog"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFileGeneral"/>
+        </Root>
+    </Loggers>
+</Configuration>

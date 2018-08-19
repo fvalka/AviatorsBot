@@ -52,6 +52,7 @@ fabric.properties
 # Compiled class file
 
 # Log file
+logs/
 
 # BlueJ files
 *.ctxt

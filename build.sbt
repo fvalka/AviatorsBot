@@ -21,8 +21,10 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
 // Telegram Bot
 libraryDependencies += "info.mukel" %% "telegrambot4s" % "3.0.15"
-libraryDependencies += "org.slf4j" % "slf4j-log4j12" % "1.7.25"
-
+//libraryDependencies += "org.slf4j" % "slf4j-log4j12" % "1.7.25"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.11.1"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.11.1"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.1"
 
 // Wire Scala CDI
 libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided"
