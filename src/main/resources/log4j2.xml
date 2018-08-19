@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<Configuration status="WARN" packages="com.codahale.metrics.log4j2">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d %p %c{1.} [%t] %replace{%msg}{\r?\n}{↵}%n"/>
@@ -32,6 +32,8 @@
                 <SizeBasedTriggeringPolicy size="512 MB"/>
             </Policies>
         </RollingFile>
+
+        <MetricsAppender name="Metrics" registryName="default"/>
     </Appenders>
     <Loggers>
         <Logger name="traffic-log" level="info" additivity="false">
@@ -41,6 +43,7 @@
         <Root level="info">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFileGeneral"/>
+            <AppenderRef ref="Metrics" />
         </Root>
     </Loggers>
 </Configuration>

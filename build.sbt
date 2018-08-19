@@ -21,7 +21,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
 // Telegram Bot
 libraryDependencies += "info.mukel" %% "telegrambot4s" % "3.0.15"
-//libraryDependencies += "org.slf4j" % "slf4j-log4j12" % "1.7.25"
+
+// Logging
 libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.11.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.11.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.1"
@@ -45,6 +46,7 @@ libraryDependencies += "com.github.cb372" %% "scalacache-caffeine" % "0.9.3"
 libraryDependencies += "nl.grons" %% "metrics4-scala" % "4.0.1"
 libraryDependencies += "nl.grons" %% "metrics4-akka_a24" % "4.0.1"
 libraryDependencies += "nl.grons" %% "metrics4-scala-hdr" % "4.0.1"
+libraryDependencies += "io.dropwizard.metrics" % "metrics-log4j2" % "4.0.1"
 
 enablePlugins(JavaServerAppPackaging)
 enablePlugins(DebianPlugin)
