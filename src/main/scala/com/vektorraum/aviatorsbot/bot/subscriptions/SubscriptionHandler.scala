@@ -1,6 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.subscriptions
 
 import java.io.File
+import java.lang.Exception
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
@@ -17,6 +18,7 @@ import nl.grons.metrics4.scala.DefaultInstrumented
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /**
@@ -74,7 +76,9 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
         databaseFailures.mark()
         Future.failed(t)
     } recover {
-      case _ => logger.warn("Exception thrown during subscription handling", _)
+      // Make sure that no exception gets thrown into the akka scheduler as this would stop the
+      // scheduling and make the error unrecoverable
+      case NonFatal(ex) => logger.warn("Exception thrown during subscription handling", ex)
     }
 
     // Block so that the poller isn't started twice while futures are still being executed

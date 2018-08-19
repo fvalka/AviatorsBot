@@ -5,10 +5,10 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.Subscriptio
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.{AsyncFeatureSpec, FeatureSpec, GivenWhenThen}
-import org.scalatest.concurrent.Eventually
 import org.scalatest.Matchers._
+import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 import scala.concurrent.Future
 
@@ -64,6 +64,43 @@ class SubscriptionHandlerTest extends FeatureSpec
       bot.runSubscriptionHandler()
 
       bot.replySent shouldEqual ""
+    }
+
+    scenario("Only METARs are sent if the subscription is only for METARs") {
+      Given("AviatorsBot with two subscriptions")
+      val bot = new AviatorsBotForTesting()
+
+      val sub1 = subscription1.copy(taf = false)
+      val sub2 = subscription2.copy(taf = false)
+
+      mockTwoStations(bot, sub1, sub2)
+      mockValidWeather(bot)
+
+      When("Handling subscriptions")
+      bot.runSubscriptionHandler()
+
+      Then("Only the METAR is sent to the pilot")
+      bot.replySent shouldEqual "<strong>LOWW</strong> ✅ 211150Z 31018KT 9999 FEW030 SCT060 19/11 Q1023 " +
+        "NOSIG"
+    }
+
+    scenario("Only TAFs are sent if the subscription is only for METARs") {
+      Given("AviatorsBot with two subscriptions")
+      val bot = new AviatorsBotForTesting()
+
+      val sub1 = subscription1.copy(metar = false)
+      val sub2 = subscription2.copy(metar = false)
+
+      mockTwoStations(bot, sub1, sub2)
+      mockValidWeather(bot)
+
+      When("Handling subscriptions")
+      bot.runSubscriptionHandler()
+
+      Then("Only the TAF is sent to the pilot")
+      bot.replySent shouldEqual "<strong>TAF LOWW</strong> 231715Z 2318/2424 18004KT CAVOK TX22/2318Z TN12/2500Z " +
+        "FM240300 29015G25KT 9999 BKN040 TEMPO 2403/2408 30018G30KT 6000 SHRA FEW030 FEW030CB BKN040 PROB30 " +
+        "2404/2407 4000 TSRA FM241000 32015G25KT CAVOK TEMPO 2410/2416 33022G32KT BECMG 2416/2418 34012KT"
     }
 
   }

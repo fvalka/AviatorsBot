@@ -36,17 +36,12 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
 
   feature("Add subscriptions") {
     scenario("Pilot subscribes to a single station") {
-      def checkDate(date: Date): Boolean = {
-        val convDate = ZonedDateTime.ofInstant(date.toInstant, ZoneOffset.UTC)
-        convDate.isBefore(ZonedDateTime.now().plusHours(7)) && convDate.isAfter(ZonedDateTime.now().plusHours(5))
-      }
-
       Given("AviatorsBotForTesting")
       val bot = new AviatorsBotForTesting()
 
       bot.subscriptionDAO.addOrExtend _ expects where {
         subscription: Subscription => subscription.icao == "LOWW" && subscription.metar && subscription.taf &&
-          subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty// && checkDate(subscription.validUntil)
+          subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty && checkDate(subscription.validUntil)
       } returns Future { WriteResultFixtures.WriteResultOk }
 
       When("Adding subscription for single station")
@@ -115,6 +110,84 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
         bot.replySent shouldEqual "Subscriptions could not be stored. Please try again!"
       }
     }
+  }
+
+  feature("Add command supports option for receiving only METARs or only TAFs") {
+    scenario("Pilot subscribes only to METARs") {
+      Given("AviatorsBotForTesting")
+      val bot = new AviatorsBotForTesting()
+
+      bot.subscriptionDAO.addOrExtend _ expects where {
+        subscription: Subscription => subscription.icao == "LOWW" && subscription.metar && !subscription.taf &&
+          subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty
+      } returns Future { WriteResultFixtures.WriteResultOk }
+
+      When("Adding subscription for single station")
+      bot.receiveMockMessage("/add metar loww")
+
+      Then("Correct message is returned and mock is called")
+      eventually {
+        bot.replySent should startWith ("Subscription is active until:")
+      }
+    }
+
+    scenario("Pilot subscribes only to TAFs") {
+      Given("AviatorsBotForTesting")
+      val bot = new AviatorsBotForTesting()
+
+      bot.subscriptionDAO.addOrExtend _ expects where {
+        subscription: Subscription => subscription.icao == "LOWW" && !subscription.metar && subscription.taf &&
+          subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty
+      } returns Future { WriteResultFixtures.WriteResultOk }
+
+      When("Adding subscription for single station")
+      bot.receiveMockMessage("/add taf loww")
+
+      Then("Correct message is returned and mock is called")
+      eventually {
+        bot.replySent should startWith ("Subscription is active until:")
+      }
+    }
+
+    scenario("Pilot uses both metar and taf option at once") {
+      Given("AviatorsBotForTesting")
+      val bot = new AviatorsBotForTesting()
+      When("Adding subscription for single station")
+      bot.receiveMockMessage("/add metar taf loww")
+
+      Then("Correct message is returned and mock is called")
+      eventually {
+        bot.replySent should include ("usage")
+      }
+    }
+  }
+
+  feature("Add allows the pilot to set how long the subscription should be valid") {
+    scenario("Pilot sets the expiration using the hours into the future option") {
+      Given("AviatorsBotForTesting")
+      val bot = new AviatorsBotForTesting()
+
+      bot.subscriptionDAO.addOrExtend _ expects where {
+        subscription: Subscription => subscription.icao == "LOWW" && subscription.metar && subscription.taf &&
+          subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty &&
+          checkDate(subscription.validUntil, 10)
+      } returns Future { WriteResultFixtures.WriteResultOk }
+
+      When("Adding subscription for single station with 10 hour expiration")
+      bot.receiveMockMessage("/add 10 loww")
+
+      Then("Correct message is returned and mock is called")
+      eventually {
+        bot.replySent should startWith ("Subscription is active until:")
+      }
+    }
+  }
+
+  def checkDate(date: Date, hoursInFuture: Int = 6): Boolean = {
+    val convDate = ZonedDateTime.ofInstant(date.toInstant, ZoneOffset.UTC)
+    val delta = 2
+    convDate.isBefore(ZonedDateTime.now().plusMinutes(hoursInFuture * 60 + delta)) &&
+      convDate.isAfter(ZonedDateTime.now().plusMinutes(hoursInFuture * 60 - delta))
   }
 
   private def initBotForErrorCase: AviatorsBotForTesting = {

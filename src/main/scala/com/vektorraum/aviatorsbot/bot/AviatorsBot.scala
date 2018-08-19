@@ -8,7 +8,7 @@ import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vektorraum.aviatorsbot.bot.commands.{Argument, Command, InstrumentedCommands}
 import com.vektorraum.aviatorsbot.bot.subscriptions.SubscriptionHandler
-import com.vektorraum.aviatorsbot.bot.util.{HelpMessages, StationUtil, TimeFormatter, TimeUtil}
+import com.vektorraum.aviatorsbot.bot.util._
 import com.vektorraum.aviatorsbot.bot.weather.BuildWxMessage
 import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.persistence.Db
@@ -72,6 +72,8 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
     min = 1, max = 1, preprocessor = _.toUpperCase))
   // Time or duration argument
   protected val oneTimeArgs = Set(Argument("time", TimeUtil.isTimeOrDuration, max = 1))
+  // METAR and/or TAF option for setting subscription options
+  protected val metarTafArgs = Set(Argument("metartaf", MetarTafOption.valid, max = 1))
 
 
   onCommand(Command("start", "Information about this bot")) {
@@ -119,7 +121,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
         }
   }
 
-  onCommand(Command("add", "Subscribe to stations", stationsArgs ++ oneTimeArgs)) {
+  onCommand(Command("add", "Subscribe to stations", stationsArgs ++ oneTimeArgs ++ metarTafArgs)) {
     implicit msg =>
       args =>
         val stations = args("stations")
@@ -131,8 +133,17 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
             ZonedDateTime.now(ZoneOffset.UTC).plusHours(validHours)
           }
 
+        val metar = args.get("metartaf")
+          .flatMap(_.exists(MetarTafOption.isMetar))
+          .getOrElse(true)
+        val taf = args.get("metartaf")
+          .flatMap(_.exists(MetarTafOption.isTaf))
+          .getOrElse(true)
+
         val insertFutures: Seq[Future[WriteResult]] = stations map { station =>
-          subscriptionDAO.addOrExtend(Subscription(msg.chat.id, station, Date.from(validUntil.toInstant)))
+          val subscription = Subscription(msg.chat.id, station,
+            Date.from(validUntil.toInstant), metar=metar, taf=taf)
+          subscriptionDAO.addOrExtend(subscription)
         }
 
         // double check that the insertion worked
