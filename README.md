@@ -14,8 +14,8 @@ USE PURELY AT YOUR OWN RISK!
 ___
 
 ## Using the Bot
-AviatorsBot is currently under development but will be available on Telegram 
-under the name: [`@AviatorsBot`](https://t.me/AviatorsBot)
+AviatorsBot is available on Telegram under the name: 
+[`@AviatorsBot`](https://t.me/AviatorsBot)
 
 ## Features
 ### METAR and TAF Subscriptions
@@ -29,7 +29,7 @@ are subscribed to and `/rm` will let you unsubscribe from a station.
 
 ### Crosswind Calculation
 Sending the command `/xwind <ICAO>` to the bot will provide you with
-the crosswind and headwind for all runways of the airport. 
+the crosswind and headwind for all runways of that airport. 
 
 ### Current Weather
 The `/wx <ICAO>` command returns the current METAR and TAF and 
@@ -39,19 +39,27 @@ the aviationweather.gov API.
 ## Technical
 ### System Architecture Overview
 MongoDB is used as the persistence backend. Weather updates are 
-retrieved from the aviationweather.gov/NOAA ADDS Textserver in XML format. 
+retrieved from the [`aviationweather.gov/NOAA ADDS Textserver`](
+https://www.aviationweather.gov/dataserver) in XML format. 
 Crosswind calculations are based upon the airfield and runway information 
-in the openAIP database. 
-
+in the [`openAIP`](https://www.openaip.net/) database. 
 
 ![System overview](doc/images/system-overview.png "System overview")
 
 ### Technology Stack
 AviatorsBot is written in Scala using akka for non-blocking IO. 
 
-MongoDB is used as the backend. Accessed using the reactive-mongo Scala
-library for extending the non-block and reactive concept also to this
-part. 
+MongoDB is used as the backend. Accessed using the 
+[`reactive-mongo`](http://reactivemongo.org/) Scala library for extending 
+the non-block and reactive concept also to this part. 
+
+### Continuous Deployment ###
+Using a Amazon AWS CodePipeline the bot is continuously deployed to 
+an EC2 instance. 
+
+Code is stored in AWS CodeCommit, built with AWS CodeBuild and deployed to
+the EC2 instance as a Debian dpkg package using AWS CodeDeploy if the build 
+as well as all unit and integration tests succeed. 
 
 ### Production Ready, High Code Quality
 The codebase has highly relevant unit and integration tests and a 
@@ -59,10 +67,15 @@ high coverage written mostly using ScalaTests FunSuite which doubles
 as a specification of the bots feature set and error handling strategies.
 
 To enable seamless testing a macro based DI library is used for 
-Inversion of Control.  
+Inversion of Control. 
 
+### Logging and Metrics ### 
 Extensive logging and configurability add to the production readiness 
 of the bot. 
+
+All commands, messages received and sent and many errors are also monitored
+and timed using 
+[`dropwizard metrics for scala`](https://github.com/erikvanoosten/metrics-scala). 
 
 ### METAR and TAF Change Detection ###
 METARs and TAFs are considered changed if the MurmurHash3 of the raw text 
