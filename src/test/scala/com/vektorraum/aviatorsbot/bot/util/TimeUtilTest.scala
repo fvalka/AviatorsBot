@@ -2,10 +2,9 @@ package com.vektorraum.aviatorsbot.bot.util
 
 import java.time.{Duration, LocalTime, ZonedDateTime}
 
-import org.scalatest.{FunSuite, GivenWhenThen}
 import org.scalatest.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.prop.Tables.Table
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 class TimeUtilTest extends FunSuite with TableDrivenPropertyChecks with GivenWhenThen {
   test("Time only matches various valid times") {

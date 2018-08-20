@@ -1,5 +1,13 @@
 language: scala
+
 scala:
 - 2.12.2
+
 services:
 - mongodb
+
+script:
+- sbt clean coverage test coverageReport
+
+after_success:
+- bash <(curl -s https://codecov.io/bash)
