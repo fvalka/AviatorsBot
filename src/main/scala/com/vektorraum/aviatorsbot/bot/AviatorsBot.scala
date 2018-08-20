@@ -58,7 +58,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   protected lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
 
   // METRICS
-  metrics.cachedGauge("subscription-count", 3 minutes) { subscriptionDAO.count() }
+  metrics.cachedGauge("subscription-count", timeout = 3 minutes) { subscriptionDAO.count() }
 
   // COMMAND ARGUMENTS
   // Requires at least one ICAO code and allows adds wildcards like LO*, etc.
@@ -80,7 +80,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
     implicit msg => _ => reply(HelpMessages("welcome"))
   }
 
-  onCommand(Command("wx", "Current METAR and TAF", wildcardStationsArgs)) {
+  onCommand(Command("wx", "Current METAR and TAF", wildcardStationsArgs, longRunning = true)) {
     implicit msg =>
       args =>
         val stations = args("stations")
@@ -98,7 +98,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
         }
   }
 
-  onCommand(Command("xwind", "Current crosswind", oneStationArgs)) {
+  onCommand(Command("xwind", "Current crosswind", oneStationArgs, longRunning = true)) {
     implicit msg =>
       args =>
         val station = args("station").head

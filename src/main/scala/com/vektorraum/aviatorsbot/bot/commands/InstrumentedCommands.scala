@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.HelpMessages
 import info.mukel.telegrambot4s.api.declarative.Messages
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
-import info.mukel.telegrambot4s.methods.{ParseMode, SendMessage}
+import info.mukel.telegrambot4s.methods.{ChatAction, ParseMode, SendChatAction, SendMessage}
 import info.mukel.telegrambot4s.models.{Message, ReplyMarkup}
 import nl.grons.metrics4.scala.{DefaultInstrumented, Meter}
 
@@ -64,6 +64,7 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
 
         if(Command.valid(command, text)) {
           logger.debug(s"Received valid command=$command in msg=$message")
+          if(command.longRunning) { sendTyping(message.chat.id) }
           timer.timeFuture(func(message)(Command.args(command, text)))
         } else {
           logger.debug(s"Received command with invalid arguments command=$command and msg=$message")
@@ -134,6 +135,23 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
         chatId,
         text,
         Some(ParseMode.HTML)
+      )
+    )
+  }
+
+  /**
+    * Sends status that the bot is currently typing, letting the user know that the request is being
+    * processed
+    *
+    * @param chatId Chat to which the typing notifaction will be sent
+    * @return
+    */
+  def sendTyping(chatId: Long): Future[Boolean] = {
+    logger.debug("Sending typing... info")
+    request(
+      SendChatAction(
+        chatId,
+        ChatAction.Typing
       )
     )
   }

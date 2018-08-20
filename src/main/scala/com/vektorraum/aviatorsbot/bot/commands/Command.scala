@@ -6,8 +6,10 @@ package com.vektorraum.aviatorsbot.bot.commands
   * @param command Name of the command e.g. ls
   * @param description Description for help command
   * @param arguments All arguments this command expects
+  * @param longRunning Used to determine if a notification is ent to the user that the input is being processed
   */
-case class Command(command: String, description: String, arguments: Set[Argument] = Set.empty) extends Ordered[Command] {
+case class Command(command: String, description: String, arguments: Set[Argument] = Set.empty,
+                   longRunning: Boolean = false) extends Ordered[Command] {
   def compare(other: Command): Int = {
     this.command.compareTo(other.command)
   }
