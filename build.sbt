@@ -72,3 +72,5 @@ startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
 
 mappings in Universal ++= directory("conf")
+
+coverageExcludedPackages := "com\\.vektorraum\\.aviatorsbot\\.generated.*"
