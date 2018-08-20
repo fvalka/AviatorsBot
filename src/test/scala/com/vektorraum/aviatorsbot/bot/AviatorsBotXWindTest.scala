@@ -21,7 +21,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
   info("without having to manually copy all the weather information into an additional calculation program")
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(30, Millis)))
+    PatienceConfig(timeout = scaled(Span(800, Millis)), interval = scaled(Span(30, Millis)))
 
   feature("Calculate the crosswind for an airfield based upon the current METAR") {
     scenario("Pilot requests crosswind calculation for a valid airfield which has a current METAR available") {
@@ -36,7 +36,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
         stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { TAFResponseFixtures.ValidLOWW }
 
-      bot.airfieldDAO.findByIcao _ when "LOWW" returns Future {Some(AirfieldFixtures.LOWW)}
+      bot.airfieldDAO.findByIcao _ when "LOWW" returns Future.successful {Some(AirfieldFixtures.LOWW)}
 
       When("Requesting crosswind for same station")
       bot.receiveMockMessage("xwind loww")
