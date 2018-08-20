@@ -7,7 +7,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 /**
-  * Created by fvalka on 25.05.2017.
+  * Database connector for reactive mongo
   */
 class Db(config: Config) {
   protected val dbConfig: Config = config.getConfig("db")
