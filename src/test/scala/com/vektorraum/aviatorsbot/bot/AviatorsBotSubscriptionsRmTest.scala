@@ -75,5 +75,18 @@ class AviatorsBotSubscriptionsRmTest extends FeatureSpec
         bot.replySent shouldEqual ERROR_MESSAGE
       }
     }
+
+    scenario("Incorrect input returns the help message") {
+      Given("AviatorsBot without mock")
+      val bot = new AviatorsBotForTesting()
+
+      When("Pilot sends the rm command")
+      bot.receiveMockMessage("/rm")
+
+      Then("Pilot receives the help message")
+      eventually {
+        bot.replySent should include ("usage")
+      }
+    }
   }
 }

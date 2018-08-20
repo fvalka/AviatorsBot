@@ -24,7 +24,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
   info("by adding subscriptions to the bot")
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(30, Millis)))
+    PatienceConfig(timeout = scaled(Span(600, Millis)), interval = scaled(Span(30, Millis)))
 
   val HELP_ADD: String = "<strong>usage:</strong> /add [&lt;valid-until&gt;] [metar] [taf] &lt;stations&gt;" +
     "\nSubscribe to weather updates of these station(s)\n\n<strong>Options:</strong>\n valid-until - UTC time " +

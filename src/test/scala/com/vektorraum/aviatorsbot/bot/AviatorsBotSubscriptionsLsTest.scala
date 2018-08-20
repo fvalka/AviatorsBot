@@ -71,6 +71,19 @@ class AviatorsBotSubscriptionsLsTest extends FeatureSpec
         bot.replySent shouldEqual "Subscriptions could not be listed. Please try again!"
       }
     }
+
+    scenario("Invalid input sent returns the help message ") {
+      Given("Aviatorsbot without mock")
+      val bot = new AviatorsBotForTesting()
+
+      When("Pilot requests a list of subscriptions with wrong input")
+      bot.receiveMockMessage("ls blabla")
+
+      Then("A help message is sent")
+      eventually {
+        bot.replySent should include ("usage")
+      }
+    }
   }
 
 }
