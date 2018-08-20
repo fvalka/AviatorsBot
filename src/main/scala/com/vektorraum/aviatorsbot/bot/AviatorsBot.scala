@@ -74,10 +74,16 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   protected val oneTimeArgs = Set(Argument("time", TimeUtil.isTimeOrDuration, max = 1))
   // METAR and/or TAF option for setting subscription options
   protected val metarTafArgs = Set(Argument("metartaf", MetarTafOption.valid, max = 1))
+  // Any arguments acceptec
+  protected val anyArgs = Set(Argument("any", _ => true))
 
 
-  onCommand(Command("start", "Information about this bot")) {
-    implicit msg => _ => reply(HelpMessages("welcome"))
+  onCommand(Command("start", "Information about this bot", anyArgs)) {
+    implicit msg => _ => reply(HelpMessages("welcome"), disableWebPagePreview = true)
+  }
+
+  onCommand(Command("privacy", "Privacy policy", anyArgs)) {
+    implicit msg => _ => reply(HelpMessages("privacy"), disableWebPagePreview = true, parseMode = ParseMode.HTML)
   }
 
   onCommand(Command("wx", "Current METAR and TAF", wildcardStationsArgs, longRunning = true)) {
