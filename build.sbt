@@ -73,4 +73,4 @@ stopRunlevels :=Option("3")
 
 mappings in Universal ++= directory("conf")
 
-coverageExcludedPackages := "com\\.vektorraum\\.aviatorsbot\\.generated.*"
+coverageExcludedPackages := "com\\.vektorraum\\.aviatorsbot\\.generated.*;scalaxb.*"
