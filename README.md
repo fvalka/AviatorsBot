@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/fvalka/AviatorsBot.svg?branch=master)](https://travis-ci.org/fvalka/AviatorsBot)
 [![codecov](https://codecov.io/gh/fvalka/AviatorsBot/branch/master/graph/badge.svg)](https://codecov.io/gh/fvalka/AviatorsBot)
 
-# AviatorsBot
+<p align="center" style="margin-bottom: 10em;">
+  <img src="doc/images/logo.png" alt="AviatorsBot"/>
+</p>
 
 This Telegram bot provides a METAR and TAF aviation weather 
 subscription service and weather based tools for flight planing, 
@@ -17,6 +19,9 @@ ___
 ## Using the Bot
 AviatorsBot is available on Telegram under the name: 
 [`@AviatorsBot`](https://t.me/AviatorsBot)
+
+Sending `/help` provides a list of all available commands and `/help <command>` 
+will show you how to use the command. 
 
 ## Features
 ### METAR and TAF Subscriptions
@@ -36,6 +41,10 @@ the crosswind and headwind for all runways of that airport.
 The `/wx <ICAO>` command returns the current METAR and TAF and 
 enhances the METAR with an icon for the flight category provided by 
 the aviationweather.gov API. 
+
+### Command Shortcuts
+For easier typing on mobile phones you can also omit the '/' prefix.
+For Example both `/help` and just sending `help` work. 
 
 ## Technical
 ### System Architecture Overview
