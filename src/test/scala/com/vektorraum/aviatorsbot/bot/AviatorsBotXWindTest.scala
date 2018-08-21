@@ -21,7 +21,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
   info("without having to manually copy all the weather information into an additional calculation program")
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(800, Millis)), interval = scaled(Span(30, Millis)))
+    PatienceConfig(timeout = scaled(Span(1000, Millis)), interval = scaled(Span(30, Millis)))
 
   feature("Calculate the crosswind for an airfield based upon the current METAR") {
     scenario("Pilot requests crosswind calculation for a valid airfield which has a current METAR available") {

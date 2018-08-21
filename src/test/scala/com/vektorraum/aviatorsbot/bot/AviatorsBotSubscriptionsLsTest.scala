@@ -18,7 +18,7 @@ class AviatorsBotSubscriptionsLsTest extends FeatureSpec
   info("be able to see all my current subscriptions")
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(500, Millis)), interval = scaled(Span(30, Millis)))
+    PatienceConfig(timeout = scaled(Span(1000, Millis)), interval = scaled(Span(30, Millis)))
 
   feature("List subscriptions") {
     scenario("Pilot lists two stored subscriptions") {
