@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/fvalka/AviatorsBot.svg?branch=master)](https://travis-ci.org/fvalka/AviatorsBot)
 [![codecov](https://codecov.io/gh/fvalka/AviatorsBot/branch/master/graph/badge.svg)](https://codecov.io/gh/fvalka/AviatorsBot)
 
-# AviatorsBot
+<p align="center">
+  <img src="doc/images/logo.png" alt="AviatorsBot"/>
+</p>
 
 This Telegram bot provides a METAR and TAF aviation weather 
 subscription service and weather based tools for flight planing, 
