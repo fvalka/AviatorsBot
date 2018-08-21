@@ -6,14 +6,10 @@ import com.vektorraum.aviatorsbot.generated.metar.METAR
 /**
   * Created by fvalka on 20.05.2017.
   */
-object FormatMetar extends ((Seq[METAR], Option[METAR], Boolean) => String) {
-  def apply(history: Seq[METAR], diffTo: Option[METAR] = None, sparklines: Boolean = false): String = {
+object FormatMetar extends (Seq[METAR] => String) {
+  def apply(history: Seq[METAR]): String = {
     if(history.isEmpty) {
       return ""
-    }
-
-    if(sparklines || diffTo.isDefined) {
-      throw new NotImplementedError()
     }
 
     val raw_without_station = history.head.raw_text.get.trim.substring(4).trim

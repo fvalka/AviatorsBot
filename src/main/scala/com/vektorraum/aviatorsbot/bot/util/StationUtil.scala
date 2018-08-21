@@ -18,11 +18,4 @@ object StationUtil {
     ActualStationPattern.pattern.matcher(input).matches()
   }
 
-  def toStationList(input: String): List[String] = {
-    if(!isValidInput(input)) {
-      throw new IllegalArgumentException("input is invalid")
-    }
-    input.toUpperCase.split(" ").toList
-  }
-
 }

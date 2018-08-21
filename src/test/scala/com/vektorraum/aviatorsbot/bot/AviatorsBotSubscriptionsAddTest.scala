@@ -42,7 +42,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
       bot.subscriptionDAO.addOrExtend _ expects where {
         subscription: Subscription => subscription.icao == "LOWW" && subscription.metar && subscription.taf &&
           subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty && checkDate(subscription.validUntil)
-      } returns Future { WriteResultFixtures.WriteResultOk }
+      } returns Future.successful { WriteResultFixtures.WriteResultOk }
 
       When("Adding subscription for single station")
       bot.receiveMockMessage("add loww")
@@ -85,7 +85,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
       Given("AviatorsBotForTesting with backend throwing exception")
       val bot = new AviatorsBotForTesting()
 
-      bot.subscriptionDAO.addOrExtend _ expects * returns Future{ throw new Exception() }
+      bot.subscriptionDAO.addOrExtend _ expects * returns Future.failed(new Exception())
 
       When("Trying to add a valid station")
       bot.receiveMockMessage("/add LOWW")
@@ -100,7 +100,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
       Given("AviatorsBotForTesting with backend throwing exception")
       val bot = new AviatorsBotForTesting()
 
-      bot.subscriptionDAO.addOrExtend _ expects * returns Future{ WriteResultFixtures.WriteResultFailed }
+      bot.subscriptionDAO.addOrExtend _ expects * returns Future.successful { WriteResultFixtures.WriteResultFailed }
 
       When("Trying to add a valid station")
       bot.receiveMockMessage("/add KJFK")
@@ -120,7 +120,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
       bot.subscriptionDAO.addOrExtend _ expects where {
         subscription: Subscription => subscription.icao == "LOWW" && subscription.metar && !subscription.taf &&
           subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty
-      } returns Future { WriteResultFixtures.WriteResultOk }
+      } returns Future.successful { WriteResultFixtures.WriteResultOk }
 
       When("Adding subscription for single station")
       bot.receiveMockMessage("/add metar loww")
@@ -138,7 +138,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
       bot.subscriptionDAO.addOrExtend _ expects where {
         subscription: Subscription => subscription.icao == "LOWW" && !subscription.metar && subscription.taf &&
           subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty
-      } returns Future { WriteResultFixtures.WriteResultOk }
+      } returns Future.successful { WriteResultFixtures.WriteResultOk }
 
       When("Adding subscription for single station")
       bot.receiveMockMessage("/add taf loww")
@@ -171,7 +171,7 @@ class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen wit
         subscription: Subscription => subscription.icao == "LOWW" && subscription.metar && subscription.taf &&
           subscription.latestMetar.isEmpty && subscription.latestTaf.isEmpty &&
           checkDate(subscription.validUntil, 10)
-      } returns Future { WriteResultFixtures.WriteResultOk }
+      } returns Future.successful { WriteResultFixtures.WriteResultOk }
 
       When("Adding subscription for single station with 10 hour expiration")
       bot.receiveMockMessage("/add 10 loww")
