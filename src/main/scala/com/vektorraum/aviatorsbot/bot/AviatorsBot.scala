@@ -30,7 +30,7 @@ import scala.util.{Failure, Success}
 /**
   * Main Bot trait which is both used for testing and production
   *
-  * Handles all the commands received by the bot using the on..() functions
+  * Handles commands received by the bot using the onCommand() functions
   */
 trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands with DefaultInstrumented {
   // STATIC STRINGS
@@ -83,7 +83,8 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   }
 
   onCommand(Command("privacy", "Privacy policy", anyArgs)) {
-    implicit msg => _ => reply(HelpMessages("privacy"), disableWebPagePreview = true, parseMode = ParseMode.HTML)
+    implicit msg => _ => reply(HelpMessages("privacy"),
+      disableWebPagePreview = true, parseMode = ParseMode.HTML)
   }
 
   onCommand(Command("wx", "Current METAR and TAF", wildcardStationsArgs, longRunning = true)) {
