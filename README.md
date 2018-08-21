@@ -20,6 +20,9 @@ ___
 AviatorsBot is available on Telegram under the name: 
 [`@AviatorsBot`](https://t.me/AviatorsBot)
 
+Sending `/help` provides a list of all available commands and `/help <command>` 
+will show you how to use the command. 
+
 ## Features
 ### METAR and TAF Subscriptions
 Using this bots subscription service you will receive an update
@@ -38,6 +41,10 @@ the crosswind and headwind for all runways of that airport.
 The `/wx <ICAO>` command returns the current METAR and TAF and 
 enhances the METAR with an icon for the flight category provided by 
 the aviationweather.gov API. 
+
+### Command Shortcuts
+For easier typing on mobile phones you can also omit the '/' prefix.
+For Example both `/help` and just sending `help` work. 
 
 ## Technical
 ### System Architecture Overview
