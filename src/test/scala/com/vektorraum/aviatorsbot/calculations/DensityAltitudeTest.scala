@@ -9,7 +9,7 @@ import squants.space.{Feet, Length, Meters}
 import squants.thermal.{Celsius, Fahrenheit}
 
 class DensityAltitudeTest extends FunSuite with TableDrivenPropertyChecks with GivenWhenThen {
-  implicit val tolerance: Length = Feet(3)
+  implicit val tolerance: Length = Feet(2)
 
   test("Density altitude calculations for various valid data points") {
     Given("Various valid inputs")
@@ -19,7 +19,11 @@ class DensityAltitudeTest extends FunSuite with TableDrivenPropertyChecks with G
       ("stationPressure", "temperature", "dewpoint", "densityAlt"),
       (Bars(MetricSystem.Milli * 1013.0), Celsius(30.0), Celsius(20.0), Feet(2044.3)),
       (Bars(1.013), Fahrenheit(90.0), Fahrenheit(60.0), Meters(676.1)),
-      (Bars(0.8), Celsius(50.0), Fahrenheit(10.0), Feet(11559.6))
+      (Bars(0.8), Celsius(50.0), Fahrenheit(10.0), Feet(11559.6)),
+      (Bars(MetricSystem.Milli * 1090), Celsius(10.0), Celsius(5.0), Feet(-3001.2)),
+      (Bars(MetricSystem.Milli * 400), Celsius(-40.0), Celsius(-50.0), Feet(22577.2)),
+      (Bars(MetricSystem.Milli * 400), Celsius(-40.0), Celsius(-40.0), Feet(22580.6)),
+      (Bars(MetricSystem.Milli * 150), Celsius(-40.0), Celsius(-50.0), Feet(47856.6))
     )
 
     Then("Only valid ones are identified as such")
