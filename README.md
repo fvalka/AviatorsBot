@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/fvalka/AviatorsBot.svg?branch=master)](https://travis-ci.org/fvalka/AviatorsBot)
 [![codecov](https://codecov.io/gh/fvalka/AviatorsBot/branch/master/graph/badge.svg)](https://codecov.io/gh/fvalka/AviatorsBot)
 
-<p align="center">
+<p align="center" style="margin-bottom: 10em;">
   <img src="doc/images/logo.png" alt="AviatorsBot"/>
 </p>
 
