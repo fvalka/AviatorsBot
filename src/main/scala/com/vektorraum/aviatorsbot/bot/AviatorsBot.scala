@@ -120,6 +120,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
                 val observationTime = TimeFormatter.shortUTCDateTimeFormat(m.head.observation_time.get)
                 reply(
                 s"METAR issued at: $observationTime\n" +
+                  "Direction of flight: ⬆\n" +
                   XWindCalculator(m.head, airfield), ParseMode.HTML)
               case None => reply(ERROR_NO_METAR_FOR_STATION)
             }
