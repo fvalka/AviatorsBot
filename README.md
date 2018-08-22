@@ -37,6 +37,17 @@ are subscribed to and `/rm` will let you unsubscribe from a station.
 Sending the command `/xwind <ICAO>` to the bot will provide you with
 the crosswind and headwind for all runways of that airport. 
 
+### Density Altitude Calculation
+Using the `/da <ICAO>` command the current density altitude is calculated.
+
+This calculation is based upon the altimeter setting, elevation, temperature 
+and dew point. All of these data points are taken from the METAR and require
+no further user input. 
+
+Calculating the density altitude with consideration for the actual pressure 
+and water vapor pressure results in a more accurate result than just using 
+the elevation and temperature. 
+
 ### Current Weather
 The `/wx <ICAO>` command returns the current METAR and TAF and 
 enhances the METAR with an icon for the flight category provided by 
