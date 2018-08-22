@@ -2,7 +2,6 @@ package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
 import info.mukel.telegrambot4s.methods.ParseMode
-import nl.grons.metrics4.scala.{FreshMetricRegistry, FreshRegistries}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._
