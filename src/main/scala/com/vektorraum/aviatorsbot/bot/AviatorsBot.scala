@@ -6,11 +6,11 @@ import java.util.Date
 
 import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
+import com.vektorraum.aviatorsbot.bot.calculators.{DensityAltitudeCalculator, XWindCalculator}
 import com.vektorraum.aviatorsbot.bot.commands.{Argument, Command, InstrumentedCommands}
 import com.vektorraum.aviatorsbot.bot.subscriptions.SubscriptionHandler
 import com.vektorraum.aviatorsbot.bot.util._
 import com.vektorraum.aviatorsbot.bot.weather.BuildWxMessage
-import com.vektorraum.aviatorsbot.bot.xwind.XWindCalculator
 import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
@@ -25,6 +25,7 @@ import nl.grons.metrics4.scala.DefaultInstrumented
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.io.Source
+import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
 /**
@@ -39,6 +40,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED = "Subscriptions could not be listed. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_REMOVED = "Could not unsubscribe from all stations. Please try again!"
+  protected val ERROR_NO_METAR_FOR_STATION = "Could not retrieve weather for station"
 
   // separated from the main configuration for security reasons
   lazy val token: String = scala.util.Properties
@@ -114,17 +116,36 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
             val metar = metars.get(station)
 
             metar match {
-              case Some(m) => reply(
-                s"METAR issued at: ${m.head.observation_time.get}\n" +
+              case Some(m) =>
+                val observationTime = TimeFormatter.shortUTCDateTimeFormat(m.head.observation_time.get)
+                reply(
+                s"METAR issued at: $observationTime\n" +
                   XWindCalculator(m.head, airfield), ParseMode.HTML)
-              case None => reply("Could not retrieve weather for station")
+              case None => reply(ERROR_NO_METAR_FOR_STATION)
             }
           }
           case None => reply("Airfield not found")
         } andThen {
-          case Success(_) => logger.info(s"XWind calculation performed successfully for station=$station")
-          case Failure(t) => reply("Could not perform crosswind calculation for this station")
+          case Success(_) => logger.debug(s"XWind calculation performed successfully for station=$station")
+          case Failure(t) => reply(s"Could not perform crosswind calculation for this station")
             logger.warn(s"Error during xwindCalculation for station=$station", t)
+        }
+  }
+
+  onCommand(Command("da", "Density altitude", oneStationArgs, longRunning = true)) {
+    implicit msg =>
+      args =>
+        val station = args("station").head
+        weatherService.getMetars(List(station)) map { metars =>
+          val metar = metars.get(station)
+          metar match {
+            case Some(m) => reply(DensityAltitudeCalculator(m.head), ParseMode.HTML)
+            case None => reply(ERROR_NO_METAR_FOR_STATION)
+          }
+        } andThen {
+          case Success(_) => logger.debug(s"Density altitude calculation successful for station=$station")
+          case Failure(t) => reply(s"Could not perform density altitude calculation for this station")
+            logger.warn(s"Error during density altitude calculation for station=$station")
         }
   }
 

@@ -1,4 +1,4 @@
-package com.vektorraum.aviatorsbot.bot.xwind
+package com.vektorraum.aviatorsbot.bot.calculators
 
 import com.vektorraum.aviatorsbot.persistence.airfielddata.model.Airfield
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARFixtures}

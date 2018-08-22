@@ -43,7 +43,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
 
       Then("Correctly calculated crosswind is returned")
       eventually {
-        bot.replySent shouldEqual "METAR issued at: 2017-05-21T11:50:00Z\n" +
+        bot.replySent shouldEqual "METAR issued at: 2017-5-21 1150Z\n" +
           "<strong>11</strong> ➡4KT ⬆17KT\n" +
           "<strong>16</strong> ⬅10KT ⬆15KT\n" +
           "<strong>29</strong> ⬅4KT ⬇17KT\n" +
