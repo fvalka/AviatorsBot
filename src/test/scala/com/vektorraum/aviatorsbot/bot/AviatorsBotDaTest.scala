@@ -20,7 +20,7 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
 
   feature("Density altitude calculation based only upon the METAR") {
     scenario("Pilot calculates da for station which has a valid and complete METAR") {
-      Given("AviatorsBotForTesting with valid xml")
+      Given("AviatorsBotForTesting with mocks for the weather service")
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
@@ -40,8 +40,21 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
       }
     }
 
+    scenario("If the command is called without a station a help message is sent") {
+      Given("AviatorsBotForTesting")
+      val bot = new AviatorsBotForTesting()
+
+      When("Requesting density altitude for valid station")
+      bot.receiveMockMessage("/da")
+
+      Then("A help message is returned")
+      eventually {
+        bot.replySent should include ("usage")
+      }
+    }
+
     scenario("Metar with missing fields lead to correct error message") {
-      Given("AviatorsBotForTesting with valid xml")
+      Given("AviatorsBotForTesting")
       val bot = new AviatorsBotForTesting()
 
       val metars = Map("LOWW" -> List(METARFixtures.ValidAndCompleteLOWW.copy(dewpoint_c = None)))
@@ -60,7 +73,7 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
     }
 
     scenario("Empty weather service result leads to correct error message") {
-      Given("AviatorsBotForTesting with valid xml")
+      Given("AviatorsBotForTesting")
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
@@ -77,7 +90,7 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
     }
 
     scenario("Weather service fails") {
-      Given("AviatorsBotForTesting with valid xml")
+      Given("AviatorsBotForTesting")
       val bot = new AviatorsBotForTesting()
 
       bot.weatherService.getMetars _ expects where {
