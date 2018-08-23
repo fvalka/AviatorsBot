@@ -4,7 +4,7 @@ import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
 
 import com.codahale.metrics.{MetricFilter, MetricRegistry}
-import com.codahale.metrics.graphite.{Graphite, GraphiteReporter}
+import com.codahale.metrics.graphite.{Graphite, GraphiteReporter, PickledGraphite}
 import com.typesafe.config.Config
 
 object ReporterUtil {
@@ -24,7 +24,7 @@ object ReporterUtil {
     */
   def graphiteReporter(config: Config, registry: MetricRegistry): Option[GraphiteReporter] = {
     if(config.getBoolean("enabled")) {
-      val graphite = new Graphite(new InetSocketAddress(config.getString("host"), config.getInt("port")))
+      val graphite = new PickledGraphite(new InetSocketAddress(config.getString("host"), config.getInt("port")))
 
       val reporter = GraphiteReporter
         .forRegistry(registry)
