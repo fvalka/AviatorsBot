@@ -47,6 +47,7 @@ libraryDependencies += "nl.grons" %% "metrics4-scala" % "4.0.1"
 libraryDependencies += "nl.grons" %% "metrics4-akka_a24" % "4.0.1"
 libraryDependencies += "nl.grons" %% "metrics4-scala-hdr" % "4.0.1"
 libraryDependencies += "io.dropwizard.metrics" % "metrics-log4j2" % "4.0.1"
+libraryDependencies += "io.dropwizard.metrics" % "metrics-graphite" % "4.0.1"
 
 // Units of Measure
 libraryDependencies += "org.typelevel"  %% "squants"  % "1.3.0"

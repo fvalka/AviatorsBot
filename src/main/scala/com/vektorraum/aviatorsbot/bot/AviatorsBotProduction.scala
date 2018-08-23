@@ -1,5 +1,9 @@
 package com.vektorraum.aviatorsbot.bot
 
+import java.util.concurrent.TimeUnit
+
+import com.vektorraum.aviatorsbot.bot.util.ReporterUtil
+
 import scala.concurrent.duration._
 
 /**
@@ -16,11 +20,9 @@ object AviatorsBotProduction extends AviatorsBot {
       this.subscriptionHandler.run()
     }
 
-    import com.codahale.metrics.ConsoleReporter
-    import java.util.concurrent.TimeUnit
-    val reporter = ConsoleReporter.forRegistry(this.metricRegistry).convertRatesTo(TimeUnit.SECONDS)
-      .convertDurationsTo(TimeUnit.MILLISECONDS).build
-    reporter.start(3, TimeUnit.MINUTES)
+    ReporterUtil.graphiteReporter(config.getConfig("metrics.graphite"), this.metricRegistry)
+      .foreach(_.start(config.getInt("metrics.graphite.interval_s"), TimeUnit.SECONDS))
+
   }
 
 }
