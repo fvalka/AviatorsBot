@@ -42,8 +42,8 @@ class SchedulerTest extends FeatureSpec with GivenWhenThen with MockFactory with
 
       Then("Scheduler has executed the function multiple times")
       eventually {
-        tracker.calls should be > 2
-        val runtime = tracker.callTimes(2).toEpochMilli - tracker.callTimes(1).toEpochMilli
+        tracker.calls should be > 3
+        val runtime = tracker.callTimes(3).toEpochMilli - tracker.callTimes(2).toEpochMilli
         (runtime - delta < 400 && runtime + delta > 400) shouldEqual true
       }
     }
