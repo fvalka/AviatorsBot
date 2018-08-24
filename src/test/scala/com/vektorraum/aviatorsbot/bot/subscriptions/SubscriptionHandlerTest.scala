@@ -1,6 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.subscriptions
 
 import com.vektorraum.aviatorsbot.bot.AviatorsBotForTesting
+import com.vektorraum.aviatorsbot.persistence.WriteResultFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.SubscriptionFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
@@ -27,8 +28,7 @@ class SubscriptionHandlerTest extends FeatureSpec
       val sub1 = subscription1.copy()
       val sub2 = subscription2.copy()
 
-      mockTwoStations(bot, sub1, sub2)
-      mockValidWeather(bot)
+      mockNormalCalls(bot, sub1, sub2)
 
       When("Handling subscriptions")
       bot.runSubscriptionHandler()
@@ -47,8 +47,7 @@ class SubscriptionHandlerTest extends FeatureSpec
       val sub1 = subscription1.copy()
       val sub2 = subscription2.copy()
 
-      mockTwoStations(bot, sub1, sub2)
-      mockValidWeather(bot)
+      mockNormalCalls(bot, sub1, sub2)
 
       When("Subscriptions have been handled once")
       bot.runSubscriptionHandler()
@@ -59,8 +58,7 @@ class SubscriptionHandlerTest extends FeatureSpec
       bot.replySent = ""
 
       Then("Weather updates are not sent again")
-      mockTwoStations(bot, sub1, sub2)
-      mockValidWeather(bot)
+      mockNormalCalls(bot, sub1, sub2)
       bot.runSubscriptionHandler()
 
       bot.replySent shouldEqual ""
@@ -73,8 +71,7 @@ class SubscriptionHandlerTest extends FeatureSpec
       val sub1 = subscription1.copy(taf = false)
       val sub2 = subscription2.copy(taf = false)
 
-      mockTwoStations(bot, sub1, sub2)
-      mockValidWeather(bot)
+      mockNormalCalls(bot, sub1, sub2)
 
       When("Handling subscriptions")
       bot.runSubscriptionHandler()
@@ -91,8 +88,7 @@ class SubscriptionHandlerTest extends FeatureSpec
       val sub1 = subscription1.copy(metar = false)
       val sub2 = subscription2.copy(metar = false)
 
-      mockTwoStations(bot, sub1, sub2)
-      mockValidWeather(bot)
+      mockNormalCalls(bot, sub1, sub2)
 
       When("Handling subscriptions")
       bot.runSubscriptionHandler()
@@ -103,18 +99,56 @@ class SubscriptionHandlerTest extends FeatureSpec
         "2404/2407 4000 TSRA FM241000 32015G25KT CAVOK TEMPO 2410/2416 33022G32KT BECMG 2416/2418 34012KT"
     }
 
+    scenario("Finding no subscriptions doesn't throw an exception and skips further processing") {
+      Given("AviatorsBot with two subscriptions")
+      val bot = new AviatorsBotForTesting()
+
+      bot.subscriptionDAO.findAllStations _ expects() returns
+        Future.successful(Set.empty)
+
+      When("Handling subscriptions")
+      noException should be thrownBy bot.runSubscriptionHandler()
+    }
+
   }
 
-  private def mockTwoStations(bot: AviatorsBotForTesting, sub1: Subscription, sub2: Subscription) = {
+  feature("Database and Weather Service Errors are handled correclty") {
+    scenario("Database throws an exception") {
+      Given("AviatorsBot with two subscriptions")
+      val bot = new AviatorsBotForTesting()
+
+      bot.subscriptionDAO.findAllStations _ expects() returns
+        Future.failed(new RuntimeException("TEST"))
+
+      Then("A retriable exception is thrown")
+      a[RetriableException] should be thrownBy bot.runSubscriptionHandler()
+    }
+
+    scenario("Weather service throws an exception") {
+      Given("AviatorsBot with two subscriptions")
+      val bot = new AviatorsBotForTesting()
+
+      val sub1 = subscription1.copy()
+      val sub2 = subscription2.copy()
+
+      bot.subscriptionDAO.findAllStations _ expects() returns
+        Future.successful(Set(sub1.icao, sub2.icao))
+
+      bot.weatherService.getMetars _ expects where {
+        stations: Iterable[String] => stations.head == "LOWW"
+      } returns Future.failed {
+        new RuntimeException("TEST")
+      }
+
+      Then("A retriable exception is thrown")
+      a[RetriableException] should be thrownBy bot.runSubscriptionHandler()
+    }
+  }
+
+  private def mockNormalCalls(bot: AviatorsBotForTesting, sub1: Subscription, sub2: Subscription) = {
     bot.subscriptionDAO.findAllStations _ expects() returns
       Future.successful(Set(sub1.icao, sub2.icao))
-    bot.subscriptionDAO.findAllSubscriptionsForStation _ expects sub1.icao returns
-      Future.successful(List(sub1))
-    bot.subscriptionDAO.findAllSubscriptionsForStation _ expects sub2.icao returns
-      Future.successful(List(sub2))
-  }
 
-  private def mockValidWeather(bot: AviatorsBotForTesting) = {
     bot.weatherService.getMetars _ expects where {
       stations: Iterable[String] => stations.head == "LOWW"
     } returns Future.successful {
@@ -125,5 +159,11 @@ class SubscriptionHandlerTest extends FeatureSpec
     } returns Future.successful {
       TAFResponseFixtures.ValidLOWW
     }
+
+    bot.subscriptionDAO.findAllSubscriptionsForStation _ expects sub1.icao returns
+      Future.successful(List(sub1))
+
+    bot.subscriptionDAO.addOrExtend _ expects * returns Future.successful(WriteResultFixtures.WriteResultOk)
   }
+
 }

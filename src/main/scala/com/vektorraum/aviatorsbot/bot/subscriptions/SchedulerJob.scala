@@ -18,13 +18,28 @@ class SchedulerJob extends Job with DefaultInstrumented {
 
       SchedulerJob.executor()
     } catch {
+      case ex: RetriableException =>
+        logger.warn(s"Retriable exception thrown maxRetries=${ex.maxRetries} retries=${context.getRefireCount}")
+        val refire = context.getRefireCount < ex.maxRetries
+        throw new JobExecutionException(ex, refire)
       case NonFatal(ex) =>
         logger.warn("Exception thrown during SchedulerJob execution", ex)
-        throw new JobExecutionException(ex)
+        throw new JobExecutionException(ex, false)
     }
   }
 }
 
 object SchedulerJob {
-  var executor: () => Unit = { throw new RuntimeException("Executor in SchedulerJob has not been set!") }
+  private val logger = Logger(getClass)
+
+  protected var setAlready = false
+  protected var executor: () => Unit = () => Unit
+
+  def setExecutor(func: () => Unit): Unit = {
+    if(setAlready) {
+      logger.warn("SchedulerJob setExecutor was called again. Overwriting the previous function!")
+    }
+    executor = func
+    setAlready = true
+  }
 }

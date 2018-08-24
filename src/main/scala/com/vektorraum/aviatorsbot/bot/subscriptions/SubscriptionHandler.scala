@@ -29,7 +29,7 @@ import scala.util.{Failure, Success}
   * @param send Updates will be sent using this function
   */
 class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: AddsWeatherService,
-                          send: (Long, String) => Future[Message]) extends DefaultInstrumented {
+                          send: (Long, String) => Future[Message], configComplete: Config) extends DefaultInstrumented {
   // LOGGING
   private val logger = Logger(getClass)
 
@@ -42,7 +42,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
   private val databaseFailures = metrics.meter("db-failures")
 
   // CONFIGURATION
-  protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
+  protected val config: Config = configComplete.getConfig("subscriptions.handler")
 
   def run(): Unit = timerAllSubscriptions.time {
     logger.info("Handling subscriptions")
@@ -64,7 +64,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
             case Failure(t) =>
               logger.warn("Retrieving the weather updates for handling the subscriptions failed", t)
               weatherServiceFailures.mark()
-              Future.failed(t)
+              Future.failed(new RetriableException(t, config.getInt("retries_weather_service")))
           }
         } else {
           logger.info("No current subscriptions found in database, skipping the handling of subscriptions")
@@ -74,15 +74,11 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
         logger.warn("Could not get the list of stations from the database " +
           "while trying to handle the subscriptions", t)
         databaseFailures.mark()
-        Future.failed(t)
-    } recover {
-      // Make sure that no exception gets thrown into the akka scheduler as this would stop the
-      // scheduling and make the error unrecoverable
-      case NonFatal(ex) => logger.warn("Exception thrown during subscription handling", ex)
+        Future.failed(new RetriableException(t, config.getInt("retries_db")))
     }
 
     // Block so that the poller isn't started twice while futures are still being executed
-    Await.ready(result, Duration(config.getString("subscriptions.handler.run_timeout")))
+    Await.result(result, Duration(config.getString("run_timeout")))
   }
 
   private def getWeatherUpdates(stations: Set[String]): Future[(Map[String, Seq[METAR]], Map[String, Seq[TAF]])] = {
