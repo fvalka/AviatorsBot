@@ -40,12 +40,12 @@ object Scheduler {
     SchedulerJob.setExecutor(func)
 
     val interval = Duration(config.getString("interval"))
-    val inital_delay = Duration(config.getString("initial_delay"))
+    val initial_delay = Duration(config.getString("initial_delay"))
 
     val startDate = Date.from(
       ZonedDateTime
         .now()
-        .plus(inital_delay)
+        .plus(initial_delay)
         .toInstant
     )
 
