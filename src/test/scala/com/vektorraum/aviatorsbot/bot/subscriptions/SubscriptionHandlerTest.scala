@@ -143,21 +143,53 @@ class SubscriptionHandlerTest extends FeatureSpec
       Then("A retriable exception is thrown")
       a[RetriableException] should be thrownBy bot.runSubscriptionHandler()
     }
+
+    scenario("Sending a message fails") {
+      Given("AviatorsBot with two subscriptions")
+      val bot = new AviatorsBotForTesting()
+
+      val sub1 = subscription1.copy()
+      val sub2 = subscription2.copy()
+
+      bot.subscriptionDAO.findAllStations _ expects() returns
+        Future.successful(Set(sub1.icao, sub2.icao))
+
+      inAnyOrder {
+        bot.weatherService.getMetars _ expects where {
+          stations: Iterable[String] => stations.head == "LOWW"
+        } returns Future.failed {
+          new RuntimeException("TEST")
+        }
+        bot.weatherService.getTafs _ expects where {
+          stations: Iterable[String] => stations.head == "LOWW"
+        } returns Future.successful {
+          TAFResponseFixtures.ValidLOWW
+        }
+      }
+
+      bot.subscriptionDAO.findAllSubscriptionsForStation _ expects sub1.icao returns
+        Future.successful(List(sub1))
+
+      Then("A retriable exception is thrown and addOrExtend is never called")
+      a[Exception] should be thrownBy bot.runSubscriptionHandler()
+    }
   }
 
   private def mockNormalCalls(bot: AviatorsBotForTesting, sub1: Subscription, sub2: Subscription) = {
     bot.subscriptionDAO.findAllStations _ expects() returns
       Future.successful(Set(sub1.icao, sub2.icao))
 
-    bot.weatherService.getMetars _ expects where {
-      stations: Iterable[String] => stations.head == "LOWW"
-    } returns Future.successful {
-      METARResponseFixtures.ValidLOWW7Hours
-    }
-    bot.weatherService.getTafs _ expects where {
-      stations: Iterable[String] => stations.head == "LOWW"
-    } returns Future.successful {
-      TAFResponseFixtures.ValidLOWW
+    inAnyOrder {
+      bot.weatherService.getMetars _ expects where {
+        stations: Iterable[String] => stations.head == "LOWW"
+      } returns Future.successful {
+        METARResponseFixtures.ValidLOWW7Hours
+      }
+      bot.weatherService.getTafs _ expects where {
+        stations: Iterable[String] => stations.head == "LOWW"
+      } returns Future.successful {
+        TAFResponseFixtures.ValidLOWW
+      }
     }
 
     bot.subscriptionDAO.findAllSubscriptionsForStation _ expects sub1.icao returns

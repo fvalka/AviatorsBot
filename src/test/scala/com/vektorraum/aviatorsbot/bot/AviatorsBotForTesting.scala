@@ -21,7 +21,7 @@ import scala.concurrent.{Future, Promise}
   *
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshRegistries {
+class AviatorsBotForTesting(val sendMessageFails: Boolean = false) extends AviatorsBot with MockFactory with FreshRegistries {
   var replySent: String = ""
   var parseMode: Option[ParseMode] = None
 
@@ -49,7 +49,7 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshReg
     recordSentMessage(text, parseMode)
   }
 
-  private def recordSentMessage(text: String, parseMode: Option[ParseMode]) = {
+  private def recordSentMessage(text: String, parseMode: Option[ParseMode]): Future[Message] = {
     if (replySent != "") {
       throw new IllegalArgumentException("This object must not be reused")
     }
@@ -59,9 +59,13 @@ class AviatorsBotForTesting() extends AviatorsBot with MockFactory with FreshReg
     replySent = text
     this.parseMode = parseMode
 
-    Future {
-      val chat = Chat(123L, ChatType.Private)
-      Message(messageId = 123, chat = chat, date = 1234444)
+    if(sendMessageFails) {
+      Future.failed(new RuntimeException("Expected failure set up for testing."))
+    } else {
+      Future {
+        val chat = Chat(123L, ChatType.Private)
+        Message(messageId = 123, chat = chat, date = 1234444)
+      }
     }
   }
 
