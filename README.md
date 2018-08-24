@@ -74,7 +74,7 @@ MongoDB is used as the backend. Accessed using the
 [`reactive-mongo`](http://reactivemongo.org/) Scala library for extending 
 the non-block and reactive concept also to this part. 
 
-### Continuous Deployment ###
+### Continuous Deployment 
 Using a Amazon AWS CodePipeline the bot is continuously deployed to 
 an EC2 instance. 
 
@@ -90,7 +90,14 @@ as a specification of the bots feature set and error handling strategies.
 To enable seamless testing a macro based DI library is used for 
 Inversion of Control. 
 
-### Logging and Metrics ### 
+### Scheduling of Subscription Updates 
+[`Quartz scheduler`](http://www.quartz-scheduler.org) is used to provide reliable 
+and fault tolerant scheduling of weather updates. 
+
+For the purpose of immediate retries a RetriableException has been implemented which 
+will cause an immediate refiring of the scheduler up to the number of maximum retries. 
+
+### Logging and Metrics
 Extensive logging and configurability add to the production readiness 
 of the bot. 
 
@@ -98,7 +105,7 @@ All commands, messages received and sent and many errors are also monitored
 and timed using 
 [`dropwizard metrics for scala`](https://github.com/erikvanoosten/metrics-scala). 
 
-### METAR and TAF Change Detection ###
+### METAR and TAF Change Detection 
 METARs and TAFs are considered changed if the MurmurHash3 of the raw text 
 changes or for METARs the observation time and for TAFs the issue time. 
 
