@@ -18,6 +18,9 @@ object AviatorsBotProduction extends AviatorsBot {
     ReporterUtil.graphiteReporter(config.getConfig("metrics.graphite"), this.metricRegistry)
       .foreach(_.start(config.getInt("metrics.graphite.interval_s"), TimeUnit.SECONDS))
 
+    ReporterUtil.csvReporter(config.getConfig("metrics.csv"), this.metricRegistry)
+      .foreach(_.start(config.getInt("metrics.csv.interval_s"), TimeUnit.SECONDS))
+
   }
 
 }

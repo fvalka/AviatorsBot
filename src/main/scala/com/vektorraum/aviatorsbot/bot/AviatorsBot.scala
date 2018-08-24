@@ -3,6 +3,7 @@ package com.vektorraum.aviatorsbot.bot
 import java.io.File
 import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
+import java.util.concurrent.atomic.AtomicLong
 
 import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
@@ -58,9 +59,6 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   // of SubscriptionHandler
   protected lazy val sendFunc: (Long, String) => Future[Message] = send
   lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
-
-  // METRICS
-  metrics.cachedGauge("subscription-count", timeout = 3 minutes) { subscriptionDAO.count() }
 
   // COMMAND ARGUMENTS
   // Requires at least one ICAO code and allows adds wildcards like LO*, etc.
@@ -239,6 +237,13 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
               s"msg=$msg args=$args", t)
             reply(ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED)
         }
+  }
+
+  // METRICS
+  protected val subscriptionCount = new AtomicLong()
+  metrics.gauge[Long]("subscription-count") {
+    subscriptionDAO.count() foreach { count => subscriptionCount.set(count)}
+    subscriptionCount.get()
   }
 
 

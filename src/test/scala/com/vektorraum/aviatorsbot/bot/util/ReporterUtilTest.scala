@@ -22,7 +22,6 @@ class ReporterUtilTest extends FunSuite with GivenWhenThen {
 
     Then("Reporter should be created")
     result should not be empty
-    result.get.report()
   }
 
   test("Disabled configuration returns an empty optional") {
@@ -40,6 +39,32 @@ class ReporterUtilTest extends FunSuite with GivenWhenThen {
     val result = ReporterUtil.graphiteReporter(config, registry)
 
     Then("Reporter should not be created")
+    result shouldBe empty
+  }
+
+  test("CSV Reporter interprets configuration correctly") {
+    Given("Valid configuration and metrics registry")
+    val bot = new AviatorsBotForTesting()
+    val registry = bot.metricRegistry
+    val config = ConfigFactory.parseString("enabled = true\n    directory = \"logs/metrics.csv\"")
+
+    When("Creating a CSV reporter")
+    val result = ReporterUtil.csvReporter(config, registry)
+
+    Then("Reporter should be created")
+    result should not be empty
+  }
+
+  test("CSV Reporter returns empty result when disabled") {
+    Given("Valid configuration and metrics registry")
+    val bot = new AviatorsBotForTesting()
+    val registry = bot.metricRegistry
+    val config = ConfigFactory.parseString("enabled = false\n    directory = \"logs/metrics.csv\"")
+
+    When("Creating a CSV reporter")
+    val result = ReporterUtil.csvReporter(config, registry)
+
+    Then("Reporter should be created")
     result shouldBe empty
   }
 
