@@ -20,9 +20,27 @@ class ReporterUtilTest extends FunSuite with GivenWhenThen {
     When("Creating a new graphite reporter")
     val result = ReporterUtil.graphiteReporter(config, registry)
 
-    Then("")
+    Then("Reporter should be created")
     result should not be empty
     result.get.report()
+  }
+
+  test("Disabled configuration returns an empty optional") {
+    Given("Valid Configuration and metrics registry")
+    val bot = new AviatorsBotForTesting()
+    val registry = bot.metricRegistry
+    val config = ConfigFactory.parseString("enabled = false\n    " +
+      "host = \"localhost\"\n    " +
+      "port = \"2003\"\n    " +
+      "prefix = " +
+      "\"aviatorsbot\"\n    " +
+      "interval_s = 60")
+
+    When("Creating a new graphite reporter")
+    val result = ReporterUtil.graphiteReporter(config, registry)
+
+    Then("Reporter should not be created")
+    result shouldBe empty
   }
 
 }
