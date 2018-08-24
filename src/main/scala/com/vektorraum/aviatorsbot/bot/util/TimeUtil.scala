@@ -1,9 +1,12 @@
 package com.vektorraum.aviatorsbot.bot.util
 
 import java.text.ParseException
+import java.time
 import java.time.{LocalTime, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAmount
 
+import scala.concurrent.duration.Duration
 import scala.util.matching.Regex
 
 /**
@@ -74,6 +77,18 @@ object TimeUtil {
       date.plusDays(1)
     } else {
       date
+    }
+  }
+
+  object implicits {
+    /**
+      * Converts a scala finite duration to a java duration
+      *
+      * @param d Scala duration
+      * @return Java duration
+      */
+    implicit def asTemporalAmount(d: Duration): TemporalAmount = {
+      time.Duration.ofNanos(d.toNanos)
     }
   }
 

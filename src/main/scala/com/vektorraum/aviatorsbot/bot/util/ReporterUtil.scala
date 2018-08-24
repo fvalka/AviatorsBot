@@ -24,7 +24,7 @@ object ReporterUtil {
     */
   def graphiteReporter(config: Config, registry: MetricRegistry): Option[GraphiteReporter] = {
     if(config.getBoolean("enabled")) {
-      val graphite = new PickledGraphite(new InetSocketAddress(config.getString("host"), config.getInt("port")))
+      val graphite = new Graphite(new InetSocketAddress(config.getString("host"), config.getInt("port")))
 
       val reporter = GraphiteReporter
         .forRegistry(registry)

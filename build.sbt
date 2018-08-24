@@ -22,6 +22,9 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 // Telegram Bot
 libraryDependencies += "info.mukel" %% "telegrambot4s" % "3.0.15"
 
+// Scheduler
+libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.3.0"
+
 // Logging
 libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.11.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.11.1"

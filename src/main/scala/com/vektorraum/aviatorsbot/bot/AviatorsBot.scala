@@ -57,7 +57,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   // Needed so that macwire can find the send function which has to be passed into the constructor
   // of SubscriptionHandler
   protected lazy val sendFunc: (Long, String) => Future[Message] = send
-  protected lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
+  lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
 
   // METRICS
   metrics.cachedGauge("subscription-count", timeout = 3 minutes) { subscriptionDAO.count() }
