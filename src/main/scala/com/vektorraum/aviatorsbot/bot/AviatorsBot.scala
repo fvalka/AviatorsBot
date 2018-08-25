@@ -62,10 +62,13 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
 
   // COMMAND ARGUMENTS
   // Requires at least one ICAO code and allows adds wildcards like LO*, etc.
-  protected val wildcardStationsArgs = Set(Argument("stations", StationUtil.isValidInput,
+  protected val weatherServiceStationsArgs = Set(Argument("stations", StationUtil.isValidInput,
     min = 1, preprocessor = _.toUpperCase))
   // Requires at lest one ICAO code and only allows actual stations e.g. LOWW, KJFK, etc.
   protected val stationsArgs = Set(Argument("stations", StationUtil.isICAOAptIdentifier,
+    min = 1, preprocessor = _.toUpperCase))
+  // Stations with wildcards at the end e.g. LOWW, LOW*, *
+  protected val wildcardStationArgs = Set(Argument("stations", StationUtil.isWildcardStation,
     min = 1, preprocessor = _.toUpperCase))
   // Requires exactly one actual ICAO code
   protected val oneStationArgs = Set(Argument("station", StationUtil.isICAOAptIdentifier,
@@ -87,7 +90,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
       disableWebPagePreview = true, parseMode = ParseMode.HTML)
   }
 
-  onCommand(Command("wx", "Current METAR and TAF", wildcardStationsArgs, longRunning = true)) {
+  onCommand(Command("wx", "Current METAR and TAF", weatherServiceStationsArgs, longRunning = true)) {
     implicit msg =>
       args =>
         val stations = args("stations")
@@ -189,7 +192,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
         }
   }
 
-  onCommand(Command("rm", "Unsubscribe from stations", stationsArgs)) {
+  onCommand(Command("rm", "Unsubscribe from stations", wildcardStationArgs)) {
     implicit msg =>
       args =>
         val stations = args("stations")
