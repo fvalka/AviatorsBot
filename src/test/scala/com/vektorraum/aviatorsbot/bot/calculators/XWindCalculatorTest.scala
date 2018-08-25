@@ -35,6 +35,19 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
       "<strong>36</strong> ➡3KT ⬇5KT"
   }
 
+  test("Given a difference which is too large between the runway number and the direction the direction is used") {
+    Given("METAR containing normal wind and Airfield with +10 deg magnetic variation")
+    val metar = METARFixtures.WindCases.normal
+    val airfield = Airfield("XXXX", "XXXX", 11.0, List(AirfieldFixtures.RunwayFixtures.NorthSouthRunway))
+
+    When("crosswind is calculated")
+    val result = XWindCalculator(metar, airfield)
+
+    Then("result matches name in the airfield information")
+    result shouldEqual "<strong>17</strong> ⬅3KT ⬆5KT\n" +
+      "<strong>35</strong> ➡3KT ⬇5KT"
+  }
+
   test("Gusting wind and no head/tailwind component") {
     Given("METAR with gusting wind")
     val metar = METARFixtures.WindCases.gusting

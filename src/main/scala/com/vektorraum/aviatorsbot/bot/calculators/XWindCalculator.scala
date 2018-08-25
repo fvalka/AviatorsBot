@@ -80,6 +80,12 @@ object XWindCalculator {
         }
       }
       .map(_.replaceAll("[A-Z]", ""))
+      .filter{ name =>
+        val runwayNumber = name.toInt
+        val runwayNumberCalculated = (dir - airfield.magVar)/10.0
+
+        Math.abs(runwayNumber % runwayNumberCalculated) <= 1.0
+      }
   }
 
   /**
