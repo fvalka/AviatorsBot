@@ -105,6 +105,27 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
         bot.replySent shouldEqual "Could not perform density altitude calculation for this station"
       }
     }
+
+    scenario("Metar with missing fields lead to nearby station") {
+      Given("AviatorsBotForTesting")
+      val bot = new AviatorsBotForTesting()
+
+      val metars = Map("LOWW" -> List(METARFixtures.ValidAndCompleteLOWW.copy(altim_in_hg = None)))
+
+      bot.weatherService.getMetars _ expects where {
+        stations: Iterable[String] => stations.head.toUpperCase == "LOWW"
+      } returns Future.successful { metars }
+
+      bot.airfieldDAO.near _ expects ("LOWW", *) returning Future.failed(new RuntimeException)
+
+      When("Requesting density altitude for valid station")
+      bot.receiveMockMessage("da loww")
+
+      Then("An error message is returned")
+      eventually {
+        bot.replySent shouldEqual "Could not perform density altitude calculation for this station"
+      }
+    }
   }
 
 }

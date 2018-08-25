@@ -33,6 +33,33 @@ object METARFixtures {
     </METAR>
   )
 
+  val ValidAndCompleteLOWG: METAR = scalaxb.fromXML[METAR](
+    <METAR>
+      <raw_text>
+        LOWG 251750Z AUTO 31005KT 280V340 9999 -SHRA FEW034 BKN038 15/13 Q1012 TEMPO RA
+      </raw_text>
+      <station_id>LOWG</station_id>
+      <observation_time>2018-08-25T17:50:00Z</observation_time>
+      <latitude>47.0</latitude>
+      <longitude>15.42</longitude>
+      <temp_c>15.0</temp_c>
+      <dewpoint_c>13.0</dewpoint_c>
+      <wind_dir_degrees>310</wind_dir_degrees>
+      <wind_speed_kt>5</wind_speed_kt>
+      <visibility_statute_mi>6.21</visibility_statute_mi>
+      <altim_in_hg>29.88189</altim_in_hg>
+      <quality_control_flags>
+        <auto>TRUE</auto>
+      </quality_control_flags>
+      <wx_string>-SHRA</wx_string>
+      <sky_condition sky_cover="FEW" cloud_base_ft_agl="3400"/>
+      <sky_condition sky_cover="BKN" cloud_base_ft_agl="3800"/>
+      <flight_category>VFR</flight_category>
+      <metar_type>METAR</metar_type>
+      <elevation_m>347.0</elevation_m>
+    </METAR>
+  )
+
   object WindCases {
     val normal: METAR = scalaxb.fromXML[METAR](
       <METAR>

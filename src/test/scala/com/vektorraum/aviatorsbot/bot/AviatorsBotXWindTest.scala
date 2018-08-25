@@ -2,14 +2,12 @@ package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
 import info.mukel.telegrambot4s.methods.ParseMode
-import nl.grons.metrics4.scala.FreshRegistries
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FeatureSpec, GivenWhenThen}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -36,7 +34,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
         stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { TAFResponseFixtures.ValidLOWW }
 
-      bot.airfieldDAO.findByIcao _ when "LOWW" returns Future.successful {Some(AirfieldFixtures.LOWW)}
+      bot.airfieldDAO.findByIcao _ expects "LOWW" returning Future.successful {Some(AirfieldFixtures.LOWW)}
 
       When("Requesting crosswind for same station")
       bot.receiveMockMessage("xwind loww")
@@ -65,7 +63,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
         stations: Iterable[String] => stations.head == "LNPP"
       } returns Future.successful { Map()}
 
-      bot.airfieldDAO.findByIcao _ when "LNPP" returns Future.successful {None}
+      bot.airfieldDAO.findByIcao _ expects "LNPP" returning Future.successful {None}
 
       When("Requesting xwind for station which is not in the database")
       bot.receiveMockMessage("xwind lnpp")
@@ -88,7 +86,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
         stations: Iterable[String] => stations.head == "LOWW"
       } returns Future.successful { Map() }
 
-      bot.airfieldDAO.findByIcao _ when "LOWW" returns Future.successful {Some(AirfieldFixtures.LOWW)}
+      bot.airfieldDAO.findByIcao _ expects "LOWW" returning Future.successful {Some(AirfieldFixtures.LOWW)}
 
       When("Requesting xwind for station which is not in the database")
       bot.receiveMockMessage("xwind loww")
@@ -103,7 +101,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
       Given("AviatorsBotForTesting with valid metar and valid database entry")
       val bot = new AviatorsBotForTesting()
 
-      bot.airfieldDAO.findByIcao _ when "LOWW" returns Future.successful {Some(AirfieldFixtures.LOWW)}
+      bot.airfieldDAO.findByIcao _ expects "LOWW" returning Future.successful {Some(AirfieldFixtures.LOWW)}
 
       When("Requesting xwind for invalid station identifier")
       bot.receiveMockMessage("xwind lowkw")
@@ -120,7 +118,7 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
     scenario("Pilot requests xwind and an exception occurs") {
       Given("AviatorsBotForTesting with valid metar and DAO throws an exception")
       val bot = new AviatorsBotForTesting()
-      bot.airfieldDAO.findByIcao _ when "LOWW" returns Future.failed(new RuntimeException())
+      bot.airfieldDAO.findByIcao _ expects "LOWW" returning Future.failed(new RuntimeException())
 
       When("Requesting xwind")
       bot.receiveMockMessage("xwind loww")

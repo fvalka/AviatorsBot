@@ -8,7 +8,6 @@ import com.softwaremill.macwire._
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.SubscriptionFixtures
-import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import org.scalatest.Matchers._
 import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 

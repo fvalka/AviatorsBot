@@ -26,7 +26,7 @@ class AviatorsBotForTesting(val sendMessageFails: Boolean = false) extends Aviat
   var parseMode: Option[ParseMode] = None
 
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
-  override lazy val airfieldDAO: AirfieldDAO = stub[AirfieldDAO]
+  override lazy val airfieldDAO: AirfieldDAO = mock[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
 
   // ensures that the bot can not connect to the real Telegram API

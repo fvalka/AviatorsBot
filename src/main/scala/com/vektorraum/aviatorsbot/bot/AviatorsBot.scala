@@ -58,6 +58,7 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   // of SubscriptionHandler
   protected lazy val sendFunc: (Long, String) => Future[Message] = send
   lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
+  lazy val densityAltitudeCalculator: DensityAltitudeCalculator = wire[DensityAltitudeCalculator]
 
   // COMMAND ARGUMENTS
   // Requires at least one ICAO code and allows adds wildcards like LO*, etc.
@@ -140,7 +141,12 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
         weatherService.getMetars(List(station)) map { metars =>
           val metar = metars.get(station)
           metar match {
-            case Some(m) => reply(DensityAltitudeCalculator(m.head), ParseMode.HTML)
+            case Some(m) =>
+              densityAltitudeCalculator(m.head) andThen {
+                case Success(message) => reply(message, ParseMode.HTML)
+                case Failure(t) => reply("Could not perform density altitude calculation for this station")
+                  logger.warn("DensityAltitudeCalculator returned failure", t)
+              }
             case None => reply(ERROR_NO_METAR_FOR_STATION)
           }
         } andThen {
