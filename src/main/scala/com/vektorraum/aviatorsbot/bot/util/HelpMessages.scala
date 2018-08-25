@@ -15,8 +15,6 @@ import scala.language.postfixOps
   * Created by fvalka on 07.06.2017.
   */
 object HelpMessages {
-  implicit val scalaCache: ScalaCache[NoSerialization] = ScalaCache(CaffeineCache())
-
   private val safeFileNames = "[a-zA-Z0-9]*".r
 
   val logger = Logger(getClass)
@@ -29,7 +27,7 @@ object HelpMessages {
     * @param command Name of the command without slashes
     * @return The stored static HTML file
     */
-  def apply(command: String): String = memoizeSync(1 hour) {
+  def apply(command: String): String = {
     logger.debug(s"Loading help file for command=$command")
     if(!safeFileNames.pattern.matcher(command).matches) {
       throw new IllegalArgumentException("Could not load help, unsafe filename")

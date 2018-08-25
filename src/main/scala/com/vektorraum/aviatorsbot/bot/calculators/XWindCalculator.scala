@@ -48,10 +48,38 @@ object XWindCalculator {
           ""
         }
 
-      val runwayText = "%02d".format(math.round(math.round(dir - airfield.magVar) / 10.0))
+      val runwayNumber = Math.round((dir - airfield.magVar)/10.0)
+      val runwayTextInferred = "%02d".format(runwayNumber)
+
+      val runwayText = runwayName(airfield, dir)
+        .getOrElse(runwayTextInferred)
 
       s"<strong>$runwayText</strong> $normalWind $variableWind".trim
     } mkString "\n"
+  }
+
+  /**
+    * Find the runway name based upon the direction
+    *
+    * Identifiers like L, R and C are removed so that only one runway remains
+    *
+    * @param airfield Airfield information, containing the runways
+    * @param dir Direction of the runway as per the airfield information
+    * @return Runway name with L, R, C
+    */
+  private def runwayName(airfield: Airfield, dir: Int) = {
+    airfield.runways
+      .find(_.directions.exists(_ == dir))
+      .map { runway =>
+        val names = runway.name.split("/")
+
+        if (dir > 180) {
+          names(1)
+        } else {
+          names(0)
+        }
+      }
+      .map(_.replaceAll("[A-Z]", ""))
   }
 
   /**

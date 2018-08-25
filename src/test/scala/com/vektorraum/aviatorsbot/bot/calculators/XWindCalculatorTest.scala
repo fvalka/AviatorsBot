@@ -30,9 +30,9 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     When("crosswind is calculated")
     val result = XWindCalculator(metar, airfield)
 
-    Then("result matches precalculated values")
-    result shouldEqual "<strong>17</strong> ⬅3KT ⬆5KT\n" +
-      "<strong>35</strong> ➡3KT ⬇5KT"
+    Then("result matches name in the airfield information")
+    result shouldEqual "<strong>18</strong> ⬅3KT ⬆5KT\n" +
+      "<strong>36</strong> ➡3KT ⬇5KT"
   }
 
   test("Gusting wind and no head/tailwind component") {
