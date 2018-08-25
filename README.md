@@ -48,6 +48,10 @@ Calculating the density altitude with consideration for the actual pressure
 and water vapor pressure results in a more accurate result than just using 
 the elevation and temperature. 
 
+If the stations METAR doesn't contain an altimeter setting the METARs for the
+airfields within 50km of the station will also be retrieved and the altimeter
+setting of the closest field with a valid value is used. 
+
 ### Current Weather
 The `/wx <ICAO>` command returns the current METAR and TAF and 
 enhances the METAR with an icon for the flight category provided by 
