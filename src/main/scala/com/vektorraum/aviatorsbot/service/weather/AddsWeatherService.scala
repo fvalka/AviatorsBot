@@ -3,6 +3,7 @@ package com.vektorraum.aviatorsbot.service.weather
 import com.vektorraum.aviatorsbot.generated.metar.{METAR, Response}
 import com.vektorraum.aviatorsbot.generated.taf
 import com.vektorraum.aviatorsbot.generated.taf.TAF
+import nl.grons.metrics4.scala.{DefaultInstrumented, Timer}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -10,14 +11,18 @@ import scala.xml.Elem
 
 
 /**
-  * Created by fvalka on 19.05.2017.
+  * Weather service for retrieving METARs and TAFs from the NOAA
+  * aviationweather.gov Text Data Server
   */
-trait AddsWeatherService {
+trait AddsWeatherService extends DefaultInstrumented {
   val MetarMaxAge = 7
   val TafMaxAge = 7
 
   protected def callAddsServerMetar(stations: Iterable[String], maxAge: Int): Future[Elem]
   protected def callAddsServerTaf(stations: Iterable[String], maxAge: Int): Future[Elem]
+
+  protected val metarTimer: Timer = metrics.timer("metars")
+  protected val tafTimer: Timer = metrics.timer("tafs")
 
   /**
     * Gets the METARs for the last hours
@@ -25,7 +30,8 @@ trait AddsWeatherService {
     * @param stations List of station ICAO ids
     * @return Future of a map ICAO -> METARs
     */
-  def getMetars(stations: Iterable[String]): Future[Map[String, Seq[METAR]]] = {
+  def getMetars(stations: Iterable[String]): Future[Map[String, Seq[METAR]]] =
+  metarTimer.timeFuture {
     callAddsServerMetar(stations, MetarMaxAge) map { xml =>
       scalaxb.fromXML[Response](xml)
     } map { response =>
@@ -40,7 +46,8 @@ trait AddsWeatherService {
     * @param stations List of station ICAO ids
     * @return Future of a map ICAO -> TAFs
     */
-  def getTafs(stations: Iterable[String]): Future[Map[String, Seq[TAF]]] = {
+  def getTafs(stations: Iterable[String]): Future[Map[String, Seq[TAF]]] =
+  tafTimer.timeFuture {
     callAddsServerTaf(stations, TafMaxAge) map { xml =>
       scalaxb.fromXML[taf.Response](xml)
     } map { response =>
