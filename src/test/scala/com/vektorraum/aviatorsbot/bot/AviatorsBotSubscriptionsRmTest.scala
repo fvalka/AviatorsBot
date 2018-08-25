@@ -40,6 +40,25 @@ class AviatorsBotSubscriptionsRmTest extends FeatureSpec
       }
     }
 
+    scenario("Pilot wants to remove all stations with wildcard") {
+      Given("AviatorsBot with mock for removing the subscription")
+      val bot = new AviatorsBotForTesting()
+
+      bot.subscriptionDAO.remove _ expects where {
+        (chatId: Long, station: String) => {
+          chatId == bot.testChatId && station == "*"
+        }
+      } returns Future.successful(WriteResultFixtures.WriteResultOk)
+
+      When("Pilot sends the rm command with wildcard")
+      bot.receiveMockMessage("/rm *")
+
+      Then("Pilot receives the deletion confirmation")
+      eventually {
+        bot.replySent shouldEqual "Unsubscribed successfully"
+      }
+    }
+
     scenario("A database error occurs, failed Future") {
       Given("AviatorsBot with mock returning a failed future")
       val bot = new AviatorsBotForTesting()

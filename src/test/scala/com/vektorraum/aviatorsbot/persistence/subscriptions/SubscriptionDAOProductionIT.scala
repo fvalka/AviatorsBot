@@ -48,7 +48,9 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
         result.get.validUntil shouldEqual validUntil
       }
     }
+  }
 
+  feature("Find all stations") {
     scenario("All stations ICAO codes of all stations with active subscriptions can be listed") {
       Given("A database with stored subscriptions")
 
@@ -61,12 +63,14 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
         dao.findAllStations()
       } flatMap { stations =>
         Then("All stations with non expired subscriptions are included")
-        stations should contain (subscription1.icao)
-        stations should contain (subscription2.icao)
+        stations should contain(subscription1.icao)
+        stations should contain(subscription2.icao)
         stations should not contain subscriptionExpired.icao
       }
     }
+  }
 
+  feature("Add or extend a subscription") {
     scenario("AddOrExtend automatically extends the validity if a station is added again") {
       Given("A subscription which is valid for one more hour and a copy of this subscription" +
         "which is valid for 2 hours")
@@ -78,11 +82,11 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
         dao.addOrExtend(subscriptionShortValidity)
       } flatMap { writeResult =>
         When("Adding a subscription for the same chatId/Icao station with different validity")
-        writeResult.ok should be (true)
+        writeResult.ok should be(true)
         dao.addOrExtend(subscriptionValidLonger)
       } flatMap { writeResult =>
         Then("Find will return the longer validity")
-        writeResult.ok should be (true)
+        writeResult.ok should be(true)
         dao.find(subscriptionShortValidity.chatId, subscriptionShortValidity.icao)
       } flatMap { subscription =>
         subscription should not be empty
@@ -90,7 +94,9 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       }
 
     }
+  }
 
+  feature("Find all subscriptions for a specific user/chatId") {
     scenario("FindAllByChatId returns all stations with non expired subscriptions") {
       Given("Two subscriptions for the same chatId")
 
@@ -104,12 +110,14 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       } flatMap { subs =>
         Then("The non expired subscriptions are contained in the list and the expired one is not part" +
           "of the result")
-        subs should contain (subscription1)
-        subs should contain (subscription2)
+        subs should contain(subscription1)
+        subs should contain(subscription2)
         subs should not contain subscriptionExpired
       }
     }
+  }
 
+  feature("Removing subscriptions") {
     scenario("Remove of a subscription which doesn't exist returns the correct writeResult") {
       Given("No subscriptions in the database")
 
@@ -121,8 +129,44 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       }
     }
 
-    scenario("Adding a subscription and then removing it actually removes it from the database") {
+    scenario("Wildcards work when removing stations from the database") {
       Given("A subscription stored in the database")
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscription1)
+        dao.addOrExtend(subscription2)
+      } flatMap { _ =>
+        When("Removing  all stations using wildcard")
+        dao.remove(subscription1.chatId, "*")
+      } flatMap { writeResult =>
+        writeResult.ok shouldBe true
+        dao.findAllByChatId(subscription1.chatId)
+      } flatMap { result =>
+        Then("The dao should no longer find this subscription")
+        result shouldBe empty
+      }
+    }
+
+    scenario("Limited wildcard only removes the correct station") {
+      Given("A subscription stored in the database")
+
+      cleanDb flatMap { _ =>
+        dao.addOrExtend(subscription1)
+        dao.addOrExtend(subscription2)
+      } flatMap { _ =>
+        When("Removing only stations with the first letter L")
+        dao.remove(subscription1.chatId, "L*")
+      } flatMap { writeResult =>
+        writeResult.ok shouldBe true
+        dao.findAllByChatId(subscription1.chatId)
+      } flatMap { result =>
+        Then("The dao should no longer find this subscription")
+        result should contain (subscription2)
+      }
+    }
+
+    scenario("Adding a subscription and then removing it actually removes it from the database") {
+      Given("Two subscription stored in the database")
 
       cleanDb flatMap { _ =>
         dao.addOrExtend(subscription1)
@@ -137,7 +181,9 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
         result shouldEqual None
       }
     }
+  }
 
+  feature("Counting subscriptions") {
     scenario("Count returns correct number of subscriptions") {
       Given("A database with stored subscriptions")
 

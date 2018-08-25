@@ -3,7 +3,7 @@ package com.vektorraum.aviatorsbot.persistence.subscriptions
 import java.util.Date
 
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.{LatestInfo, Subscription}
-import com.vektorraum.aviatorsbot.persistence.{Db, subscriptions}
+import com.vektorraum.aviatorsbot.persistence.{Db, DbUtil, subscriptions}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, ReadConcern, commands}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, Macros}
@@ -130,8 +130,12 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     * @return Future of the write result
     */
   override def remove(chatId: Long, station: String): Future[WriteResult] = {
-    val query = findByChatIdAndIcaoQuery(chatId, station)
-    airfieldCollection.flatMap(_.remove(query)) map convertWriteResult
+    val query = if(station.contains("*")) {
+      findByChatIdAndWildcardIcaoQuery(chatId, station)
+    } else {
+      findByChatIdAndIcaoQuery(chatId, station)
+    }
+    airfieldCollection.flatMap(_.delete().one(query)) map convertWriteResult
   }
 
   /**
@@ -153,6 +157,18 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     */
   protected def findByChatIdAndIcaoQuery(chatId: Long, icao: String): BSONDocument = {
     BSONDocument("chatId" -> chatId, "icao" -> icao)
+  }
+
+  /**
+    * Creates a BSON query for searching by chatId and ICAO code, containing * wildcard
+    *
+    * @param chatId Chat Id by which to search
+    * @param icao ICAO code of the station to be queried for
+    * @return BSON query for execution on mongodb
+    */
+  protected def findByChatIdAndWildcardIcaoQuery(chatId: Long, icao: String): BSONDocument = {
+    val icaoConverted = DbUtil.wildcardToQuery(icao)
+    BSONDocument("chatId" -> chatId, "icao" -> BSONDocument("$regex" -> icaoConverted))
   }
 
   /**
