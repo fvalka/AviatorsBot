@@ -1,9 +1,6 @@
 package com.vektorraum.aviatorsbot.bot.subscriptions
 
-import java.io.File
-import java.lang.Exception
-
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.LatestInfoConverter
 import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
@@ -18,7 +15,6 @@ import nl.grons.metrics4.scala.DefaultInstrumented
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /**
@@ -27,6 +23,7 @@ import scala.util.{Failure, Success}
   * @param subscriptionDAO Persistence backend
   * @param weatherService Weather service providing METARs and TAFs
   * @param send Updates will be sent using this function
+  * @param configComplete Configuration subtree for the subscription handler
   */
 class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: AddsWeatherService,
                           send: (Long, String) => Future[Message], configComplete: Config) extends DefaultInstrumented {
@@ -44,6 +41,13 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
   // CONFIGURATION
   protected val config: Config = configComplete.getConfig("subscriptions.handler")
 
+  /**
+    * Handling of all subscriptions stored in the database.
+    *
+    * Retrieves a list of all ICAO stations, checks the weather service for updates and
+    * sends messages if the weather changed compared to the last update sent to the user.
+    *
+    */
   def run(): Unit = timerAllSubscriptions.time {
     logger.info("Handling subscriptions")
     val result = subscriptionDAO.findAllStations() transformWith {
@@ -81,6 +85,12 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
     Await.result(result, Duration(config.getString("run_timeout")))
   }
 
+  /**
+    * Get weather updates from the weather service, TAF and METAR combined
+    *
+    * @param stations Set of all stations which should be queried
+    * @return Futures of both the METAR and TAF updates, as a Tuple2
+    */
   private def getWeatherUpdates(stations: Set[String]): Future[(Map[String, Seq[METAR]], Map[String, Seq[TAF]])] = {
     logger.debug("Retrieving weather updates from service")
     logger.info(s"Currently subscribed stations: $stations")
@@ -90,6 +100,16 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
     } yield (metars, tafs)
   }
 
+  /**
+    * Send weather updates to the subscribers.
+    *
+    * Checks if the subscribers have not yet gotten the new updates.
+    *
+    * @param metars All METARs obtained from the weather service
+    * @param tafs All TAFs obtained from the weather service
+    * @param subscriptions Subscriptions for one specific station
+    * @return A future which can be used for timing and exception handling
+    */
   private def sendUpdatesForStation(metars: Map[String, Seq[METAR]], tafs: Map[String, Seq[TAF]],
   subscriptions: List[Subscription]): Future[Seq[Any]] = {
     val result: Seq[Future[Any]] = subscriptions map { sub =>
@@ -136,6 +156,13 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
     Future.sequence(result)
   }
 
+  /**
+    * Builds a weather message for the METAR and TAF
+    *
+    * @param metar If Some METAR is included it will be included in the message
+    * @param taf If Some TAF is included it will be included in the message
+    * @return Weather message which can be sent to the user
+    */
   private def buildWxMessage(metar: Option[Seq[METAR]], taf: Option[Seq[TAF]]) = {
     val metarFormatted = metar.map(FormatMetar(_)).getOrElse("")
     val tafFormatted = taf.map(FormatTaf(_)).getOrElse("")

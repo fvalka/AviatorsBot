@@ -4,7 +4,7 @@ import com.vektorraum.aviatorsbot.bot.util.TimeFormatter
 import com.vektorraum.aviatorsbot.calculations.{DensityAltitude, StationPressure}
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import squants.motion.Pascals
-import squants.space.{Feet, Meters}
+import squants.space.Meters
 import squants.thermal.Celsius
 
 object DensityAltitudeCalculator {

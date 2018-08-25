@@ -2,11 +2,12 @@ package com.vektorraum.aviatorsbot.bot.util
 
 import java.text.ParseException
 import java.time
-import java.time.{LocalTime, ZoneOffset, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAmount
+import java.time.{LocalTime, ZoneOffset, ZonedDateTime}
 
 import scala.concurrent.duration.Duration
+import scala.language.implicitConversions
 import scala.util.matching.Regex
 
 /**

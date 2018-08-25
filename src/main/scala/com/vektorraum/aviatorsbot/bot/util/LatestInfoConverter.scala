@@ -8,6 +8,7 @@ import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.LatestInfo
 
+import scala.language.implicitConversions
 import scala.util.hashing.MurmurHash3
 
 object LatestInfoConverter {

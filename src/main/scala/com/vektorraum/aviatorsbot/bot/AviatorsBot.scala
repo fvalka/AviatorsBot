@@ -24,7 +24,6 @@ import info.mukel.telegrambot4s.models._
 import nl.grons.metrics4.scala.DefaultInstrumented
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
 import scala.io.Source
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
