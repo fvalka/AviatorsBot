@@ -11,6 +11,7 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.Subscriptio
 import org.scalatest.Matchers._
 import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 
+import scala.concurrent.Future
 import scala.language.postfixOps
 
 class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen with SubscriptionFixtures {
@@ -54,9 +55,10 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       Given("A database with stored subscriptions")
 
       cleanDb flatMap { _ =>
-        dao.addOrExtend(subscription1)
-        dao.addOrExtend(subscription2)
-        dao.addOrExtend(subscriptionExpired)
+        val futures = Seq(dao.addOrExtend(subscription1),
+        dao.addOrExtend(subscription2),
+        dao.addOrExtend(subscriptionExpired))
+        Future.sequence(futures)
       } flatMap { _ =>
         When("Finding all stations/obtaining a list of all subscribed stations")
         dao.findAllStations()
@@ -100,9 +102,10 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       Given("Two subscriptions for the same chatId")
 
       cleanDb flatMap { _ =>
-        dao.addOrExtend(subscription1)
-        dao.addOrExtend(subscription2)
-        dao.addOrExtend(subscriptionExpired)
+        val futures = Seq(dao.addOrExtend(subscription1),
+        dao.addOrExtend(subscription2),
+        dao.addOrExtend(subscriptionExpired))
+        Future.sequence(futures)
       } flatMap { _ =>
         When("Finding all subscriptions for a specific chatId")
         dao.findAllByChatId(subscription1.chatId)
@@ -132,8 +135,9 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       Given("A subscription stored in the database")
 
       cleanDb flatMap { _ =>
-        dao.addOrExtend(subscription1)
-        dao.addOrExtend(subscription2)
+        val futures = Seq(dao.addOrExtend(subscription1),
+        dao.addOrExtend(subscription2))
+        Future.sequence(futures)
       } flatMap { _ =>
         When("Removing  all stations using wildcard")
         dao.remove(subscription1.chatId, "*")
@@ -150,8 +154,9 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       Given("A subscription stored in the database")
 
       cleanDb flatMap { _ =>
-        dao.addOrExtend(subscription1)
-        dao.addOrExtend(subscription2)
+        val futures = Seq(dao.addOrExtend(subscription1),
+        dao.addOrExtend(subscription2))
+        Future.sequence(futures)
       } flatMap { _ =>
         When("Removing only stations with the first letter L")
         dao.remove(subscription1.chatId, "L*")
@@ -187,9 +192,10 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       Given("A database with stored subscriptions")
 
       cleanDb flatMap { _ =>
-        dao.addOrExtend(subscription1)
-        dao.addOrExtend(subscription2)
-        dao.addOrExtend(subscriptionExpired)
+        val futures = Seq(dao.addOrExtend(subscription1),
+        dao.addOrExtend(subscription2),
+        dao.addOrExtend(subscriptionExpired))
+        Future.sequence(futures)
       } flatMap { _ =>
         When("Counting all subscriptions in the database")
         dao.count()
@@ -206,9 +212,10 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
       Given("Subscriptions stored in the database")
 
       cleanDb flatMap { _ =>
-        dao.addOrExtend(subscription1)
-        dao.addOrExtend(subscription2)
-        dao.addOrExtend(subscription3)
+        val futures = Seq(dao.addOrExtend(subscription1),
+        dao.addOrExtend(subscription2),
+        dao.addOrExtend(subscription3))
+        Future.sequence(futures)
       } flatMap { _ =>
         When("Finding all stations by ICAO code")
         dao.findAllSubscriptionsForStation(subscription1.icao)
