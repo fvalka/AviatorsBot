@@ -21,7 +21,11 @@ import scala.concurrent.{Future, Promise}
   *
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotForTesting(val sendMessageFails: Boolean = false) extends AviatorsBot with MockFactory with FreshRegistries {
+class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = None)
+  extends AviatorsBot
+    with MockFactory
+    with FreshRegistries {
+
   var replySent: String = ""
   var parseMode: Option[ParseMode] = None
 
@@ -59,8 +63,8 @@ class AviatorsBotForTesting(val sendMessageFails: Boolean = false) extends Aviat
     replySent = text
     this.parseMode = parseMode
 
-    if(sendMessageFails) {
-      Future.failed(new RuntimeException("Expected failure set up for testing."))
+    if(sendMessageFailsException.isDefined) {
+      Future.failed(sendMessageFailsException.getOrElse(new RuntimeException))
     } else {
       Future {
         val chat = Chat(123L, ChatType.Private)

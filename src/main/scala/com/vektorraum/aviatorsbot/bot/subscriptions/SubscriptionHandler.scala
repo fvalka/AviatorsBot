@@ -9,6 +9,7 @@ import com.vektorraum.aviatorsbot.generated.taf.TAF
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
+import info.mukel.telegrambot4s.api.TelegramApiException
 import info.mukel.telegrambot4s.models.Message
 import nl.grons.metrics4.scala.DefaultInstrumented
 
@@ -100,6 +101,8 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
     } yield (metars, tafs)
   }
 
+  private val BLOCKED_EXECPTION_MESSAGE = "bot was blocked by the user"
+
   /**
     * Send weather updates to the subscribers.
     *
@@ -142,10 +145,16 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
 
             subscriptionDAO.addOrExtend(sub)
           case Failure(e) =>
-            logger.warn(s"Subscription update message could not be sent for subscription=$sub")
-            messagesInTransit -= 1
-            messageFailures.mark()
-            Future.failed(e)
+            if(e.isInstanceOf[TelegramApiException] && e.getMessage.contains(BLOCKED_EXECPTION_MESSAGE)) {
+              logger.info(s"Bot was blocked by user chatId=${sub.chatId} removing all subscriptions for this user")
+              subscriptionDAO.remove(sub.chatId, "*")
+              Future.successful()
+            } else {
+              logger.warn(s"Subscription update message could not be sent for subscription=$sub")
+              messagesInTransit -= 1
+              messageFailures.mark()
+              Future.failed(e)
+            }
         }
       } else {
         logger.debug(s"No updates to send for sub=$sub since both metarToSend and tafToSend were empty")
