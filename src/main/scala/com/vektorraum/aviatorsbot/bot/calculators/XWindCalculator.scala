@@ -12,6 +12,7 @@ import scala.collection.SortedSet
   * Created by fvalka on 25.05.2017.
   */
 object XWindCalculator {
+  private val DIGIT_WIDTH_SPACE = "  "
   private val VariableWindPattern = ".*(\\d{3})V(\\d{3}).*".r
 
   def apply(metar: METAR, airfield: Airfield): String = {
@@ -99,12 +100,14 @@ object XWindCalculator {
     */
   protected def formatOneCombo(runwayDirection: Int, windDirection: Int, windSpeed: Double): String = {
     def windAndEmoji(windSpeed: Int, emojiNegative: String, emojiPositive: String): String = {
+      def formatWindSpeed(speed: Int) =
+        if(speed < 10) { DIGIT_WIDTH_SPACE + speed } else { speed.toString }
       if (windSpeed == 0) {
         ""
       } else if (windSpeed < 0) {
-        s"$emojiNegative" + (-1 * windSpeed) + "KT"
+        s"$emojiNegative" + formatWindSpeed(-1 * windSpeed) + "KT"
       } else {
-        s"$emojiPositive${windSpeed}KT"
+        s"$emojiPositive${formatWindSpeed(windSpeed)}KT"
       }
     }
 

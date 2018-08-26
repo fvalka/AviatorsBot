@@ -43,9 +43,9 @@ class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFacto
       eventually {
         bot.replySent shouldEqual "METAR issued at: 2017-5-21 1150Z\n" +
           "Direction of flight: ⬆\n" +
-          "<strong>11</strong> ➡4KT ⬆17KT\n" +
+          "<strong>11</strong> ➡  4KT ⬆17KT\n" +
           "<strong>16</strong> ⬅10KT ⬆15KT\n" +
-          "<strong>29</strong> ⬅4KT ⬇17KT\n" +
+          "<strong>29</strong> ⬅  4KT ⬇17KT\n" +
           "<strong>34</strong> ➡10KT ⬇15KT"
         bot.parseMode shouldEqual Some(ParseMode.HTML)
       }

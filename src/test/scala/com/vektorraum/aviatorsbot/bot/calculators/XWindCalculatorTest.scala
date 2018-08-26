@@ -18,8 +18,8 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("result matches precalculated values")
-    result shouldEqual "<strong>18</strong> ⬅3KT ⬆5KT\n" +
-      "<strong>36</strong> ➡3KT ⬇5KT"
+    result shouldEqual "<strong>18</strong> ⬅  3KT ⬆  5KT\n" +
+      "<strong>36</strong> ➡  3KT ⬇  5KT"
   }
 
   test("Magnetic variation is considered correctly in runway names") {
@@ -31,8 +31,8 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val result = XWindCalculator(metar, airfield)
 
     Then("result matches name in the airfield information")
-    result shouldEqual "<strong>18</strong> ⬅3KT ⬆5KT\n" +
-      "<strong>36</strong> ➡3KT ⬇5KT"
+    result shouldEqual "<strong>18</strong> ⬅  3KT ⬆  5KT\n" +
+      "<strong>36</strong> ➡  3KT ⬇  5KT"
   }
 
   test("Given a difference which is too large between the runway number and the direction the direction is used") {
@@ -44,8 +44,8 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val result = XWindCalculator(metar, airfield)
 
     Then("result matches name in the airfield information")
-    result shouldEqual "<strong>17</strong> ⬅3KT ⬆5KT\n" +
-      "<strong>35</strong> ➡3KT ⬇5KT"
+    result shouldEqual "<strong>17</strong> ⬅  3KT ⬆  5KT\n" +
+      "<strong>35</strong> ➡  3KT ⬇  5KT"
   }
 
   test("Gusting wind and no head/tailwind component") {
@@ -69,8 +69,8 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("result contains all variations of the wind")
-    result shouldEqual "<strong>18</strong> ➡11KT ⬇9KT varying btw ➡14KT and ➡2KT ⬇14KT\n" +
-      "<strong>36</strong> ⬅11KT ⬆9KT varying btw ⬅14KT and ⬅2KT ⬆14KT"
+    result shouldEqual "<strong>18</strong> ➡11KT ⬇  9KT varying btw ➡14KT and ➡  2KT ⬇14KT\n" +
+      "<strong>36</strong> ⬅11KT ⬆  9KT varying btw ⬅14KT and ⬅  2KT ⬆14KT"
   }
 
   test("Fully variable wind (=VRBXX) gives error message") {
