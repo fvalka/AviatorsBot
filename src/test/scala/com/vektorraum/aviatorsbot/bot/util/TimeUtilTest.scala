@@ -1,5 +1,6 @@
 package com.vektorraum.aviatorsbot.bot.util
 
+import java.text.ParseException
 import java.time.{Duration, LocalTime, ZonedDateTime}
 
 import org.scalatest.Matchers._
@@ -91,6 +92,10 @@ class TimeUtilTest extends FunSuite with TableDrivenPropertyChecks with GivenWhe
       minutes should be < time * 60 + 2
       minutes should be > time * 60 - 2
     }
+  }
+
+  test("An invalid time format leads to a ParseException") {
+    a[ParseException] should be thrownBy TimeUtil.parseDurationOrTime("12000")
   }
 
 }

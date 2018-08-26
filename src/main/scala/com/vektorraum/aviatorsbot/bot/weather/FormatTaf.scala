@@ -5,14 +5,10 @@ import com.vektorraum.aviatorsbot.generated.taf.TAF
 /**
   * Created by fvalka on 23.05.2017.
   */
-object FormatTaf extends ((Seq[TAF], Option[TAF], Boolean) => String) {
-  def apply(history: Seq[TAF], diffTo: Option[TAF] = None, sparklines: Boolean = false): String = {
+object FormatTaf extends (Seq[TAF] => String) {
+  def apply(history: Seq[TAF]): String = {
     if(history.isEmpty) {
       return ""
-    }
-
-    if(sparklines || diffTo.isDefined) {
-      throw new NotImplementedError()
     }
 
     val raw = history.head.raw_text.get.trim
