@@ -1,22 +1,17 @@
 package com.vektorraum.aviatorsbot.bot
 
-import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARFixtures, METARResponseFixtures, TAFResponseFixtures}
+import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARFixtures, METARResponseFixtures}
 import info.mukel.telegrambot4s.methods.ParseMode
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FeatureSpec, GivenWhenThen}
-import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Millis, Span}
+import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.Matchers._
+import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 
 import scala.concurrent.Future
 
-class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
+class AviatorsBotDaTest extends AsyncFeatureSpec with GivenWhenThen with AsyncMockFactory {
   info("As a pilot I want to")
   info("Be able to calculate the density altitude")
   info("Without having to provide any additional input, besides the station name")
-
-  implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(1000, Millis)), interval = scaled(Span(60, Millis)))
 
   feature("Density altitude calculation based only upon the METAR") {
     scenario("Pilot calculates da for station which has a valid and complete METAR") {
@@ -31,12 +26,15 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("da loww")
 
       Then("The correct result is returned")
-      eventually {
+      for {
+        result <- bot.replyFuture
+        parseMode <- bot.parseModeFuture
+      } yield {
         val expected = "METAR observation time: 2017-5-21 1150Z\n" +
           "Elevation: 623 ft\n" +
           "Density altitude: <strong>1103 ft</strong>"
-        bot.replySent shouldEqual expected
-        bot.parseMode shouldEqual Some(ParseMode.HTML)
+        result shouldEqual expected
+        parseMode shouldEqual Some(ParseMode.HTML)
       }
     }
 
@@ -48,8 +46,8 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("/da")
 
       Then("A help message is returned")
-      eventually {
-        bot.replySent should include ("usage")
+      bot.replyFuture map { result =>
+        result should include ("usage")
       }
     }
 
@@ -67,8 +65,8 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("da loww")
 
       Then("An error message is returned")
-      eventually {
-        bot.replySent shouldEqual "Missing values in METAR, calculation can not be performed."
+      bot.replyFuture map { result =>
+        result shouldEqual "Missing values in METAR, calculation can not be performed."
       }
     }
 
@@ -84,8 +82,8 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("da loww")
 
       Then("An error message is returned")
-      eventually {
-        bot.replySent shouldEqual "Could not retrieve weather for station"
+      bot.replyFuture map { result =>
+        result shouldEqual "Could not retrieve weather for station"
       }
     }
 
@@ -101,8 +99,8 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("da loww")
 
       Then("An error message is returned")
-      eventually {
-        bot.replySent shouldEqual "Could not perform density altitude calculation for this station"
+      bot.replyFuture map { result =>
+        result shouldEqual "Could not perform density altitude calculation for this station"
       }
     }
 
@@ -122,8 +120,8 @@ class AviatorsBotDaTest extends FeatureSpec with GivenWhenThen with MockFactory 
       bot.receiveMockMessage("da loww")
 
       Then("An error message is returned")
-      eventually {
-        bot.replySent shouldEqual "Could not perform density altitude calculation for this station"
+      bot.replyFuture map { result =>
+        result shouldEqual "Could not perform density altitude calculation for this station"
       }
     }
   }

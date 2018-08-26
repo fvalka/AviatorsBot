@@ -29,6 +29,11 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
   var replySent: String = ""
   var parseMode: Option[ParseMode] = None
 
+  private val replyPromise: Promise[String] = Promise[String]()
+  val replyFuture: Future[String] = replyPromise.future
+  private val parseModePromise: Promise[Option[ParseMode]] = Promise[Option[ParseMode]]()
+  val parseModeFuture: Future[Option[ParseMode]] = parseModePromise.future
+
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
   override lazy val airfieldDAO: AirfieldDAO = mock[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
@@ -62,6 +67,9 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
     }
     replySent = text
     this.parseMode = parseMode
+
+    replyPromise.success(text)
+    parseModePromise.success(parseMode)
 
     if(sendMessageFailsException.isDefined) {
       Future.failed(sendMessageFailsException.getOrElse(new RuntimeException))
