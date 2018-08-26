@@ -105,7 +105,8 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       Then("Returns error message that the station name is incorrect")
       eventually {
         bot.replySent should include("<strong>usage:</strong> /wx &lt;stations&gt;\nGet the current METAR and TAF for" +
-          " these stations\n\n<strong>Examples:</strong>\n/wx loww eddm ... METAR and TAF for these airfields")
+          " these stations")
+        bot.replySent should include("<strong>Examples:</strong>\n/wx loww eddm ... METAR and TAF for these airfields")
 
         bot.parseMode shouldEqual Some(ParseMode.HTML)
       }
@@ -129,6 +130,28 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       Then("Returns error message that the weather could not be retrieved")
       eventually {
         bot.replySent should include("Could not retrieve weather")
+      }
+    }
+
+    scenario("Pilot requets weather with a query and no result is returned") {
+      Given("Aviatorsbot with empty response from weather service")
+      val bot = new AviatorsBotForTesting()
+
+      bot.weatherService.getMetars _ expects where {
+        stations: Iterable[String] => stations.head.toUpperCase == "FRA"
+      } returns Future.successful { Map()}
+
+      bot.weatherService.getTafs _ expects where {
+        stations: Iterable[String] => stations.head.toUpperCase == "FRA"
+      } returns Future.successful { Map()}
+
+
+      When("Pilot requests the current weather")
+      bot.receiveMockMessage("wx fra")
+
+      Then("Returns error message that no weather was received")
+      eventually {
+        bot.replySent should include("No weather received for this query. Try using an ICAO station code.")
       }
     }
   }

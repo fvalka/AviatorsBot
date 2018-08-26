@@ -29,7 +29,7 @@ object BuildWxMessage {
     val inputStationsSet = mutable.LinkedHashSet(stations.filter(StationUtil.isICAOAptIdentifier): _*)
     val stationSet = inputStationsSet ++ metars.keySet
 
-    stationSet.map(station => {
+    val result = stationSet.map(station => {
       val metar = metars.get(station) match {
         case Some(mt) => FormatMetar(mt)
         case None => s"<strong>$station</strong> No METAR received for station"
@@ -40,6 +40,12 @@ object BuildWxMessage {
       }
       metar + "\n" + taf
     }) mkString "\n"
+
+    if(result.isEmpty) {
+      "No weather received for this query. Try using an ICAO station code."
+    } else {
+      result
+    }
   }
 
 }
