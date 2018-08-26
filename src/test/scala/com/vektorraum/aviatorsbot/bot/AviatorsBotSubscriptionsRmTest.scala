@@ -17,7 +17,7 @@ class AviatorsBotSubscriptionsRmTest extends FeatureSpec
   info("removing my subscriptions from the bot")
 
   implicit override val patienceConfig: PatienceConfig =
-    PatienceConfig(timeout = scaled(Span(1000, Millis)), interval = scaled(Span(30, Millis)))
+    PatienceConfig(timeout = scaled(Span(2000, Millis)), interval = scaled(Span(30, Millis)))
 
   protected val ERROR_MESSAGE = "Could not unsubscribe from all stations. Please try again!"
   feature("Remove subscriptions") {
