@@ -148,6 +148,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
             if(e.isInstanceOf[TelegramApiException] && e.getMessage.contains(BLOCKED_EXECPTION_MESSAGE)) {
               logger.info(s"Bot was blocked by user chatId=${sub.chatId} removing all subscriptions for this user")
               subscriptionDAO.remove(sub.chatId, "*")
+              messagesInTransit -= 1
               Future.successful()
             } else {
               logger.warn(s"Subscription update message could not be sent for subscription=$sub")
