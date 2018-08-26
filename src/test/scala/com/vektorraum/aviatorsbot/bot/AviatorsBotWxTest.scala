@@ -72,6 +72,29 @@ class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory 
       }
     }
 
+    scenario("Pilot just sends the station name and receives a valid response") {
+      Given("AviatorsBotForTesting with valid xml")
+      val bot = new AviatorsBotForTesting()
+
+      bot.weatherService.getMetars _ expects where {
+        stations: Iterable[String] => stations.head == "LOWW"
+      } returns Future.successful { METARResponseFixtures.ValidLOWW7Hours }
+
+      bot.weatherService.getTafs _ expects where {
+        stations: Iterable[String] => stations.head == "LOWW"
+      } returns Future.successful { TAFResponseFixtures.ValidLOWW }
+
+
+      When("Requesting weather with /wx <station> instead of wx <station>")
+      bot.receiveMockMessage("loww")
+
+      Then("Weather is returned")
+      eventually {
+        bot.replySent should include ("<strong>LOWW</strong>")
+        bot.parseMode shouldEqual Some(ParseMode.HTML)
+      }
+    }
+
     scenario("Pilot requests weather for a station which doesn't exist") {
       Given("Aviatorsbot with empty response from weather service")
       val bot = new AviatorsBotForTesting()

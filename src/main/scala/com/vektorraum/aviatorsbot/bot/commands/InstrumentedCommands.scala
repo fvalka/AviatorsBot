@@ -1,12 +1,12 @@
 package com.vektorraum.aviatorsbot.bot.commands
 
 import com.typesafe.scalalogging.Logger
-import com.vektorraum.aviatorsbot.bot.util.HelpMessages
+import com.vektorraum.aviatorsbot.bot.util.{HelpMessages, StationUtil}
 import info.mukel.telegrambot4s.api.declarative.Messages
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.methods.{ChatAction, ParseMode, SendChatAction, SendMessage}
 import info.mukel.telegrambot4s.models.{Message, ReplyMarkup}
-import nl.grons.metrics4.scala.{DefaultInstrumented, Meter}
+import nl.grons.metrics4.scala.{DefaultInstrumented, Meter, Timer}
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,7 +22,10 @@ import scala.concurrent.Future
   */
 trait InstrumentedCommands extends Messages with DefaultInstrumented {
   // COMMAND REGISTRY
-  protected val commandRegistry: mutable.SortedSet[Command] = new mutable.TreeSet[Command]()
+  protected type CommandFunction = Message => Map[String, Seq[String]] => Future[Any]
+  protected val commandRegistry: mutable.SortedMap[Command, CommandFunction] =
+    new mutable.TreeMap[Command, CommandFunction]()
+  protected val commandTimers: mutable.SortedMap[Command, Timer] = new mutable.TreeMap[Command, Timer]()
 
   // LOGGING
   protected val trafficLog = Logger("traffic-log")
@@ -32,6 +35,9 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
   protected val commandsInvalidArgsMeter: Meter = metrics.meter("commands-invalid-arguments")
   protected val messagesReceived: Meter = metrics.meter("messages-received")
   protected val messagesSent: Meter = metrics.meter("messages-sent")
+
+  // HELP COMMAND
+  protected val helpCommand: Command = Command("help", "Overview of commands", Set(Argument("any", _ => true)))
 
   onMessage { implicit message =>
     trafficLog.info(s"Inbound chatId=${message.chat.id} - chatUserName=${message.chat.username} - " +
@@ -52,40 +58,51 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
     * @param command Command definition, including definition of arguments
     * @param func Handles the received message and returns any kind of Future for instrumentation
     */
-  def onCommand(command: Command)
-               (func: Message => Map[String, Seq[String]] => Future[Any]): Unit = {
-    val timer = metrics.timer(s"command-${command.command}")
-    commandRegistry += command
+  def onCommand(command: Command)(func: CommandFunction): Unit = {
+    commandTimers += (command -> metrics.timer(s"command-${command.command}"))
+    commandRegistry += (command -> func)
+  }
 
-    onMessage { implicit message =>
-      val text = message.text.getOrElse("")
-      if(Command.matches(command, text)) {
-        commandMeter.mark()
+  onMessage { implicit message =>
+    val text = message.text.getOrElse("")
+    commandMeter.mark()
 
-        if(Command.valid(command, text)) {
-          logger.debug(s"Received valid command=$command in msg=$message")
-          if(command.longRunning) { sendTyping(message.chat.id) }
-          timer.timeFuture(func(message)(Command.args(command, text)))
+    val cmd = commandRegistry.keys
+      .find(Command.matches(_, text))
+      .getOrElse {
+        if(StationUtil.isICAOAptIdentifier(text)) {
+          commandRegistry.keys
+            .find(_.command == "wx")
+            .getOrElse(helpCommand)
         } else {
-          logger.debug(s"Received command with invalid arguments command=$command and msg=$message")
-          commandsInvalidArgsMeter.mark()
-          val helpFileName = command.command
-          reply(HelpMessages(helpFileName), Some(ParseMode.HTML))
+          helpCommand
         }
       }
+
+    val func = commandRegistry(cmd)
+
+    if(Command.valid(cmd, text)) {
+      logger.debug(s"Received valid command=$cmd in msg=$message")
+      if(cmd.longRunning) { sendTyping(message.chat.id) }
+      commandTimers(cmd).timeFuture(func(message)(Command.args(cmd, text)))
+    } else {
+      logger.debug(s"Received command with invalid arguments command=$cmd and msg=$message")
+      commandsInvalidArgsMeter.mark()
+      val helpFileName = cmd.command
+      reply(HelpMessages(helpFileName), Some(ParseMode.HTML))
     }
   }
 
-  onCommand(Command("help", "Overview of commands", Set(Argument("any", _ => true)))) {
+  onCommand(helpCommand) {
     implicit message =>
       args =>
         val cmd = args.values.headOption
           .map(_.head.replace("/",""))
-          .flatMap(arg => commandRegistry.find(_.command == arg))
+          .flatMap(arg => commandRegistry.keys.find(_.command == arg))
 
         cmd match {
           case Some(command) => reply(HelpMessages(command.command), Some(ParseMode.HTML))
-          case _ => reply(commandRegistry map {
+          case _ => reply(commandRegistry.keys map {
             command => s"/${command.command} - ${command.description}"
           } mkString "\n")
         }

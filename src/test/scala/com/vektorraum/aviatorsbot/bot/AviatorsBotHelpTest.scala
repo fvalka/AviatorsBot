@@ -71,4 +71,20 @@ class AviatorsBotHelpTest extends FeatureSpec with GivenWhenThen with MockFactor
     }
   }
 
+  feature("Unkown command input leads to the help message") {
+    scenario("Pilot sends non existant command") {
+      Given("AviatorsBot without any mocks")
+      val bot = new AviatorsBotForTesting()
+
+      When("Pilot sends a nonexistant command")
+      bot.receiveMockMessage("/thiswillneverexist")
+
+      Then("Help message is received")
+      eventually {
+        bot.replySent should include ("/rm")
+        bot.replySent should include ("/ls")
+      }
+    }
+  }
+
 }

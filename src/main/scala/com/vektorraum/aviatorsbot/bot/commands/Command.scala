@@ -1,5 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.commands
 
+import scala.language.postfixOps
+
 /**
   * Description for a Command and its Arguments
   *
@@ -41,8 +43,8 @@ object Command {
     * @return If all Argument constraints are fulfilled and all input parts match Command arguments
     */
   def valid(command: Command, input: String): Boolean = {
-    val rawArgs = input.split(" ").drop(1)
-    val argsResult = argsExtract(command, input)
+    val rawArgs = toRawArgs(command, input)
+    val argsResult = argsExtract(command, rawArgs)
     val numberOfMatchedArgs = argsResult.map(_._2.length).sum
 
     val argumentConstraints = command.arguments forall { argument =>
@@ -57,6 +59,12 @@ object Command {
     argumentConstraints && rawArgs.length == numberOfMatchedArgs
   }
 
+  private def toRawArgs(command: Command, input: String): Array[String] = {
+    input
+      .split(" ")
+      .filter(_.replace(COMMAND_PREFIX, "").toLowerCase != command.command)
+  }
+
   /**
     * Extract the arguments from the input.
     *
@@ -67,12 +75,10 @@ object Command {
   def args(command: Command, input: String): Map[String, Seq[String]] = {
     require(valid(command, input), "Input to command must be valid for argument extraction")
 
-    argsExtract(command, input)
+    argsExtract(command, toRawArgs(command, input))
   }
 
-  protected def argsExtract(command: Command, input: String): Map[String, Seq[String]] = {
-    val rawArgs: Array[String] = input.split(" ").drop(1)
-
+  protected def argsExtract(command: Command, rawArgs: Iterable[String]): Map[String, Seq[String]] = {
     //val resultMap = mutable.HashMap[String, Seq[String]]
     command.arguments flatMap { argument =>
       val matchedArgs = rawArgs flatMap { rawArg =>
