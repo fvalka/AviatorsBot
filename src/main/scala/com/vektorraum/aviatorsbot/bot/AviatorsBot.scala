@@ -33,7 +33,12 @@ import scala.util.{Failure, Success}
   *
   * Handles commands received by the bot using the onCommand() functions
   */
-trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands with DefaultInstrumented {
+trait AviatorsBot
+  extends TelegramBot
+    with Polling
+    with InstrumentedCommands
+    with DefaultInstrumented
+    with Args {
   // STATIC STRINGS
   protected val ERROR_INVALID_ICAO_LIST: String = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW " +
     "LOAV\""
@@ -59,27 +64,6 @@ trait AviatorsBot extends TelegramBot with Polling with InstrumentedCommands wit
   protected lazy val sendFunc: (Long, String) => Future[Message] = send
   lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
   lazy val densityAltitudeCalculator: DensityAltitudeCalculator = wire[DensityAltitudeCalculator]
-
-  // COMMAND ARGUMENTS
-  // Requires at least one ICAO code and allows adds wildcards like LO*, etc.
-  protected val weatherServiceStationsArgs = Set(Argument("stations", StationUtil.isValidInput,
-    min = 1, preprocessor = _.toUpperCase))
-  // Requires at lest one ICAO code and only allows actual stations e.g. LOWW, KJFK, etc.
-  protected val stationsArgs = Set(Argument("stations", StationUtil.isICAOAptIdentifier,
-    min = 1, preprocessor = _.toUpperCase))
-  // Stations with wildcards at the end e.g. LOWW, LOW*, *
-  protected val wildcardStationArgs = Set(Argument("stations", StationUtil.isWildcardStation,
-    min = 1, preprocessor = _.toUpperCase))
-  // Requires exactly one actual ICAO code
-  protected val oneStationArgs = Set(Argument("station", StationUtil.isICAOAptIdentifier,
-    min = 1, max = 1, preprocessor = _.toUpperCase))
-  // Time or duration argument
-  protected val oneTimeArgs = Set(Argument("time", TimeUtil.isTimeOrDuration, max = 1))
-  // METAR and/or TAF option for setting subscription options
-  protected val metarTafArgs = Set(Argument("metartaf", MetarTafOption.valid, max = 1))
-  // Any arguments acceptec
-  protected val anyArgs = Set(Argument("any", _ => true))
-
 
   onCommand(Command("start", "Information about this bot", anyArgs)) {
     implicit msg => _ => reply(HelpMessages("welcome"), disableWebPagePreview = true)
