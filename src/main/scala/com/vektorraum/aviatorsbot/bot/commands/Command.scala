@@ -10,7 +10,7 @@ import scala.language.postfixOps
   * @param arguments All arguments this command expects
   * @param longRunning Used to determine if a notification is ent to the user that the input is being processed
   */
-case class Command(command: String, description: String, arguments: Set[Argument] = Set.empty,
+case class Command(command: String, description: String, group: String = "", arguments: Set[Argument] = Set.empty,
                    longRunning: Boolean = false) extends Ordered[Command] {
   def compare(other: Command): Int = {
     this.command.compareTo(other.command)

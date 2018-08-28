@@ -65,16 +65,20 @@ trait AviatorsBot
   lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
   lazy val densityAltitudeCalculator: DensityAltitudeCalculator = wire[DensityAltitudeCalculator]
 
-  onCommand(Command("start", "Information about this bot", anyArgs)) {
-    implicit msg => _ => reply(HelpMessages("welcome"), disableWebPagePreview = true)
+  onCommand(Command("start", "Information about this bot", "Info", anyArgs)) {
+    implicit msg => _ =>
+      val helpMessage = HelpMessages("welcome") + "\n" +
+        commandList() +
+        "\n\nSend /help &lt;command&gt; to learn more about a command."
+      reply(helpMessage, disableWebPagePreview = true, parseMode = ParseMode.HTML)
   }
 
-  onCommand(Command("privacy", "Privacy policy", anyArgs)) {
+  onCommand(Command("privacy", "Privacy policy", "Info", anyArgs)) {
     implicit msg => _ => reply(HelpMessages("privacy"),
       disableWebPagePreview = true, parseMode = ParseMode.HTML)
   }
 
-  onCommand(Command("wx", "Current METAR and TAF", weatherServiceStationsArgs, longRunning = true)) {
+  onCommand(Command("wx", "Current METAR and TAF", "Weather", weatherServiceStationsArgs, longRunning = true)) {
     implicit msg =>
       args =>
         val stations = args("stations")
@@ -92,7 +96,7 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("xwind", "Current crosswind", oneStationArgs, longRunning = true)) {
+  onCommand(Command("xwind", "Current crosswind", "Calculations", oneStationArgs, longRunning = true)) {
     implicit msg =>
       args =>
         val station = args("station").head
@@ -118,7 +122,7 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("da", "Density altitude", oneStationArgs, longRunning = true)) {
+  onCommand(Command("da", "Density altitude", "Calculations", oneStationArgs, longRunning = true)) {
     implicit msg =>
       args =>
         val station = args("station").head
@@ -140,7 +144,7 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("add", "Subscribe to stations", stationsArgs ++ oneTimeArgs ++ metarTafArgs)) {
+  onCommand(Command("add", "Subscribe to stations", "Subscriptions", stationsArgs ++ oneTimeArgs ++ metarTafArgs)) {
     implicit msg =>
       args =>
         val stations = args("stations")
@@ -181,7 +185,7 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("rm", "Unsubscribe from stations", wildcardStationArgs)) {
+  onCommand(Command("rm", "Unsubscribe from stations", "Subscriptions", wildcardStationArgs)) {
     implicit msg =>
       args =>
         val stations = args("stations")
@@ -204,7 +208,7 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("ls", "List all subscriptions")) {
+  onCommand(Command("ls", "List all subscriptions", "Subscriptions")) {
     implicit msg =>
       args =>
         subscriptionDAO.findAllByChatId(msg.chat.id) andThen {

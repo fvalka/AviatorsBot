@@ -8,7 +8,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
   test("Valid command matches") {
     Given("Command with one argument")
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier)
-    val command = Command("test", "Only for testing", Set(argument1))
+    val command = Command("test", "Only for testing", "Test", Set(argument1))
 
     Then("Command matches")
     Command.matches(command, "/test") shouldEqual true
@@ -28,7 +28,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier, min = Some(2))
     val argument2 = Argument("time", "[0-9]{2}".r.pattern.matcher(_).matches, Some(1))
 
-    val command = Command("test", "Only for testing", Set(argument1, argument2))
+    val command = Command("test", "Only for testing", "Test", Set(argument1, argument2))
 
     Then("Arguments are all valid")
     Command.valid(command, "/test LOWW loav 02") shouldEqual true
@@ -37,7 +37,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
   test("To few arguments in inputs cause validation to fail") {
     Given("Command with one argument")
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier, min = Some(2))
-    val command = Command("test", "Only for testing", Set(argument1))
+    val command = Command("test", "Only for testing", "Test", Set(argument1))
 
     Then("Validation fails if only one station is provided")
     Command.valid(command, "/test LOWW") shouldEqual false
@@ -46,7 +46,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
   test("No argument provided causes validation to fail") {
     Given("Command with one argument")
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier, min = Some(1))
-    val command = Command("test", "Only for testing", Set(argument1))
+    val command = Command("test", "Only for testing", "Test",  Set(argument1))
 
     Then("Validation fails if no argument is provided")
     Command.valid(command, "/test") shouldEqual false
@@ -55,7 +55,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
   test("Too many arguments causes validation to fail") {
     Given("Command with one argument")
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier, min = Some(1), max = Some(2))
-    val command = Command("test", "Only for testing", Set(argument1))
+    val command = Command("test", "Only for testing", "Test",  Set(argument1))
 
     Then("Validation fails if too many arguments are provided")
     Command.valid(command, "/test lowg LoWW LOAV") shouldEqual false
@@ -65,7 +65,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
     Given("Command with multiple arguments")
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier, min = Some(1))
 
-    val command = Command("test", "Only for testing", Set(argument1))
+    val command = Command("test", "Only for testing", "Test",  Set(argument1))
 
     Then("One wrong argument causes validation to fail")
     Command.valid(command, "/test LOWW 02") shouldEqual false
@@ -84,7 +84,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier, min = Some(2))
     val argument2 = Argument("time", "[0-9]{2}".r.pattern.matcher(_).matches, Some(1))
 
-    val command = Command("test", "Only for testing", Set(argument1, argument2))
+    val command = Command("test", "Only for testing", "Test",  Set(argument1, argument2))
 
     When("Extracting arguments")
     val result = Command.args(command, "test LOWW LOAV 02")
@@ -100,7 +100,7 @@ class CommandTest extends FunSuite with GivenWhenThen {
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier, min = Some(2))
     val argument2 = Argument("time", "[0-9]{2}".r.pattern.matcher(_).matches, Some(1))
 
-    val command = Command("test", "Only for testing", Set(argument1, argument2))
+    val command = Command("test", "Only for testing", "Test",  Set(argument1, argument2))
 
     Then("One wrong argument causes validation to fail")
     an [IllegalArgumentException] should be thrownBy Command.args(command, "/test LOWW inv")

@@ -46,7 +46,6 @@ class AviatorsBotInfoMessagesTest extends FeatureSpec with GivenWhenThen with Mo
     bot.replySent should include("/privacy")
     bot.replySent should include("/help")
     bot.replySent.toLowerCase should include("liability")
-    bot.replySent.toLowerCase should include("risk")
   }
 
   feature("Privacy policy is sent to the user upon request") {
