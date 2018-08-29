@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.calculators
 
 import com.vektorraum.aviatorsbot.generated.metar.METAR
-import com.vektorraum.aviatorsbot.persistence.airfielddata.model.Airfield
+import com.vektorraum.aviatorsbot.persistence.airfielddata.model.{Airfield, Runway}
 
 import scala.collection.SortedSet
 
@@ -24,7 +24,7 @@ object XWindCalculator {
       return "⚠ Wind variable! No calculation possible."
     }
 
-    val directions = SortedSet(airfield.runways flatMap { runway => runway.directions }: _*)
+    val directions = SortedSet(airfield.runways flatMap { runway => runwayDirections(airfield, runway) }: _*)
 
     directions map { dir =>
       def formatForWindDirection(windDir: Int): String = {
@@ -49,7 +49,7 @@ object XWindCalculator {
           ""
         }
 
-      val runwayNumber = Math.round((dir - airfield.magVar)/10.0)
+      val runwayNumber = Math.round(runwayDirectionToNumber(airfield, dir))
       val runwayTextInferred = "%02d".format(runwayNumber)
 
       val runwayText = runwayName(airfield, dir)
@@ -57,6 +57,25 @@ object XWindCalculator {
 
       s"<strong>$runwayText</strong> $normalWind $variableWind".trim
     } mkString "\n"
+  }
+
+  /**
+    * Filters one ended runways from the input data
+    *
+    * @param runway Runway information
+    * @return Sequence of directions which match runway names
+    */
+  private def runwayDirections(airfield: Airfield, runway: Runway): Seq[Int] = {
+    if(runway.name.contains("/")) {
+      runway.directions
+    } else {
+      val rwyNameBased = runway.name
+        .replace("[A-Z]", "")
+        .toInt
+
+      runway.directions
+        .filter(dir => deltaRunwayNumber(rwyNameBased, runwayDirectionToNumber(airfield, dir)) < 10.0)
+    }
   }
 
   /**
@@ -87,10 +106,32 @@ object XWindCalculator {
       .map(_.replaceAll("[A-Z]", ""))
       .filter{ name =>
         val runwayNumber = name.toInt
-        val runwayNumberCalculated = (dir - airfield.magVar)/10.0
+        val runwayNumberCalculated = runwayDirectionToNumber(airfield, dir)
 
-        Math.abs(runwayNumber % runwayNumberCalculated) <= 1.0
+        deltaRunwayNumber(runwayNumber, runwayNumberCalculated) <= 1.0
       }
+  }
+
+  /**
+    * Calculate the supposed runway number based upon the direction and magnetic variation
+    *
+    * @param airfield Airfield information, containing the magnetic variation
+    * @param dir Direction for which to calculate its runway number
+    * @return Runway number based upon the magnetic variation
+    */
+  private def runwayDirectionToNumber(airfield: Airfield, dir: Int) = {
+    ((dir - airfield.magVar) / 10.0) % 36.0
+  }
+
+  /**
+    * Calculate the difference in runway numbers between to runway numbers
+    *
+    * @param rwy1 First runway number 1 to 36
+    * @param rwy2 Second runway number 1 to 36
+    * @return Difference between the runway numbers 0 to < 36
+    */
+  private def deltaRunwayNumber(rwy1: Double, rwy2: Double): Double = {
+    18 - Math.abs(Math.abs(rwy1-rwy2) - 18)
   }
 
   /**
