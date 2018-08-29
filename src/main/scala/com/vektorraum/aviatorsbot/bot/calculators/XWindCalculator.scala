@@ -32,7 +32,7 @@ object XWindCalculator {
           .map(windSpeed => formatOneCombo(dir, windDir, windSpeed))
           .getOrElse("")
         val gustingWind = metar.wind_gust_kt
-          .map(gustSpeed => "gusting " + formatOneCombo(dir, windDir, gustSpeed))
+          .map(gustSpeed => "\n      gusting " + formatOneCombo(dir, windDir, gustSpeed))
           .getOrElse("")
         s"$normalWind $gustingWind".trim
       }
@@ -43,7 +43,7 @@ object XWindCalculator {
         if (VariableWindPattern.pattern.matcher(metar.raw_text.get.trim).matches()) {
           val VariableWindPattern(windVLeft, windVRight) = metar.raw_text.get.trim
 
-          s"varying btw ${formatForWindDirection(windVLeft.toInt)} and " +
+          s"\n      var ${formatForWindDirection(windVLeft.toInt)} &amp; " +
             s"${formatForWindDirection(windVRight.toInt)} "
         } else {
           ""

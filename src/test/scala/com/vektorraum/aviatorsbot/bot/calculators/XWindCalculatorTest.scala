@@ -56,8 +56,8 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("result matches precalculated values and doesn't contain a head/tailwind")
-    result shouldEqual "<strong>18</strong> ⬅37KT gusting ⬅47KT\n" +
-      "<strong>36</strong> ➡37KT gusting ➡47KT"
+    result shouldEqual "<strong>18</strong> ⬅37KT \n      gusting ⬅47KT\n" +
+      "<strong>36</strong> ➡37KT \n      gusting ➡47KT"
 
   }
 
@@ -69,8 +69,8 @@ class XWindCalculatorTest extends FunSuite with GivenWhenThen {
     val result = XWindCalculator(metar, AirfieldFixtures.AirfieldNorthSouthRwy)
 
     Then("result contains all variations of the wind")
-    result shouldEqual "<strong>18</strong> ➡11KT ⬇  9KT varying btw ➡14KT and ➡  2KT ⬇14KT\n" +
-      "<strong>36</strong> ⬅11KT ⬆  9KT varying btw ⬅14KT and ⬅  2KT ⬆14KT"
+    result shouldEqual "<strong>18</strong> ➡11KT ⬇  9KT \n      var ➡14KT &amp; ➡  2KT ⬇14KT\n" +
+      "<strong>36</strong> ⬅11KT ⬆  9KT \n      var ⬅14KT &amp; ⬅  2KT ⬆14KT"
   }
 
   test("Fully variable wind (=VRBXX) gives error message") {
