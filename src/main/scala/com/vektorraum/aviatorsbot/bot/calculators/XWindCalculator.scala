@@ -74,8 +74,12 @@ object XWindCalculator {
       .map { runway =>
         val names = runway.name.split("/")
 
-        if (dir > 180) {
-          names(1)
+        if(names.length == 2) {
+          if (dir > 180) {
+            names(1)
+          } else {
+            names(0)
+          }
         } else {
           names(0)
         }
