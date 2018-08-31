@@ -4,8 +4,8 @@ import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.{HelpMessages, StationUtil}
 import info.mukel.telegrambot4s.api.declarative.Messages
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
-import info.mukel.telegrambot4s.methods.{ChatAction, ParseMode, SendChatAction, SendMessage}
-import info.mukel.telegrambot4s.models.{Message, ReplyMarkup}
+import info.mukel.telegrambot4s.methods._
+import info.mukel.telegrambot4s.models.{InputFile, Message, ReplyMarkup}
 import nl.grons.metrics4.scala.{DefaultInstrumented, Meter, Timer}
 
 import scala.collection.mutable
@@ -21,7 +21,7 @@ import scala.concurrent.Future
   *
   */
 trait InstrumentedCommands extends Messages with DefaultInstrumented {
-  implicit val OrderingCommand = Ordering.by((_: Command).command)
+  implicit val OrderingCommand: Ordering[Command] = Ordering.by((_: Command).command)
 
   // COMMAND REGISTRY
   protected type CommandFunction = Message => Map[String, Seq[String]] => Future[Any]
@@ -181,6 +181,22 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
       SendChatAction(
         chatId,
         ChatAction.Typing
+      )
+    )
+  }
+
+  /**
+    * Send a photo which will be downloaded from url by Telegram
+    *
+    * @param chatId Receiver of the photo
+    * @param url Url under which Telegram can download the photo
+    * @return Future of the sent message
+    */
+  def sendPhoto(chatId: Long, url: String): Future[Message] = {
+    request(
+      SendPhoto(
+        chatId,
+        InputFile(url)
       )
     )
   }
