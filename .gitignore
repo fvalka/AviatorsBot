@@ -72,4 +72,4 @@ logs/
 hs_err_pid*
 
 target/
-conf/bot.token
+conf/*.token
