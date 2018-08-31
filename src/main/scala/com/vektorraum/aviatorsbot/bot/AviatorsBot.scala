@@ -102,6 +102,22 @@ trait AviatorsBot
         }
   }
 
+  onCommand(Command("strikes", "Lightning strikes", "Weather Charts", regionOptionalArgs)) {
+    implicit msg =>
+      args =>
+        val region: Regions = args.get("region")
+          .flatMap(_.headOption)
+          .flatMap(RegionUtil.find)
+          .getOrElse(defaultRegion)
+
+        strikesService.getUrl(region) match {
+          case Some(url) => sendPhoto(msg.chat.id, url)
+          case None =>
+            logger.info(s"Strikes requested for region which doesn't exist region=$region and msg=$msg")
+            reply("No strikes available for this region")
+        }
+  }
+
   onCommand(Command("xwind", "Current crosswind", "Calculations", oneStationArgs, longRunning = true)) {
     implicit msg =>
       args =>
