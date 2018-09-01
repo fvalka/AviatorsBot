@@ -11,12 +11,12 @@ sealed abstract class Regions(val value: String, val description: String,
     with Serializable
 
 object Regions extends StringEnum[Regions] with StringReactiveMongoBsonValueEnum[Regions] {
-  val values: immutable.IndexedSeq[Regions] = findValues
-
   case object Europe extends Regions("eu", "Europe")
   case object NorthAmerica extends Regions("na", "North America")
   case object SouthAmerica extends Regions("sa", "South America")
   case object Asia extends Regions("as", "Asia")
   case object Oceania extends Regions("oc", "Oceania")
   case object Africa extends Regions("af", "Africa")
+
+  lazy val values: immutable.IndexedSeq[Regions] = findValues
 }

@@ -12,10 +12,12 @@ import com.vektorraum.aviatorsbot.bot.commands.{Argument, Command, InstrumentedC
 import com.vektorraum.aviatorsbot.bot.subscriptions.SubscriptionHandler
 import com.vektorraum.aviatorsbot.bot.util._
 import com.vektorraum.aviatorsbot.bot.weather.BuildWxMessage
-import com.vektorraum.aviatorsbot.persistence.Db
+import com.vektorraum.aviatorsbot.persistence.{Db, WriteResult}
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
+import com.vektorraum.aviatorsbot.persistence.regions.model.RegionSetting
+import com.vektorraum.aviatorsbot.persistence.regions.{RegionsDAO, RegionsDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
-import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction, WriteResult}
+import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction}
 import com.vektorraum.aviatorsbot.service.regions.Regions
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
@@ -42,12 +44,14 @@ trait AviatorsBot
     with DefaultInstrumented
     with Args {
   // STATIC STRINGS
-  protected val ERROR_INVALID_ICAO_LIST: String = "Please provide a valid ICAO station or list of stations e.g. \"wx LOWW " +
+  protected val ERROR_INVALID_ICAO_LIST: String = "Please provide a valid ICAO station or list of stations e.g. \"wx " +
+    "LOWW " +
     "LOAV\""
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_ADDED = "Subscriptions could not be stored. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED = "Subscriptions could not be listed. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_REMOVED = "Could not unsubscribe from all stations. Please try again!"
   protected val ERROR_NO_METAR_FOR_STATION = "Could not retrieve weather for station"
+  protected val ERROR_REGION_UPDATE_FAILED = "Could not write preference to database"
 
   // separated from the main configuration for security reasons
   lazy val token: String = scala.util.Properties
@@ -64,6 +68,7 @@ trait AviatorsBot
   protected lazy val strikesService: StrikesService = wire[StrikesServiceProduction]
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
+  protected lazy val regionsDAO: RegionsDAO = wire[RegionsDAOProduction]
   // Needed so that macwire can find the send function which has to be passed into the constructor
   // of SubscriptionHandler
   protected lazy val sendFunc: (Long, String) => Future[Message] = send
@@ -72,16 +77,64 @@ trait AviatorsBot
 
 
   onCommand(Command("start", "Information about this bot", "Info", anyArgs)) {
-    implicit msg => _ =>
-      val helpMessage = HelpMessages("welcome") + "\n" +
-        commandList() +
-        "\n\nSend /help &lt;command&gt; to learn more about a command."
-      reply(helpMessage, disableWebPagePreview = true, parseMode = ParseMode.HTML)
+    implicit msg =>
+      _ =>
+        val helpMessage = HelpMessages("welcome") + "\n" +
+          commandList() +
+          "\n\nSend /help &lt;command&gt; to learn more about a command."
+        reply(helpMessage, disableWebPagePreview = true, parseMode = ParseMode.HTML)
   }
 
   onCommand(Command("privacy", "Privacy policy", "Info", anyArgs)) {
-    implicit msg => _ => reply(HelpMessages("privacy"),
-      disableWebPagePreview = true, parseMode = ParseMode.HTML)
+    implicit msg =>
+      _ =>
+        reply(HelpMessages("privacy"),
+          disableWebPagePreview = true, parseMode = ParseMode.HTML)
+  }
+
+  onCommand(Command("region", "Preferred region", "Settings", regionOptionalArgs)) {
+    def setRegion(implicit msg: Message, region: Regions) = {
+      regionsDAO.set(RegionSetting(msg.chat.id, region)) andThen {
+        case Success(writeResult) =>
+          if (writeResult.ok) {
+            reply("Preferred region updated")
+          } else {
+            logger.warn(s"Region update failed with writeResult.ok false msg=$msg")
+            reply(ERROR_REGION_UPDATE_FAILED)
+          }
+        case Failure(exception) =>
+          logger.warn(s"Region update failed with failed future msg=$msg", exception)
+          reply(ERROR_REGION_UPDATE_FAILED)
+      }
+    }
+
+    def listRegions(implicit msg: Message) = {
+      regionsDAO.get(msg.chat.id) flatMap { regionInDb =>
+        val current = regionInDb
+          .map(dbValue => dbValue.region.description)
+          .getOrElse("Not Set. Default: " + defaultRegion.description)
+
+        val regionString = Regions.values
+          .sortBy(_.value)
+          .map(region => region.value + " - " + region.description)
+          .mkString("\n")
+
+        reply("<strong>Current region:</strong> " + current + "\n\n" +
+          "<strong>Available regions:</strong>\n" +
+          regionString +
+          "\n\nUse /region &lt;code&gt; to set your preference.",
+          ParseMode.HTML)
+      }
+    }
+
+    implicit msg =>
+      args =>
+        regionFromArgs(args) match {
+          case Some(region) =>
+            setRegion(msg, region)
+          case None =>
+            listRegions(msg)
+        }
   }
 
   onCommand(Command("wx", "Current METAR and TAF", "Weather", weatherServiceStationsArgs, longRunning = true)) {
@@ -105,16 +158,13 @@ trait AviatorsBot
   onCommand(Command("strikes", "Lightning strikes", "Weather Charts", regionOptionalArgs)) {
     implicit msg =>
       args =>
-        val region: Regions = args.get("region")
-          .flatMap(_.headOption)
-          .flatMap(RegionUtil.find)
-          .getOrElse(defaultRegion)
-
-        strikesService.getUrl(region) match {
-          case Some(url) => sendPhoto(msg.chat.id, url)
-          case None =>
-            logger.info(s"Strikes requested for region which doesn't exist region=$region and msg=$msg")
-            reply("No strikes available for this region")
+        regionPreference(msg.chat.id, args) flatMap { region =>
+          strikesService.getUrl(region) match {
+            case Some(url) => sendPhoto(msg.chat.id, url)
+            case None =>
+              logger.info(s"Strikes requested for region which doesn't exist region=$region and msg=$msg")
+              reply("No strikes available for this region")
+          }
         }
   }
 
@@ -130,9 +180,9 @@ trait AviatorsBot
               case Some(m) =>
                 val observationTime = TimeFormatter.shortUTCDateTimeFormat(m.head.observation_time.get)
                 reply(
-                s"METAR issued at: $observationTime\n" +
-                  "Direction of flight: ⬆\n" +
-                  XWindCalculator(m.head, airfield), ParseMode.HTML)
+                  s"METAR issued at: $observationTime\n" +
+                    "Direction of flight: ⬆\n" +
+                    XWindCalculator(m.head, airfield), ParseMode.HTML)
               case None => reply(ERROR_NO_METAR_FOR_STATION)
             }
           }
@@ -187,7 +237,7 @@ trait AviatorsBot
 
         val insertFutures: Seq[Future[WriteResult]] = stations map { station =>
           val subscription = Subscription(msg.chat.id, station,
-            Date.from(validUntil.toInstant), metar=metar, taf=taf)
+            Date.from(validUntil.toInstant), metar = metar, taf = taf)
           subscriptionDAO.addOrExtend(subscription)
         }
 
@@ -257,10 +307,46 @@ trait AviatorsBot
         }
   }
 
+  /**
+    * Get the region for the execution of this command.
+    *
+    * The following order is used:
+    * 1. Args - If the args contain a valid region this is used
+    * 2. Database - If the args didn't contain a region the users RegionSetting is looked up
+    * 3. Default Region - If the user doesn't have a region setting stored the default region is used
+    *
+    * @param chatId For whom the region preference will be determined
+    * @param args Arguments sent to the command
+    * @return Region obtained as described above
+    */
+  private def regionPreference(chatId: Long, args: Map[String, Seq[String]]): Future[Regions] = {
+    val argRegion = regionFromArgs(args)
+
+    val result = if(argRegion.isDefined) {
+      Future.successful(argRegion)
+    } else {
+      regionsDAO.get(chatId).map(_.map(_.region))
+    }
+
+    result.map(_.getOrElse(defaultRegion))
+  }
+
+  /**
+    * Get the region set in the command arguments, if present
+    *
+    * @param args Command arguments
+    * @return Region set in the arguments, if present
+    */
+  private def regionFromArgs(args: Map[String, Seq[String]]): Option[Regions] = {
+    args.get("region")
+      .flatMap(_.headOption)
+      .flatMap(RegionUtil.find)
+  }
+
   // METRICS
   protected val subscriptionCount = new AtomicLong()
   metrics.gauge[Long]("subscription-count") {
-    subscriptionDAO.count() foreach { count => subscriptionCount.set(count)}
+    subscriptionDAO.count() foreach { count => subscriptionCount.set(count) }
     subscriptionCount.get()
   }
 

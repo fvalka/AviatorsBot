@@ -1,4 +1,5 @@
 package com.vektorraum.aviatorsbot.persistence.subscriptions
+import com.vektorraum.aviatorsbot.persistence.WriteResult
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 
 import scala.concurrent.Future

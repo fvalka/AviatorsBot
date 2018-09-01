@@ -3,7 +3,7 @@ package com.vektorraum.aviatorsbot.persistence.subscriptions
 import java.util.Date
 
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.{LatestInfo, Subscription}
-import com.vektorraum.aviatorsbot.persistence.{Db, DbUtil, subscriptions}
+import com.vektorraum.aviatorsbot.persistence.{Db, DbUtil, WriteResult, subscriptions}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, ReadConcern, commands}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, Macros}
@@ -12,16 +12,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
-  * _    _                                       
-  * | |  | |                                      
-  * __   _____| | _| |_ ___  _ __ _ __ __ _ _   _ _ __ ___  
-  * \ \ / / _ \ |/ / __/ _ \| '__| '__/ _` | | | | '_ ` _ \ 
-  * \ V /  __/   <| || (_) | |  | | | (_| | |_| | | | | | |
-  * \_/ \___|_|\_\\__\___/|_|  |_|  \__,_|\__,_|_| |_| |_|
+  * DAO used for the actual implementation of the subscription management database backend
   *
-  * vektorraum.com
-  *
-  * Created by fvalka on 27.05.2017.
+  * @param db Database where the collection is stored
   */
 class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
   def airfieldCollection: Future[BSONCollection] = db.aviatorsDb.map(_.collection("subscriptions"))
@@ -50,8 +43,8 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
             "latestMetar" -> subscription.latestMetar,
             "latestTaf" -> subscription.latestTaf)
         )
-        airfieldCollection.flatMap(_.update(selector, update)) map convertWriteResult
-      case None => airfieldCollection.flatMap(_.insert(subscription)) map convertWriteResult
+        airfieldCollection.flatMap(_.update(selector, update)) map DbUtil.convertWriteResult
+      case None => airfieldCollection.flatMap(_.insert(subscription)) map DbUtil.convertWriteResult
     }
   }
 
@@ -135,7 +128,7 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     } else {
       findByChatIdAndIcaoQuery(chatId, station)
     }
-    airfieldCollection.flatMap(_.delete().one(query)) map convertWriteResult
+    airfieldCollection.flatMap(_.delete().one(query)) map DbUtil.convertWriteResult
   }
 
   /**
@@ -145,7 +138,7 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
     */
   override def purgeOld(): Future[WriteResult] = {
     val query = BSONDocument("validUntil" -> BSONDocument("$lt" -> new Date()))
-    airfieldCollection.flatMap(_.remove(query)) map convertWriteResult
+    airfieldCollection.flatMap(_.remove(query)) map DbUtil.convertWriteResult
   }
 
   /**
@@ -169,16 +162,6 @@ class SubscriptionDAOProduction(db: Db)  extends SubscriptionDAO {
   protected def findByChatIdAndWildcardIcaoQuery(chatId: Long, icao: String): BSONDocument = {
     val icaoConverted = DbUtil.wildcardToQuery(icao)
     BSONDocument("chatId" -> chatId, "icao" -> BSONDocument("$regex" -> icaoConverted))
-  }
-
-  /**
-    * Converts a database writeResult into an encapsulated one
-    *
-    * @param original ReactiveMongo WriteResult
-    * @return Encapsulated WriteResult
-    */
-  protected def convertWriteResult(original: commands.WriteResult): WriteResult = {
-    subscriptions.WriteResult(original.ok)
   }
 
 

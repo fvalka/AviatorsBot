@@ -1,5 +1,8 @@
 package com.vektorraum.aviatorsbot.persistence
 
+import com.vektorraum.aviatorsbot.persistence
+import reactivemongo.api.commands
+
 /**
   * Database utility for conversions
   */
@@ -17,6 +20,16 @@ object DbUtil {
     } else {
       input
     }
+  }
+
+  /**
+    * Converts a database writeResult into an encapsulated one
+    *
+    * @param original ReactiveMongo WriteResult
+    * @return Encapsulated WriteResult
+    */
+  def convertWriteResult(original: commands.WriteResult): WriteResult = {
+    persistence.WriteResult(original.ok)
   }
 
 }

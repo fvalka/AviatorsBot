@@ -1,12 +1,9 @@
 package com.vektorraum.aviatorsbot.persistence.subscriptions
 
-import java.io.File
 import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
 
-import com.softwaremill.macwire._
-import com.typesafe.config.{Config, ConfigFactory}
-import com.vektorraum.aviatorsbot.persistence.Db
+import com.vektorraum.aviatorsbot.persistence.DatabaseSetup
 import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.SubscriptionFixtures
 import org.scalatest.Matchers._
 import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
@@ -14,14 +11,16 @@ import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 import scala.concurrent.Future
 import scala.language.postfixOps
 
-class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen with SubscriptionFixtures {
+class SubscriptionDAOProductionIT
+  extends AsyncFeatureSpec
+    with GivenWhenThen
+    with SubscriptionFixtures
+    with DatabaseSetup {
   info("As a pilot I want to be able to subscribe to weather stations")
   info("and make sure that those subscriptions will lead to reliable")
   info("weather updates and don't want to have to take care of restarts or technical details")
 
 
-  protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot-test.conf"))
-  val db: Db = wire[Db]
   val dao: SubscriptionDAOProduction = new SubscriptionDAOProduction(db)
 
   feature("Store subscriptions in the backend database using the DAO") {
@@ -56,8 +55,8 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
 
       cleanDb flatMap { _ =>
         val futures = Seq(dao.addOrExtend(subscription1),
-        dao.addOrExtend(subscription2),
-        dao.addOrExtend(subscriptionExpired))
+          dao.addOrExtend(subscription2),
+          dao.addOrExtend(subscriptionExpired))
         Future.sequence(futures)
       } flatMap { _ =>
         When("Finding all stations/obtaining a list of all subscribed stations")
@@ -103,8 +102,8 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
 
       cleanDb flatMap { _ =>
         val futures = Seq(dao.addOrExtend(subscription1),
-        dao.addOrExtend(subscription2),
-        dao.addOrExtend(subscriptionExpired))
+          dao.addOrExtend(subscription2),
+          dao.addOrExtend(subscriptionExpired))
         Future.sequence(futures)
       } flatMap { _ =>
         When("Finding all subscriptions for a specific chatId")
@@ -136,7 +135,7 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
 
       cleanDb flatMap { _ =>
         val futures = Seq(dao.addOrExtend(subscription1),
-        dao.addOrExtend(subscription2))
+          dao.addOrExtend(subscription2))
         Future.sequence(futures)
       } flatMap { _ =>
         When("Removing  all stations using wildcard")
@@ -155,7 +154,7 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
 
       cleanDb flatMap { _ =>
         val futures = Seq(dao.addOrExtend(subscription1),
-        dao.addOrExtend(subscription2))
+          dao.addOrExtend(subscription2))
         Future.sequence(futures)
       } flatMap { _ =>
         When("Removing only stations with the first letter L")
@@ -193,8 +192,8 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
 
       cleanDb flatMap { _ =>
         val futures = Seq(dao.addOrExtend(subscription1),
-        dao.addOrExtend(subscription2),
-        dao.addOrExtend(subscriptionExpired))
+          dao.addOrExtend(subscription2),
+          dao.addOrExtend(subscriptionExpired))
         Future.sequence(futures)
       } flatMap { _ =>
         When("Counting all subscriptions in the database")
@@ -213,8 +212,8 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
 
       cleanDb flatMap { _ =>
         val futures = Seq(dao.addOrExtend(subscription1),
-        dao.addOrExtend(subscription2),
-        dao.addOrExtend(subscription3))
+          dao.addOrExtend(subscription2),
+          dao.addOrExtend(subscription3))
         Future.sequence(futures)
       } flatMap { _ =>
         When("Finding all stations by ICAO code")
@@ -237,19 +236,6 @@ class SubscriptionDAOProductionIT extends AsyncFeatureSpec with GivenWhenThen wi
         Then("The list should be empty")
         result.isEmpty shouldEqual true
       }
-    }
-  }
-
-  /**
-    * Used instead of before/after methods because it is also async which
-    * is not supported by ScalaTest in the current version
-    *
-    * @return Future, which when completed means that the db is ready for
-    *         testing
-    */
-  private def cleanDb = {
-    db.aviatorsDb flatMap { aviatorsDb =>
-      aviatorsDb.drop()
     }
   }
 }
