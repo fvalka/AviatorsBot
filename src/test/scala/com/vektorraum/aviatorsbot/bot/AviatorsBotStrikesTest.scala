@@ -5,6 +5,8 @@ import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 import org.scalatest.Matchers._
 
+import scala.concurrent.Future
+
 class AviatorsBotStrikesTest extends AsyncFeatureSpec with GivenWhenThen with AsyncMockFactory {
   info("As a pilot")
   info("I want to know where there are the current lightning strikes")
@@ -16,11 +18,28 @@ class AviatorsBotStrikesTest extends AsyncFeatureSpec with GivenWhenThen with As
       val bot = new AviatorsBotForTesting()
       val testUrl = Some("http://test-eu-url")
       bot.strikesService.getUrl _ expects Regions.Europe returning testUrl
+      bot.regionsDAO.get _ expects * returning Future.successful(None)
 
       When("Pilot requests the strike map")
       bot.receiveMockMessage("/strikes")
 
       Then("The photo is sent to the user")
+      bot.photoSentFuture map { res =>
+        res shouldEqual testUrl.get
+      }
+    }
+
+    scenario("Pilot requests strikes without selecting a region and the database fails") {
+      Given("AviatorsBotForTesting with mock for the url service")
+      val bot = new AviatorsBotForTesting()
+      val testUrl = Some("http://test-eu-url")
+      bot.strikesService.getUrl _ expects Regions.Europe returning testUrl
+      bot.regionsDAO.get _ expects * returning Future.failed(new RuntimeException)
+
+      When("Pilot requests the strike map")
+      bot.receiveMockMessage("/strikes")
+
+      Then("Default region is used and the pilot still receives a photo")
       bot.photoSentFuture map { res =>
         res shouldEqual testUrl.get
       }

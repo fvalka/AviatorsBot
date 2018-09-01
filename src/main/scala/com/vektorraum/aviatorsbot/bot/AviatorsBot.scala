@@ -30,6 +30,7 @@ import nl.grons.metrics4.scala.DefaultInstrumented
 import scala.concurrent.Future
 import scala.io.Source
 import scala.language.postfixOps
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /**
@@ -51,7 +52,7 @@ trait AviatorsBot
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_LISTED = "Subscriptions could not be listed. Please try again!"
   protected val ERROR_SUBSCRIPTIONS_COULD_NOT_BE_REMOVED = "Could not unsubscribe from all stations. Please try again!"
   protected val ERROR_NO_METAR_FOR_STATION = "Could not retrieve weather for station"
-  protected val ERROR_REGION_UPDATE_FAILED = "Could not write preference to database"
+  protected val ERROR_REGION_UPDATE_FAILED = "Could not store preference. Please try again later!"
 
   // separated from the main configuration for security reasons
   lazy val token: String = scala.util.Properties
@@ -112,7 +113,7 @@ trait AviatorsBot
       regionsDAO.get(msg.chat.id) flatMap { regionInDb =>
         val current = regionInDb
           .map(dbValue => dbValue.region.description)
-          .getOrElse("Not Set. Default: " + defaultRegion.description)
+          .getOrElse("Default: " + defaultRegion.description)
 
         val regionString = Regions.values
           .sortBy(_.value)
@@ -124,6 +125,9 @@ trait AviatorsBot
           regionString +
           "\n\nUse /region &lt;code&gt; to set your preference.",
           ParseMode.HTML)
+      } recoverWith {
+        case NonFatal(t) => logger.warn(s"Region could not be retrieved from the database msg=$msg", t)
+        reply("Could not get current region from the database")
       }
     }
 
@@ -319,13 +323,19 @@ trait AviatorsBot
     * @param args Arguments sent to the command
     * @return Region obtained as described above
     */
-  private def regionPreference(chatId: Long, args: Map[String, Seq[String]]): Future[Regions] = {
+  protected def regionPreference(chatId: Long, args: Map[String, Seq[String]]): Future[Regions] = {
     val argRegion = regionFromArgs(args)
 
     val result = if(argRegion.isDefined) {
       Future.successful(argRegion)
     } else {
-      regionsDAO.get(chatId).map(_.map(_.region))
+      regionsDAO.get(chatId)
+        .map(_.map(_.region))
+        .recover {
+          case NonFatal(t) =>
+            logger.warn(s"Retrieving the region preference from the database failed in regionPreference chatId=$chatId", t)
+            Some(defaultRegion)
+        }
     }
 
     result.map(_.getOrElse(defaultRegion))
@@ -337,7 +347,7 @@ trait AviatorsBot
     * @param args Command arguments
     * @return Region set in the arguments, if present
     */
-  private def regionFromArgs(args: Map[String, Seq[String]]): Option[Regions] = {
+  protected def regionFromArgs(args: Map[String, Seq[String]]): Option[Regions] = {
     args.get("region")
       .flatMap(_.headOption)
       .flatMap(RegionUtil.find)

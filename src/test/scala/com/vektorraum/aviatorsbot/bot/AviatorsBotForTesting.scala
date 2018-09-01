@@ -1,5 +1,6 @@
 package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
+import com.vektorraum.aviatorsbot.persistence.regions.RegionsDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
@@ -39,6 +40,7 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
   override lazy val strikesService: StrikesService = mock[StrikesService]
   override lazy val airfieldDAO: AirfieldDAO = mock[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
+  override lazy val regionsDAO: RegionsDAO = mock[RegionsDAO]
 
   // ensures that the bot can not connect to the real Telegram API
   override lazy val token: String = "TESTONLY"
