@@ -4,7 +4,7 @@ import java.time.Instant
 
 import com.vektorraum.aviatorsbot.service.regions.Regions
 
-class StrikesServiceProduction {
+class StrikesServiceProduction extends StrikesService {
   private val urls = Map(
     Regions.Europe -> "http://images.blitzortung.org/Images/image_b_eu.png",
     Regions.Oceania -> "http://images.blitzortung.org/Images/image_b_oc.png",
@@ -23,7 +23,7 @@ class StrikesServiceProduction {
     * @param region Region for which to retrieve the strikes
     * @return Url including time parameter which can be send to Telegram
     */
-  def getUrl(region: Regions): Option[String] = {
+  override def getUrl(region: Regions): Option[String] = {
     val timeParam: Long = Instant.now().getEpochSecond / 60
     urls.get(region)
       .map(url => s"$url?t=$timeParam")

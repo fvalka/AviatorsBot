@@ -17,7 +17,7 @@ import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, Airfiel
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction, WriteResult}
 import com.vektorraum.aviatorsbot.service.regions.Regions
-import com.vektorraum.aviatorsbot.service.strikes.StrikesServiceProduction
+import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
@@ -61,7 +61,7 @@ trait AviatorsBot
   // EXTERNAL SERVICES
   protected lazy val db: Db = wire[Db]
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
-  protected lazy val strikesService: StrikesServiceProduction = wire[StrikesServiceProduction]
+  protected lazy val strikesService: StrikesService = wire[StrikesServiceProduction]
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
   // Needed so that macwire can find the send function which has to be passed into the constructor

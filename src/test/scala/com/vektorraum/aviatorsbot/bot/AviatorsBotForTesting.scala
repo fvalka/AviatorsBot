@@ -1,13 +1,12 @@
 package com.vektorraum.aviatorsbot.bot
-import com.vektorraum.aviatorsbot.bot.subscriptions.SubscriptionHandler
 import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
+import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.models._
 import nl.grons.metrics4.scala.FreshRegistries
 import org.scalamock.scalatest.MockFactory
-import com.softwaremill.macwire._
 
 import scala.concurrent.{Future, Promise}
 
@@ -33,8 +32,11 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
   val replyFuture: Future[String] = replyPromise.future
   private val parseModePromise: Promise[Option[ParseMode]] = Promise[Option[ParseMode]]()
   val parseModeFuture: Future[Option[ParseMode]] = parseModePromise.future
+  private val photoSentPromise: Promise[String] = Promise[String]
+  val photoSentFuture: Future[String] = photoSentPromise.future
 
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
+  override lazy val strikesService: StrikesService = mock[StrikesService]
   override lazy val airfieldDAO: AirfieldDAO = mock[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
 
@@ -58,6 +60,11 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
     recordSentMessage(text, parseMode)
   }
 
+  override def sendPhoto(chatId: Long, url: String): Future[Message] = {
+    photoSentPromise.success(url)
+    messageFuture
+  }
+
   private def recordSentMessage(text: String, parseMode: Option[ParseMode]): Future[Message] = {
     if (replySent != "") {
       throw new IllegalArgumentException("This object must not be reused")
@@ -71,13 +78,17 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
     replyPromise.success(text)
     parseModePromise.success(parseMode)
 
-    if(sendMessageFailsException.isDefined) {
+    if (sendMessageFailsException.isDefined) {
       Future.failed(sendMessageFailsException.getOrElse(new RuntimeException))
     } else {
-      Future {
-        val chat = Chat(123L, ChatType.Private)
-        Message(messageId = 123, chat = chat, date = 1234444)
-      }
+      messageFuture
+    }
+  }
+
+  private def messageFuture = {
+    Future.successful {
+      val chat = Chat(123L, ChatType.Private)
+      Message(messageId = 123, chat = chat, date = 1234444)
     }
   }
 
