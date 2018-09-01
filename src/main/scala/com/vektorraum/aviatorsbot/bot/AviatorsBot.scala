@@ -159,7 +159,7 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("strikes", "Lightning strikes", "Weather Charts", regionOptionalArgs)) {
+  onCommand(Command("strikes", "Lightning strikes", "Weather Charts", regionOptionalArgs, longRunning = true)) {
     implicit msg =>
       args =>
         regionPreference(msg.chat.id, args) flatMap { region =>
