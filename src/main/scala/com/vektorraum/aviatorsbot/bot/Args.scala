@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.bot.commands.Argument
-import com.vektorraum.aviatorsbot.bot.util.{MetarTafOption, StationUtil, TimeUtil}
+import com.vektorraum.aviatorsbot.bot.util.{MetarTafOption, RegionUtil, StationUtil, TimeUtil}
 
 trait Args {
   // Requires at least one ICAO code and allows adds wildcards like LO*, etc.
@@ -20,6 +20,8 @@ trait Args {
   protected val oneTimeArgs = Set(Argument("time", TimeUtil.isTimeOrDuration, max = Some(1)))
   // METAR and/or TAF option for setting subscription options
   protected val metarTafArgs = Set(Argument("metartaf", MetarTafOption.valid, max = Some(1)))
+  // A region setting
+  protected val regionOptionalArgs = Set(Argument("region", RegionUtil.isRegion, max = Some(1)))
   // Any arguments acceptec
   protected val anyArgs = Set(Argument("any", _ => true))
 

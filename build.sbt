@@ -55,6 +55,10 @@ libraryDependencies += "io.dropwizard.metrics" % "metrics-graphite" % "4.0.1"
 // Units of Measure
 libraryDependencies += "org.typelevel"  %% "squants"  % "1.3.0"
 
+// Enums
+libraryDependencies += "com.beachape" %% "enumeratum" % "1.5.13"
+libraryDependencies += "com.beachape" %% "enumeratum-reactivemongo-bson" % "1.5.13"
+
 enablePlugins(JavaServerAppPackaging)
 enablePlugins(DebianPlugin)
 enablePlugins(SystemdPlugin)

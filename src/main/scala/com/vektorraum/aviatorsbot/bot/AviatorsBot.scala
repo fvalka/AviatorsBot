@@ -16,6 +16,8 @@ import com.vektorraum.aviatorsbot.persistence.Db
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction, WriteResult}
+import com.vektorraum.aviatorsbot.service.regions.Regions
+import com.vektorraum.aviatorsbot.service.strikes.StrikesServiceProduction
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import info.mukel.telegrambot4s.Implicits._
 import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
@@ -54,9 +56,12 @@ trait AviatorsBot
 
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
 
+  protected val defaultRegion: Regions = Regions.withValue(config.getString("regions.default"))
+
   // EXTERNAL SERVICES
   protected lazy val db: Db = wire[Db]
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
+  protected lazy val strikesService: StrikesServiceProduction = wire[StrikesServiceProduction]
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
   // Needed so that macwire can find the send function which has to be passed into the constructor
@@ -64,6 +69,7 @@ trait AviatorsBot
   protected lazy val sendFunc: (Long, String) => Future[Message] = send
   lazy val subscriptionHandler: SubscriptionHandler = wire[SubscriptionHandler]
   lazy val densityAltitudeCalculator: DensityAltitudeCalculator = wire[DensityAltitudeCalculator]
+
 
   onCommand(Command("start", "Information about this bot", "Info", anyArgs)) {
     implicit msg => _ =>
