@@ -9,7 +9,7 @@ then
      then cp "${CONFIG_DIR}/aviatorsbot.conf" "${CONFIG_DIR}/aviatorsbot.conf-base"
     fi
 
-    cp "${CONFIG_DIR}/aviatorsbot.conf-base" "${CONFIG_DIR}/aviatorsbot.conf-new-base"
+    cp "${CONFIG_DIR}/aviatorsbot.conf" "${CONFIG_DIR}/aviatorsbot.conf-new-base"
 
     git merge-file --theirs "${CONFIG_DIR}/aviatorsbot.conf" "${CONFIG_DIR}/aviatorsbot.conf-base" "${CONFIG_DIR}/aviatorsbot.conf-changed"
 
