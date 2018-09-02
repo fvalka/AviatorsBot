@@ -57,6 +57,14 @@ The `/wx <ICAO>` command returns the current METAR and TAF and
 enhances the METAR with an icon for the flight category provided by 
 the aviationweather.gov API. 
 
+### Worldwide
+If possible all commands provide information for the whole world. 
+Using the `/region` command you can set your default region so that 
+you don't have to provide your region with each command. 
+
+### Lightning strikes
+Maps of lightning strikes can be viewed using the `/strikes` command. 
+
 ### Command Shortcuts
 For easier typing on mobile phones you can also omit the '/' prefix.
 For Example both `/help` and just sending `help` work. 
