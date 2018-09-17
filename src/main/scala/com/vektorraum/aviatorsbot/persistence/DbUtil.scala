@@ -32,4 +32,14 @@ object DbUtil {
     persistence.WriteResult(original.ok)
   }
 
+  /**
+    * Converts a database writeResult into an encapsulated one
+    *
+    * @param original ReactiveMongo WriteResult
+    * @return Encapsulated WriteResult
+    */
+  def convertWriteResult(original: commands.MultiBulkWriteResult): WriteResult = {
+    persistence.WriteResult(original.ok)
+  }
+
 }

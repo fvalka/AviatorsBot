@@ -33,7 +33,7 @@ class RegionsDAOProductionIT
       }
     }
 
-    scenario("Pilot changes his prefered region") {
+    scenario("Pilot changes his preferred region") {
       Given("An original and a new RegionSetting")
       val original = RegionSetting(1234L, Regions.NorthAmerica)
       val newSetting = RegionSetting(1234L, Regions.Asia)
