@@ -18,11 +18,12 @@ import com.vektorraum.aviatorsbot.bot.weather.BuildWxMessage
 import com.vektorraum.aviatorsbot.persistence.airfielddata.{AirfieldDAO, AirfieldDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.regions.model.RegionSetting
 import com.vektorraum.aviatorsbot.persistence.regions.{RegionsDAO, RegionsDAOProduction}
+import com.vektorraum.aviatorsbot.persistence.sigmets.{SigmetInfoDAO, SigmetInfoDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.{Db, WriteResult}
 import com.vektorraum.aviatorsbot.service.regions.Regions
-import com.vektorraum.aviatorsbot.service.sigmets.{SigmetService, SigmetServiceProduction}
+import com.vektorraum.aviatorsbot.service.sigmets.{PlotData, SigmetService, SigmetServiceProduction}
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import info.mukel.telegrambot4s.Implicits._
@@ -73,6 +74,7 @@ trait AviatorsBot
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
   protected lazy val strikesService: StrikesService = wire[StrikesServiceProduction]
   protected lazy val sigmetService: SigmetService = wire[SigmetServiceProduction]
+  protected lazy val sigmetInfoDAO: SigmetInfoDAO = wire[SigmetInfoDAOProduction]
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
   protected lazy val regionsDAO: RegionsDAO = wire[RegionsDAOProduction]
@@ -133,7 +135,7 @@ trait AviatorsBot
           ParseMode.HTML)
       } recoverWith {
         case NonFatal(t) => logger.warn(s"Region could not be retrieved from the database msg=$msg", t)
-        reply("Could not get current region from the database")
+          reply("Could not get current region from the database")
       }
     }
 
@@ -178,19 +180,58 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("sigmet", "Sigmet Map", "Weather Charts", regionOptionalArgs, longRunning = true)) {
+  onCommand(Command("sigmet", "Sigmet Map", "Weather Charts", regionOptionalArgs ++ numberOptionArgs, longRunning =
+    true)) {
     implicit msg =>
       args =>
-        regionPreference(msg.chat.id, args) flatMap { region =>
-          send(msg.chat.id, "Drawing weather map. This might take up to 20 seconds.")
-          sigmetService.get(region) andThen {
-            case Success(plotData) =>
-              val base_url = config.getString("sigmet.url")
-              sendPhoto(msg.chat.id, base_url + plotData.url)
-            case Failure(t) =>
-              logger.warn(s"Exception thrown while loading SIGMETs from web for region=$region", t)
-              reply("Could not retrieve the SIGMET map")
+        def store(plotData: PlotData) = {
+          def failureReply(t: Option[Throwable]): Unit = {
+            reply("Could not store the detailed SIGMET information. Please run the /sigmet command again!")
+            logger.warn("Could not store SIGMET infos in the database!", t)
           }
+
+          sigmetInfoDAO.store(SigmetInfoConverter(plotData, msg.chat.id)) andThen {
+            case Success(value) =>
+              if (value.ok) {
+                logger.debug("Successfully stored SIGMET info to database")
+              }
+              else {
+                failureReply(None)
+              }
+            case Failure(t) => failureReply(t)
+          }
+        }
+
+        def loadMap() = {
+          regionPreference(msg.chat.id, args) flatMap { region =>
+            reply("Drawing weather map. This might take up to 20 seconds.")
+            sigmetService.get(region) andThen {
+              case Success(plotData) =>
+                val base_url = config.getString("sigmet.url")
+                sendPhoto(msg.chat.id, base_url + plotData.url, "To view the full SIGMET send: /sigmet <number>")
+              case Failure(t) =>
+                logger.warn(s"Exception thrown while loading SIGMETs from web for region=$region", t)
+                reply("Could not retrieve the SIGMET map")
+            } andThen {
+              case Success(plotData) =>
+                store(plotData)
+              case Failure(exception) => Future.failed(exception)
+            }
+          }
+        }
+
+        def loadInfo(number: Int) = {
+          sigmetInfoDAO.get(msg.chat.id, number) andThen {
+            case Success(res) => reply(res.map(_.info).getOrElse("No information stored for this number"))
+            case Failure(exception) => logger.warn("Could not load number from database", exception)
+              reply("Could not load information.")
+          }
+        }
+
+        if (args.contains("number")) {
+          loadInfo(args("number").head.toInt)
+        } else {
+          loadMap()
         }
   }
 
@@ -342,20 +383,21 @@ trait AviatorsBot
     * 3. Default Region - If the user doesn't have a region setting stored the default region is used
     *
     * @param chatId For whom the region preference will be determined
-    * @param args Arguments sent to the command
+    * @param args   Arguments sent to the command
     * @return Region obtained as described above
     */
   protected def regionPreference(chatId: Long, args: Map[String, Seq[String]]): Future[Regions] = {
     val argRegion = regionFromArgs(args)
 
-    val result = if(argRegion.isDefined) {
+    val result = if (argRegion.isDefined) {
       Future.successful(argRegion)
     } else {
       regionsDAO.get(chatId)
         .map(_.map(_.region))
         .recover {
           case NonFatal(t) =>
-            logger.warn(s"Retrieving the region preference from the database failed in regionPreference chatId=$chatId", t)
+            logger.warn(s"Retrieving the region preference from the database failed in regionPreference " +
+              s"chatId=$chatId", t)
             Some(defaultRegion)
         }
     }

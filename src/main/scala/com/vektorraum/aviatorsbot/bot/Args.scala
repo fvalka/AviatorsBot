@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.bot.commands.Argument
-import com.vektorraum.aviatorsbot.bot.util.{MetarTafOption, RegionUtil, StationUtil, TimeUtil}
+import com.vektorraum.aviatorsbot.bot.util._
 
 trait Args {
   // Requires at least one ICAO code and allows adds wildcards like LO*, etc.
@@ -22,6 +22,8 @@ trait Args {
   protected val metarTafArgs = Set(Argument("metartaf", MetarTafOption.valid, max = Some(1)))
   // A region setting
   protected val regionOptionalArgs = Set(Argument("region", RegionUtil.isRegion, max = Some(1)))
+  // A number for the SIGMET or other weather maps
+  protected val numberOptionArgs = Set(Argument("number", ArgsUtil.isNumber, max = Some(1)))
   // Any arguments acceptec
   protected val anyArgs = Set(Argument("any", _ => true))
 

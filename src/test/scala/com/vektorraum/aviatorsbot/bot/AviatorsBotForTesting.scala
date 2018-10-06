@@ -1,9 +1,10 @@
 package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import com.vektorraum.aviatorsbot.persistence.regions.RegionsDAO
+import com.vektorraum.aviatorsbot.persistence.sigmets.SigmetInfoDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.sigmets.SigmetService
-import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
+import com.vektorraum.aviatorsbot.service.strikes.StrikesService
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
 import info.mukel.telegrambot4s.models._
@@ -22,12 +23,13 @@ import scala.concurrent.{Future, Promise}
   *
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = None)
+class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = None, val ignoreMessages: Int = 0)
   extends AviatorsBot
     with MockFactory
     with FreshRegistries {
 
   var replySent: String = ""
+  var messagesSentCount: Int = 0
   var parseMode: Option[ParseMode] = None
 
   private val replyPromise: Promise[String] = Promise[String]()
@@ -40,6 +42,7 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
   override lazy val strikesService: StrikesService = mock[StrikesService]
   override lazy val sigmetService: SigmetService = mock[SigmetService]
+  override lazy val sigmetInfoDAO: SigmetInfoDAO = mock[SigmetInfoDAO]
   override lazy val airfieldDAO: AirfieldDAO = mock[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
   override lazy val regionsDAO: RegionsDAO = mock[RegionsDAO]
@@ -64,28 +67,32 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
     recordSentMessage(text, parseMode)
   }
 
-  override def sendPhoto(chatId: Long, url: String): Future[Message] = {
+  override def sendPhoto(chatId: Long, url: String, caption: Option[String] = None): Future[Message] = {
     photoSentPromise.success(url)
     messageFuture
   }
 
   private def recordSentMessage(text: String, parseMode: Option[ParseMode]): Future[Message] = {
-    if (replySent != "") {
-      throw new IllegalArgumentException("This object must not be reused")
-    }
-    if (text.length > 4096) {
-      throw new IllegalArgumentException("Text is too long and can not be sent to the real Telegram API!")
-    }
-    replySent = text
-    this.parseMode = parseMode
-
-    replyPromise.success(text)
-    parseModePromise.success(parseMode)
-
-    if (sendMessageFailsException.isDefined) {
-      Future.failed(sendMessageFailsException.getOrElse(new RuntimeException))
-    } else {
+    if (messagesSentCount < ignoreMessages) {
+      messagesSentCount += 1
       messageFuture
+    } else {
+      if (text.length > 4096) {
+        throw new IllegalArgumentException("Text is too long and can not be sent to the real Telegram API!")
+      }
+      messagesSentCount += 1
+
+      replySent = text
+      this.parseMode = parseMode
+
+      replyPromise.success(text)
+      parseModePromise.success(parseMode)
+
+      if (sendMessageFailsException.isDefined) {
+        Future.failed(sendMessageFailsException.getOrElse(new RuntimeException))
+      } else {
+        messageFuture
+      }
     }
   }
 

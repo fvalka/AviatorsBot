@@ -190,15 +190,17 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
     *
     * @param chatId Receiver of the photo
     * @param url Url under which Telegram can download the photo
+    * @param caption Caption for the photo
     * @return Future of the sent message
     */
-  def sendPhoto(chatId: Long, url: String): Future[Message] = {
-    trafficLog.info(s"Outbound send - chatId=$chatId - photo=$url")
+  def sendPhoto(chatId: Long, url: String, caption: Option[String] = None): Future[Message] = {
+    trafficLog.info(s"Outbound send - chatId=$chatId - photo=$url - caption=$caption")
     messagesSent.mark()
     request(
       SendPhoto(
         chatId,
-        InputFile(url)
+        InputFile(url),
+        caption
       )
     )
   }
