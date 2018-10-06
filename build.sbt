@@ -22,6 +22,14 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 // Telegram Bot
 libraryDependencies += "info.mukel" %% "telegrambot4s" % "3.0.15"
 
+// HTTP Client
+libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.3.5"
+libraryDependencies += "com.softwaremill.sttp" %% "akka-http-backend" % "1.3.5"
+libraryDependencies += "com.softwaremill.sttp" %% "json4s" % "1.3.5"
+
+// XML
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.1.1"
+
 // Scheduler
 libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.3.0"
 

@@ -193,6 +193,8 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
     * @return Future of the sent message
     */
   def sendPhoto(chatId: Long, url: String): Future[Message] = {
+    trafficLog.info(s"Outbound send - chatId=$chatId - photo=$url")
+    messagesSent.mark()
     request(
       SendPhoto(
         chatId,

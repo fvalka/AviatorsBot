@@ -2,6 +2,7 @@ package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.persistence.airfielddata.AirfieldDAO
 import com.vektorraum.aviatorsbot.persistence.regions.RegionsDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
+import com.vektorraum.aviatorsbot.service.sigmets.SigmetService
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
@@ -38,6 +39,7 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
 
   override lazy val weatherService: AddsWeatherService = mock[AddsWeatherService]
   override lazy val strikesService: StrikesService = mock[StrikesService]
+  override lazy val sigmetService: SigmetService = mock[SigmetService]
   override lazy val airfieldDAO: AirfieldDAO = mock[AirfieldDAO]
   override lazy val subscriptionDAO: SubscriptionDAO = mock[SubscriptionDAO]
   override lazy val regionsDAO: RegionsDAO = mock[RegionsDAO]

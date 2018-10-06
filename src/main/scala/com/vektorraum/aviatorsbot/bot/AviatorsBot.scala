@@ -5,7 +5,10 @@ import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
 import java.util.concurrent.atomic.AtomicLong
 
+import akka.util.ByteString
 import com.softwaremill.macwire._
+import com.softwaremill.sttp.SttpBackend
+import com.softwaremill.sttp.akkahttp.AkkaHttpBackend
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vektorraum.aviatorsbot.bot.calculators.{DensityAltitudeCalculator, XWindCalculator}
 import com.vektorraum.aviatorsbot.bot.commands.{Command, InstrumentedCommands}
@@ -19,6 +22,7 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.persistence.subscriptions.{SubscriptionDAO, SubscriptionDAOProduction}
 import com.vektorraum.aviatorsbot.persistence.{Db, WriteResult}
 import com.vektorraum.aviatorsbot.service.regions.Regions
+import com.vektorraum.aviatorsbot.service.sigmets.{SigmetService, SigmetServiceProduction}
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import info.mukel.telegrambot4s.Implicits._
@@ -65,8 +69,10 @@ trait AviatorsBot
 
   // EXTERNAL SERVICES
   protected lazy val db: Db = wire[Db]
+  protected lazy val httpBackend: SttpBackend[Future, akka.stream.scaladsl.Source[ByteString, Any]] = AkkaHttpBackend()
   protected lazy val weatherService: AddsWeatherService = wire[AddsWeatherServiceProduction]
   protected lazy val strikesService: StrikesService = wire[StrikesServiceProduction]
+  protected lazy val sigmetService: SigmetService = wire[SigmetServiceProduction]
   protected lazy val airfieldDAO: AirfieldDAO = wire[AirfieldDAOProduction]
   protected lazy val subscriptionDAO: SubscriptionDAO = wire[SubscriptionDAOProduction]
   protected lazy val regionsDAO: RegionsDAO = wire[RegionsDAOProduction]
@@ -168,6 +174,22 @@ trait AviatorsBot
             case None =>
               logger.info(s"Strikes requested for region which doesn't exist region=$region and msg=$msg")
               reply("No strikes available for this region")
+          }
+        }
+  }
+
+  onCommand(Command("sigmet", "Sigmet Map", "Weather Charts", regionOptionalArgs, longRunning = true)) {
+    implicit msg =>
+      args =>
+        regionPreference(msg.chat.id, args) flatMap { region =>
+          send(msg.chat.id, "Drawing weather map. This might take up to 20 seconds.")
+          sigmetService.get(region) andThen {
+            case Success(plotData) =>
+              val base_url = config.getString("sigmet.url")
+              sendPhoto(msg.chat.id, base_url + plotData.url)
+            case Failure(t) =>
+              logger.warn(s"Exception thrown while loading SIGMETs from web for region=$region", t)
+              reply("Could not retrieve the SIGMET map")
           }
         }
   }
