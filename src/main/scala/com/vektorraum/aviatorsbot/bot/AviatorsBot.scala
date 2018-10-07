@@ -180,8 +180,7 @@ trait AviatorsBot
         }
   }
 
-  onCommand(Command("sigmet", "Sigmet Map", "Weather Charts", regionOptionalArgs ++ numberOptionArgs, longRunning =
-    true)) {
+  onCommand(Command("sigmet", "SIGMET Map", "Weather Charts", regionOptionalArgs ++ numberOptionArgs)) {
     implicit msg =>
       args =>
         def store(plotData: PlotData) = {
