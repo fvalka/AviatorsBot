@@ -9,6 +9,8 @@ phases:
       - apt-get -y install dpkg-sig lintian fakeroot mongodb-server
       - echo Starting mongodb server
       - service mongodb start
+      - echo Waiting for mongodb to come up
+      - sleep 5
   build:
     commands:
       - echo Build started on `date`

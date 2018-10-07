@@ -65,6 +65,14 @@ you don't have to provide your region with each command.
 ### Lightning strikes
 Maps of lightning strikes can be viewed using the `/strikes` command. 
 
+### SIGMET and Flight Conditions Map
+Using `/sigmet` a map of the current SIGMETs and flight conditions, as 
+published in the METARs can be requested. This map is drawn by a
+[`dedicated micro service.`](https://github.com/fvalka/sigmet-map)
+
+After the map is received the user can request the SIGMETs drawn on the map
+by sending `/sigmet <number_on_map>`.
+
 ### Command Shortcuts
 For easier typing on mobile phones you can also omit the '/' prefix.
 For Example both `/help` and just sending `help` work. 
