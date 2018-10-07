@@ -186,7 +186,7 @@ trait AviatorsBot
       args =>
         def store(plotData: PlotData) = {
           def failureReply(t: Option[Throwable]): Unit = {
-            reply("Could not store the detailed SIGMET information. Please run the /sigmet command again!")
+            reply("Could not store the SIGMET information. Please run the /sigmet command again!")
             logger.warn("Could not store SIGMET infos in the database!", t)
           }
 
@@ -224,7 +224,7 @@ trait AviatorsBot
           sigmetInfoDAO.get(msg.chat.id, number) andThen {
             case Success(res) => reply(res.map(_.info).getOrElse("No information stored for this number"))
             case Failure(exception) => logger.warn("Could not load number from database", exception)
-              reply("Could not load information.")
+              reply("Could not load information")
           }
         }
 
