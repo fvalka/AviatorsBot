@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import com.vektorraum.aviatorsbot.bot.subscriptions.Scheduler
 import com.vektorraum.aviatorsbot.bot.util.ReporterUtil
+import slogging.SLF4JLoggerFactory
 
 /**
   * Created by fvalka on 21.05.2017.
@@ -20,6 +21,9 @@ object AviatorsBotProduction extends AviatorsBot {
 
     ReporterUtil.csvReporter(config.getConfig("metrics.csv"), this.metricRegistry)
       .foreach(_.start(config.getInt("metrics.csv.interval_s"), TimeUnit.SECONDS))
+
+    // activate SLF4J backend
+    slogging.LoggerConfig.factory = SLF4JLoggerFactory()
 
   }
 

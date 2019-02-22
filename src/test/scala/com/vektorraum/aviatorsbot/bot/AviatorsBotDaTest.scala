@@ -1,7 +1,7 @@
 package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARFixtures, METARResponseFixtures}
-import info.mukel.telegrambot4s.methods.ParseMode
+import com.bot4s.telegram.methods.ParseMode
 import org.scalamock.scalatest.AsyncMockFactory
 import org.scalatest.Matchers._
 import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}

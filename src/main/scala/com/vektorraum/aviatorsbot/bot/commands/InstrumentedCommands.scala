@@ -2,11 +2,12 @@ package com.vektorraum.aviatorsbot.bot.commands
 
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.{HelpMessages, StationUtil}
-import info.mukel.telegrambot4s.api.declarative.Messages
-import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
-import info.mukel.telegrambot4s.methods._
-import info.mukel.telegrambot4s.models.{InputFile, Message, ReplyMarkup}
+import com.bot4s.telegram.api.declarative.Messages
+import com.bot4s.telegram.methods.ParseMode.ParseMode
+import com.bot4s.telegram.methods._
+import com.bot4s.telegram.models.{InputFile, Message, ReplyMarkup}
 import nl.grons.metrics4.scala.{DefaultInstrumented, Meter, Timer}
+import slogging.StrictLogging
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,7 +21,9 @@ import scala.concurrent.Future
   * all incoming messages and times the performance of each command.
   *
   */
-trait InstrumentedCommands extends Messages with DefaultInstrumented {
+trait InstrumentedCommands extends Messages
+    with DefaultInstrumented
+    with StrictLogging {
   implicit val OrderingCommand: Ordering[Command] = Ordering.by((_: Command).command)
 
   // COMMAND REGISTRY
@@ -59,7 +62,7 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
     * func until the future completes.
     *
     * @param command Command definition, including definition of arguments
-    * @param func Handles the received message and returns any kind of Future for instrumentation
+    * @param func    Handles the received message and returns any kind of Future for instrumentation
     */
   def onCommand(command: Command)(func: CommandFunction): Unit = {
     commandTimers += (command -> metrics.timer(s"command-${command.command}"))
@@ -73,7 +76,7 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
     val cmd = commandRegistry.keys
       .find(Command.matches(_, text))
       .getOrElse {
-        if(StationUtil.isICAOAptIdentifier(text)) {
+        if (StationUtil.isICAOAptIdentifier(text)) {
           commandRegistry.keys
             .find(_.command == "wx")
             .getOrElse(helpCommand)
@@ -84,9 +87,11 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
 
     val func = commandRegistry(cmd)
 
-    if(Command.valid(cmd, text)) {
+    if (Command.valid(cmd, text)) {
       logger.debug(s"Received valid command=$cmd in msg=$message")
-      if(cmd.longRunning) { sendTyping(message.chat.id) }
+      if (cmd.longRunning) {
+        sendTyping(message.chat.id)
+      }
       commandTimers(cmd).timeFuture(func(message)(Command.args(cmd, text)))
     } else {
       logger.debug(s"Received command with invalid arguments command=$cmd and msg=$message")
@@ -100,7 +105,7 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
     implicit message =>
       args =>
         val cmd = args.values.headOption
-          .map(_.head.replace("/",""))
+          .map(_.head.replace("/", ""))
           .flatMap(arg => commandRegistry.keys.find(_.command == arg))
 
         cmd match {
@@ -123,17 +128,17 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
   /**
     * Reply to a previous message
     *
-    * @param text                   Text of the message to be sent
-    * @param parseMode              Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
-    * @param disableWebPagePreview  Optional Disables link previews for links in this message
-    * @param disableNotification    Optional Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-    * @param replyToMessageId       Optional If the message is a reply, ID of the original message
-    * @param replyMarkup  [[info.mukel.telegrambot4s.models.InlineKeyboardMarkup]] or
-    *                     [[info.mukel.telegrambot4s.models.ReplyKeyboardMarkup]] or
-    *                     [[info.mukel.telegrambot4s.models.ReplyKeyboardRemove]] or
-    *                     [[info.mukel.telegrambot4s.models.ForceReply]]
-    *                     Optional Additional interface options.
-    *                     A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to hide reply keyboard or to force a reply from the user.
+    * @param text                  Text of the message to be sent
+    * @param parseMode             Optional Send Markdown or HTML, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
+    * @param disableWebPagePreview Optional Disables link previews for links in this message
+    * @param disableNotification   Optional Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+    * @param replyToMessageId      Optional If the message is a reply, ID of the original message
+    * @param replyMarkup           [[com.bot4s.telegram.models.InlineKeyboardMarkup]] or
+    *                              [[com.bot4s.telegram.models.ReplyKeyboardMarkup]] or
+    *                              [[com.bot4s.telegram.models.ReplyKeyboardRemove]] or
+    *                              [[com.bot4s.telegram.models.ForceReply]]
+    *                              Optional Additional interface options.
+    *                              A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to hide reply keyboard or to force a reply from the user.
     */
   override def reply(text: String, parseMode: Option[ParseMode],
                      disableWebPagePreview: Option[Boolean],
@@ -152,7 +157,7 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
     * Send a HTML message to a specific chatId
     *
     * @param chatId Receiver of the message
-    * @param text HTML formatted text
+    * @param text   HTML formatted text
     * @return Future of the message completed on its delivery
     */
   def send(chatId: Long, text: String): Future[Message] = {
@@ -188,8 +193,8 @@ trait InstrumentedCommands extends Messages with DefaultInstrumented {
   /**
     * Send a photo which will be downloaded from url by Telegram
     *
-    * @param chatId Receiver of the photo
-    * @param url Url under which Telegram can download the photo
+    * @param chatId  Receiver of the photo
+    * @param url     Url under which Telegram can download the photo
     * @param caption Caption for the photo
     * @return Future of the sent message
     */

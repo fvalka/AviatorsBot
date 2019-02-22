@@ -4,23 +4,27 @@ name := "aviatorsbot-scala"
 
 version := "1.0"
 
-scalaVersion := "2.12.6"
+scalaVersion := "2.12.7"
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += Resolver.sonatypeRepo("public")
 
 // Akka
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.5.14"
-libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.14"
-libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.1.3"
-libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % "10.1.3"
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.5.17"
+libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.17"
+libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.1.5"
+libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % "10.1.5"
 
 // Scalatest
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
 // Telegram Bot
-libraryDependencies += "info.mukel" %% "telegrambot4s" % "3.0.15"
+// Core with minimal dependencies, enough to spawn your first bot.
+libraryDependencies += "com.bot4s" %% "telegram-core" % "4.0.0-RC2"
+
+// Extra goodies: Webhooks, support for games, bindings for actors.
+libraryDependencies += "com.bot4s" %% "telegram-akka" % "4.0.0-RC2"
 
 // HTTP Client
 libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.3.5"
@@ -34,6 +38,8 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.1.1"
 libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.3.0"
 
 // Logging
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
+libraryDependencies += "biz.enef" %% "slogging-slf4j" % "0.6.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.11.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.11.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.1"
@@ -86,6 +92,9 @@ packageDescription := "A telegram bot for aviators. Focused on providing up to d
 serverLoading in Debian := Some(ServerLoader.Systemd)
 startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
+
+// Docker
+dockerBaseImage := "openjdk:jre-alpine"
 
 mappings in Universal ++= directory("conf")
 

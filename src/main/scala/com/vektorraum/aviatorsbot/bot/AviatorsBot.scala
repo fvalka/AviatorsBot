@@ -26,10 +26,11 @@ import com.vektorraum.aviatorsbot.service.regions.Regions
 import com.vektorraum.aviatorsbot.service.sigmets.{PlotData, SigmetService, SigmetServiceProduction}
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
-import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
-import info.mukel.telegrambot4s.methods._
-import info.mukel.telegrambot4s.models._
+import com.bot4s.telegram.Implicits._
+import com.bot4s.telegram.api.{Polling, RequestHandler, TelegramBot}
+import com.bot4s.telegram.clients.SttpClient
+import com.bot4s.telegram.methods._
+import com.bot4s.telegram.models._
 import nl.grons.metrics4.scala.DefaultInstrumented
 
 import scala.concurrent.Future
@@ -63,6 +64,10 @@ trait AviatorsBot
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromFile("conf/bot.token").getLines().mkString)
+
+  // Bot Client Creation
+  protected implicit val httpBackendForBot: SttpBackend[Future, Nothing] = AkkaHttpBackend()
+  override val client: RequestHandler = new SttpClient(token)
 
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
 
