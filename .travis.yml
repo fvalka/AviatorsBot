@@ -5,7 +5,9 @@ scala:
 
 services:
 - mongodb
-
+-
+before_script:
+  - sleep 15 # Used to fix Mongodb issues as recommended by travis https://docs.travis-ci.com/user/database-setup/
 script:
 - sbt clean coverage test coverageReport
 
