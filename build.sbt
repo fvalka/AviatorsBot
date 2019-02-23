@@ -74,6 +74,7 @@ libraryDependencies += "com.beachape" %% "enumeratum" % "1.5.13"
 libraryDependencies += "com.beachape" %% "enumeratum-reactivemongo-bson" % "1.5.13"
 
 enablePlugins(JavaServerAppPackaging)
+enablePlugins(DockerPlugin)
 enablePlugins(DebianPlugin)
 enablePlugins(SystemdPlugin)
 
@@ -86,6 +87,8 @@ lazy val dispatch = "net.databinder.dispatch" %% "dispatch-core" % dispatchV
 
 mainClass in Compile := Some("com.vektorraum.aviatorsbot.bot.AviatorsBotProduction")
 
+topLevelDirectory := None
+
 maintainer in Linux := "Fabian Valka <contact@vektorraum.com>"
 packageSummary in Linux := "AviatorsBot"
 packageDescription := "A telegram bot for aviators. Focused on providing up to date weather information."
@@ -94,7 +97,9 @@ startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
 
 // Docker
-dockerBaseImage := "openjdk:jre-alpine"
+packageName in Docker := "aviatorsbot-scala"
+dockerBaseImage := "openjdk:8-jre-stretch"
+dockerBaseImage in Docker := "openjdk:jre"
 
 mappings in Universal ++= directory("conf")
 
