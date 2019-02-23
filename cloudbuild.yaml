@@ -1,5 +1,5 @@
 steps:
-  - name: 'gcr.io/cloud-builders/scala-sbt'
+  - name: 'gcr.io/$PROJECT_ID/scala-sbt'
     args: ['clean','universal:packageBin']
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/aviatorsbot-scala', '.' ]
