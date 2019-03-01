@@ -1,0 +1,11 @@
+steps:
+  - name: 'gcr.io/$PROJECT_ID/scala-sbt'
+    args: ['clean','universal:packageBin']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala', '.' ]
+images:
+  - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala'
+secrets:
+  - kmsKeyName: projects/[PROJECT-ID]/locations/global/keyRings/aviatorsbot/cryptoKeys/aviatorsbot-e2e
+    secretEnv:
+      SESSIONS_KEY: CiQAKrkaETX8JQEP/zjeOeycmRPrWZDZ5j24kSujar1C67vTnWcSZgA1Iu/jCUOSv21wqRInxM75Hx59dJP31KtS16xCMpu5TGbl2rYvKOOxY3amsriM0FPeXlbBDxFZB57gUDK4DlFYEhPLXg8YEZo5+XcR3NkFdZKHbmrtNxKLIv1PBYQ3H0Ant5BNqg==
