@@ -7,8 +7,8 @@ steps:
       - '-t'
       - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala'
       - '-t'
-      - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala:$BRANCH_NAME-$SHORT_SHA'
+      - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala/$BRANCH_NAME/aviatorsbot-scala:$SHORT_SHA'
       - '.'
 images:
   - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala'
-  - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala:$BRANCH_NAME-$SHORT_SHA'
+  - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala/$BRANCH_NAME/aviatorsbot-scala:$SHORT_SHA'
