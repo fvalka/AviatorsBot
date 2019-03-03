@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-stretch
+FROM openjdk:8-alpine
 MAINTAINER aviatorsbot.com
 
 WORKDIR /app

@@ -27,18 +27,12 @@ spec:
             - mountPath: "/app/conf/secrets"
               name: secrets
               readOnly: true
-            - mountPath: "/app/conf"
-              name: config
-              readOnly: true
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: secrets
           secret:
             secretName: aviatorsbot-secrets
-        - name: config
-          configMap:
-            name: aviatorsbot-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
