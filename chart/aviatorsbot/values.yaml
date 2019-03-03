@@ -5,8 +5,9 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  tag: stable
+  registry: gcr.io
+  repository: trim-airfoil-155016/aviatorsbot-scala
+  tag: latest
   pullPolicy: IfNotPresent
 
 nameOverride: ""

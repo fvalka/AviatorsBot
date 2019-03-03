@@ -63,7 +63,7 @@ trait AviatorsBot
   // separated from the main configuration for security reasons
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
-    .getOrElse(Source.fromFile("conf/bot.token").getLines().mkString)
+    .getOrElse(Source.fromFile("conf/secrets/bot.token").getLines().mkString)
 
   // Bot Client Creation
   protected implicit val httpBackendForBot: SttpBackend[Future, Nothing] = AkkaHttpBackend()
