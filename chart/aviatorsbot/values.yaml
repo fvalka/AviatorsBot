@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  registry: gcr.io
-  repository: trim-airfoil-155016/aviatorsbot-scala
-  tag: latest
-  pullPolicy: Always
+  registry: eu.gcr.io
+  repository:  trim-airfoil-155016/aviatorsbot-scala/feature/kubernetes-deployment/aviatorsbot-scala
+  tag: fda812c
+  pullPolicy: IfNotPresent
 
 nameOverride: ""
 fullnameOverride: ""
@@ -48,3 +48,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+mongodb:
+  fullnameOverride: 'aviatorsbot-mongodb'
