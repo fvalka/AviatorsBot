@@ -8,7 +8,7 @@ image:
   registry: gcr.io
   repository: trim-airfoil-155016/aviatorsbot-scala
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 nameOverride: ""
 fullnameOverride: ""

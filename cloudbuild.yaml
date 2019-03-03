@@ -2,6 +2,13 @@ steps:
   - name: 'gcr.io/$PROJECT_ID/scala-sbt'
     args: ['clean','universal:packageBin']
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '-t', 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala', '.' ]
+    args:
+      - 'build'
+      - '-t'
+      - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala'
+      - '-t'
+      - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala:$BRANCH_NAME-$SHORT_SHA'
+      - '.'
 images:
   - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala'
+  - 'eu.gcr.io/$PROJECT_ID/aviatorsbot-scala:$BRANCH_NAME-$SHORT_SHA'
