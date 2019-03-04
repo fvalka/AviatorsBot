@@ -9,4 +9,4 @@ RUN unzip /app/app.zip
 RUN ls /app
 RUN chmod -R a+x /app/bin
 
-ENTRYPOINT ["/app/bin/aviatorsbot-scala"]
+CMD ["/app/bin/aviatorsbot-scala"]
