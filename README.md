@@ -150,7 +150,13 @@ and journaling with `j = 1`. This ensures that the insert and update operations 
 succeed once they have been propagated to the majority of voting members in the cluster and
 written to disk on those members. 
 
+## Cluster Operating States and Failure Scenarios
+### Normal Operating State
 
+<img src="doc/images/cluster_failures/normal.png" alt="AviatorsBot" style="width: 70%"/>
+
+The machine which obtained the lock initially continues to renew it and continues to send
+the weather updates to all subscribers. 
 
 ## Scheduling of Subscription Updates 
 [`Quartz scheduler`](http://www.quartz-scheduler.org) is used to provide reliable 
