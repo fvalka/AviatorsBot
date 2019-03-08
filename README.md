@@ -152,14 +152,12 @@ written to disk on those members.
 
 ## Cluster Operating States and Failure Scenarios
 ### Normal Operating State
-
 <img src="doc/images/cluster_failures/normal.png" alt="Normal operating state" style="width: 70%"/>
 
 The machine which obtained the lock initially continues to renew it and continues to send
 the weather updates to all subscribers. 
 
 ### Node Failure
-
 <img src="doc/images/cluster_failures/node_failure.png" alt="Node failure" style="width: 70%"/>
 
 If the node holding the lock fails no messages will be sent until the locks lease time expires
@@ -170,7 +168,6 @@ actual dispatch frequency of weather updates and sending a weather update immedi
 lock has been newly obtained reducing the switch-over time. 
 
 ### MongoDB Primary Failure
-
 <img src="doc/images/cluster_failures/db_failure.png" alt="Db failure" style="width: 70%"/>
 
 If the MongoDBs primary fails no lock can be obtained until a new primary has been elected 
@@ -181,7 +178,6 @@ this should not typically exceed 12 seconds.
 New subscriptions will also be delayed until a new primary has been elected. 
 
 ### MongoDB 2 out of 3 Database Failure 
-
 <img src="doc/images/cluster_failures/dual_db_failure.png" alt="Dual db failure" style="width: 70%"/>
 
 Should so many MongoDB nodes fail that no majority can be reached anymore then the remaining 
@@ -193,6 +189,20 @@ weather update will be sent to the subscriber.
 
 New subscriptions are not accepted, since the write operation of the subscription will fail
 with an error. 
+
+### System Clocks Out of Sync 
+The locking algorithm already considers the situation of the system clocks being in
+disagreement. If this situation were not considered a lock could be set which could not
+be resolved within the actual lease time and could be stuck for a very long time. 
+
+Therefore locks which are more than 10% longer than the lease time, from the perspective
+of one of the systems, will be deleted. This leads to a situation where different machines 
+will obtain the lock, since the lock will always be deleted before it can be renewed. 
+
+In that case the polling interval will be increased, by up to the node count in a worst
+case scenario where the lock is obtained by a different node in each run. This situation
+leads to increased traffic, otherwise the poller intervals must be configured as such that 
+they don't cause any backend failures at this increased polling frequency. 
 
 ### Optimal Lease Time
 The lease time needs to be set short enough so that the switch-over time is low enough during
