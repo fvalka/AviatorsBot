@@ -54,7 +54,7 @@ libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.0"
 libraryDependencies += "org.scalamock" %% "scalamock" % "4.1.0" % Test
 
 // Mongodb
-libraryDependencies += "org.reactivemongo" % "reactivemongo_2.12" % "0.16.0"// https://mvnrepository.com/artifact/org.scala-lang/scala-xml
+libraryDependencies += "org.reactivemongo" % "reactivemongo_2.12" % "0.16.3"// https://mvnrepository.com/artifact/org.scala-lang/scala-xml
 
 // Caching
 libraryDependencies += "com.github.cb372" %% "scalacache-caffeine" % "0.9.3"
