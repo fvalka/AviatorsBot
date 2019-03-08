@@ -153,10 +153,51 @@ written to disk on those members.
 ## Cluster Operating States and Failure Scenarios
 ### Normal Operating State
 
-<img src="doc/images/cluster_failures/normal.png" alt="AviatorsBot" style="width: 70%"/>
+<img src="doc/images/cluster_failures/normal.png" alt="Normal operating state" style="width: 70%"/>
 
 The machine which obtained the lock initially continues to renew it and continues to send
 the weather updates to all subscribers. 
+
+### Node Failure
+
+<img src="doc/images/cluster_failures/node_failure.png" alt="Node failure" style="width: 70%"/>
+
+If the node holding the lock fails no messages will be sent until the locks lease time expires
+and a lock can be obtained by a different node. 
+
+This delay is reduced by running the polling process with a far higher frequency then the 
+actual dispatch frequency of weather updates and sending a weather update immediately once a 
+lock has been newly obtained reducing the switch-over time. 
+
+### MongoDB Primary Failure
+
+<img src="doc/images/cluster_failures/db_failure.png" alt="Db failure" style="width: 70%"/>
+
+If the MongoDBs primary fails no lock can be obtained until a new primary has been elected 
+by the remaining instances. According to the 
+[`MongoDB documentation`](https://docs.mongodb.com/manual/replication/#automatic-failover)
+this should not typically exceed 12 seconds. 
+
+New subscriptions will also be delayed until a new primary has been elected. 
+
+### MongoDB 2 out of 3 Database Failure 
+
+<img src="doc/images/cluster_failures/dual_db_failure.png" alt="Dual db failure" style="width: 70%"/>
+
+Should so many MongoDB nodes fail that no majority can be reached anymore then the remaining 
+server will remain in a read only state. Therefore locks can not be renewed. New locks can be
+obtained after the configured amount of errors has been reached. 
+
+All running bot nodes will fall back to obtaining a lock and multiple copies of the same
+weather update will be sent to the subscriber. 
+
+New subscriptions are not accepted, since the write operation of the subscription will fail
+with an error. 
+
+### Optimal Lease Time
+The lease time needs to be set short enough so that the switch-over time is low enough during
+a failure of the node holding the lock and long enough so that a MongoDB primary failure
+or short network partition doesn't cause the fallback to be triggered. 
 
 ## Scheduling of Subscription Updates 
 [`Quartz scheduler`](http://www.quartz-scheduler.org) is used to provide reliable 
