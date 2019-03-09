@@ -172,7 +172,7 @@ control would add complexity and failure points and most readily available algor
 implementations prioritize safety & consistency over availability. 
 
 ### Definition of the High Availability Low Consistency Locking Algorithm 
-<img src="doc/images/locking_algorithm.png" alt="Locking algorithm" style="max-width: 85%"/>
+<img src="doc/images/locking_algorithm.png" alt="Locking algorithm" width="750"/>
 
 ### Locking and MongoDBs Casual Consistency
 The algorithms implementation uses the MongoDB WriteConcern with the settings: `w="majority"` 
