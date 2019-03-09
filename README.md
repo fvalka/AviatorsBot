@@ -25,7 +25,6 @@ will show you how to use the command.
 
 The bots website: [`aviatorsbot.com`](https://www.aviatorsbot.com/)
 
-___
 # Table of Contents
 - [Features](#features)
   * [METAR and TAF Subscriptions](#metar-and-taf-subscriptions)
@@ -54,8 +53,6 @@ ___
   * [Scheduling of Subscription Updates](#scheduling-of-subscription-updates)
   * [Logging and Metrics](#logging-and-metrics)
   * [METAR and TAF Change Detection](#metar-and-taf-change-detection)
-
-___
 
 # Features
 ## METAR and TAF Subscriptions
@@ -175,8 +172,7 @@ control would add complexity and failure points and most readily available algor
 implementations prioritize safety & consistency over availability. 
 
 ### Definition of the High Availability Low Consistency Locking Algorithm 
-
-![Locking Algorithm](doc/images/locking_algorithm.png "Locking Algorithm")
+<img src="doc/images/locking_algorithm.png" alt="Locking algorithm" style="max-width: 85%"/>
 
 ### Locking and MongoDBs Casual Consistency
 The algorithms implementation uses the MongoDB WriteConcern with the settings: `w="majority"` 
@@ -186,7 +182,7 @@ written to disk on those members.
 
 ## Cluster Operating States and Failure Scenarios
 ### Normal Operating State
-<img src="doc/images/cluster_failures/normal.png" alt="Normal operating state" style="width: 70%"/>
+<img src="doc/images/cluster_failures/normal.png" alt="Normal operating state"/>
 
 The machine which obtained the lock initially continues to renew it and continues to send
 the weather updates to all subscribers. 
