@@ -23,6 +23,40 @@ AviatorsBot is available on Telegram under the name:
 Sending `/help` provides a list of all available commands and `/help <command>` 
 will show you how to use the command. 
 
+The bots website: [`aviatorsbot.com`](https://www.aviatorsbot.com/)
+
+___
+# Table of Contents
+- [Features](#features)
+  * [METAR and TAF Subscriptions](#metar-and-taf-subscriptions)
+  * [Crosswind Calculation](#crosswind-calculation)
+  * [Density Altitude Calculation](#density-altitude-calculation)
+  * [Current Weather](#current-weather)
+  * [Worldwide](#worldwide)
+  * [Lightning strikes](#lightning-strikes)
+  * [SIGMET and Flight Conditions Map](#sigmet-and-flight-conditions-map)
+  * [Command Shortcuts](#command-shortcuts)
+- [Technical](#technical)
+  * [System Architecture Overview](#system-architecture-overview)
+  * [Technology Stack](#technology-stack)
+  * [Continuous Deployment](#continuous-deployment)
+  * [Production Ready, High Code Quality](#production-ready--high-code-quality)
+  * [Locking of Subscription Update Poller](#locking-of-subscription-update-poller)
+    + [Definition of the High Availability Low Consistency Locking Algorithm](#definition-of-the-high-availability-low-consistency-locking-algorithm)
+    + [Locking and MongoDBs Casual Consistency](#locking-and-mongodbs-casual-consistency)
+  * [Cluster Operating States and Failure Scenarios](#cluster-operating-states-and-failure-scenarios)
+    + [Normal Operating State](#normal-operating-state)
+    + [Node Failure](#node-failure)
+    + [MongoDB Primary Failure](#mongodb-primary-failure)
+    + [MongoDB 2 out of 3 Database Failure](#mongodb-2-out-of-3-database-failure)
+    + [System Clocks Out of Sync](#system-clocks-out-of-sync)
+    + [Optimal Lease Time](#optimal-lease-time)
+  * [Scheduling of Subscription Updates](#scheduling-of-subscription-updates)
+  * [Logging and Metrics](#logging-and-metrics)
+  * [METAR and TAF Change Detection](#metar-and-taf-change-detection)
+
+___
+
 # Features
 ## METAR and TAF Subscriptions
 Using this bots subscription service you will receive an update
