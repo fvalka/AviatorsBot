@@ -116,7 +116,7 @@ https://www.aviationweather.gov/dataserver) in XML format.
 Crosswind calculations are based upon the airfield and runway information 
 in the [`openAIP`](https://www.openaip.net/) database. 
 
-![System overview](doc/images/system-overview.png "System overview")
+<img src="doc/images/system-overview.png" alt="System overview" width="750" align="center"/>
 
 ## Technology Stack
 AviatorsBot is written in Scala using akka for non-blocking IO. 
@@ -130,7 +130,7 @@ the non-block and reactive concept also to this part.
 Using Google cloud services the bot is continuously deployed to a Google
 Kubernetes engine cluster. 
 
-![Deployment Pipeline](doc/images/deployment_pipeline.png "Deployment Pipeline")
+<img src="doc/images/deployment_pipeline.png" alt="Deployment Pipeline" width="750" align="center"/>
 
 Code is stored on Github, built on Google cloud build. During the build unit and
 integration tests are run. If all tests pass this code is deployed to the 
@@ -172,7 +172,7 @@ control would add complexity and failure points and most readily available algor
 implementations prioritize safety & consistency over availability. 
 
 ### Definition of the High Availability Low Consistency Locking Algorithm 
-<img src="doc/images/locking_algorithm.png" alt="Locking algorithm" width="750"/>
+<img src="doc/images/locking_algorithm.png" alt="Locking algorithm" width="800"/>
 
 ### Locking and MongoDBs Casual Consistency
 The algorithms implementation uses the MongoDB WriteConcern with the settings: `w="majority"` 
