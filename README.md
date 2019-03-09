@@ -116,7 +116,9 @@ https://www.aviationweather.gov/dataserver) in XML format.
 Crosswind calculations are based upon the airfield and runway information 
 in the [`openAIP`](https://www.openaip.net/) database. 
 
-<img src="doc/images/system-overview.png" alt="System overview" width="750" align="center"/>
+<p align="center" style="margin-bottom: 10em;">
+    <img src="doc/images/system-overview.png" alt="System overview" width="750"/>
+</p>
 
 ## Technology Stack
 AviatorsBot is written in Scala using akka for non-blocking IO. 
@@ -130,7 +132,9 @@ the non-block and reactive concept also to this part.
 Using Google cloud services the bot is continuously deployed to a Google
 Kubernetes engine cluster. 
 
-<img src="doc/images/deployment_pipeline.png" alt="Deployment Pipeline" width="750" align="center"/>
+<p align="center" style="margin-bottom: 10em;">
+    <img src="doc/images/deployment_pipeline.png" alt="Deployment Pipeline" width="650"/>
+</p>
 
 Code is stored on Github, built on Google cloud build. During the build unit and
 integration tests are run. If all tests pass this code is deployed to the 
