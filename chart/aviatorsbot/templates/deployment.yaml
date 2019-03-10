@@ -29,6 +29,10 @@ spec:
               readOnly: true
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
       volumes:
         - name: secrets
           secret:

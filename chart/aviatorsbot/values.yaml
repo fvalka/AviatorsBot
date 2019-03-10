@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   registry: eu.gcr.io
   repository:  trim-airfoil-155016/aviatorsbot-scala/feature/kubernetes-deployment/aviatorsbot-scala
-  tag: c930905
+  tag: be9fc32
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -53,3 +53,8 @@ affinity: {}
 mongodb:
   fullnameOverride: 'aviatorsbot-mongodb'
   usePassword: false
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true

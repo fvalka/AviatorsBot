@@ -28,7 +28,7 @@ import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServic
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import com.bot4s.telegram.Implicits._
 import com.bot4s.telegram.api._
-import com.bot4s.telegram.clients.SttpClient
+import com.bot4s.telegram.clients.{AkkaHttpClient, SttpClient}
 import com.bot4s.telegram.methods._
 import com.bot4s.telegram.models._
 import nl.grons.metrics4.scala.DefaultInstrumented
@@ -66,8 +66,7 @@ trait AviatorsBot
     .getOrElse(Source.fromFile("conf/secrets/bot.token").getLines().mkString)
 
   // Bot Client Creation
-  protected implicit val httpBackendForBot: SttpBackend[Future, Nothing] = AkkaHttpBackend()
-  override val client: RequestHandler = new SttpClient(token)
+  override val client: RequestHandler = new AkkaHttpClient(token)
 
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
 
