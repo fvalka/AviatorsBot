@@ -9,4 +9,6 @@ RUN unzip /app/app.zip
 RUN ls /app
 RUN chmod -R a+x /app/bin
 
+EXPOSE 80
+
 CMD ["/app/bin/aviatorsbot-scala"]

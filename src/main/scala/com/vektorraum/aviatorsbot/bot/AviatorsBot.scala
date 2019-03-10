@@ -27,7 +27,7 @@ import com.vektorraum.aviatorsbot.service.sigmets.{PlotData, SigmetService, Sigm
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
 import com.bot4s.telegram.Implicits._
-import com.bot4s.telegram.api.{Polling, RequestHandler, TelegramBot}
+import com.bot4s.telegram.api._
 import com.bot4s.telegram.clients.SttpClient
 import com.bot4s.telegram.methods._
 import com.bot4s.telegram.models._
@@ -45,8 +45,8 @@ import scala.util.{Failure, Success}
   * Handles commands received by the bot using the onCommand() functions
   */
 trait AviatorsBot
-  extends TelegramBot
-    with Polling
+  extends AkkaTelegramBot
+    with Webhook
     with InstrumentedCommands
     with DefaultInstrumented
     with Args {
@@ -70,6 +70,10 @@ trait AviatorsBot
   override val client: RequestHandler = new SttpClient(token)
 
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
+
+  // Configure Webhooks
+  override lazy val webhookUrl: String = config.getString("webhook.url")
+  override lazy val port: Int = config.getInt("webhook.port")
 
   protected val defaultRegion: Regions = Regions.withValue(config.getString("regions.default"))
 
