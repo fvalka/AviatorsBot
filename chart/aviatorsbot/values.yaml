@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   registry: eu.gcr.io
   repository:  trim-airfoil-155016/aviatorsbot-scala/feature/kubernetes-deployment/aviatorsbot-scala
-  tag: be9fc32
+  tag: "3693485"
   pullPolicy: IfNotPresent
 
 nameOverride: ""
@@ -24,6 +24,8 @@ ingress:
     kubernetes.io/ingress.class: nginx
     # TLS Config
     certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
+    # Restrict access to Telegram server
+    nginx.ingress.kubernetes.io/whitelist-source-range: "149.154.167.192/26"
   paths: []
   hosts:
     - &aviatorsbot-host bot.staging.aviatorsbot.com
@@ -58,3 +60,36 @@ mongodb:
     enabled: true
     serviceMonitor:
       enabled: true
+
+  persistence:
+    enabled: true
+    accessModes:
+      - ReadWriteOnce
+    size: 3Gi
+    annotations: {}
+
+  replicaSet:
+    ## Whether to create a MongoDB replica set for high availability or not
+    enabled: true
+    useHostnames: true
+
+    ## Name of the replica set
+    ##
+    name: rs0
+
+    ## Key used for replica set authentication
+    ##
+    # key: key
+
+    ## Number of replicas per each node type
+    ##
+    replicas:
+      secondary: 1
+      arbiter: 1
+    ## Pod Disruption Budget
+    ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+    pdb:
+      minAvailable:
+        primary: 1
+        secondary: 1
+        arbiter: 1

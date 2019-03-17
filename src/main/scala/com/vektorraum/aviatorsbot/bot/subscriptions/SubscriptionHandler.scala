@@ -137,7 +137,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
         messagesInTransit += 1
         send(sub.chatId, buildWxMessage(metarToSend, tafToSend)) transformWith {
           case Success(msg) =>
-            logger.debug(s"Subscription update message successfully sent and udating database for sub=$sub")
+            logger.debug(s"Subscription update message successfully sent and updating database for sub=$sub")
             messagesInTransit -= 1
 
             if(latestMetar.nonEmpty) { sub.latestMetar = latestMetar }
