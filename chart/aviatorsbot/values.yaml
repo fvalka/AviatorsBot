@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   registry: eu.gcr.io
   repository:  trim-airfoil-155016/aviatorsbot-scala/feature/kubernetes-deployment/aviatorsbot-scala
-  tag: "3693485"
+  tag: "8a1209d"
   pullPolicy: IfNotPresent
 
 nameOverride: ""
