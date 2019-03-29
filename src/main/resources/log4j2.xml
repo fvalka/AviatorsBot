@@ -33,16 +33,44 @@
             </Policies>
         </RollingFile>
 
+        <Gelf name="gelf" host="udp:graylog-udp.logging.svc.cluster.local" port="12222" version="1.1" extractStackTrace="true"
+              mdcProfiling="true" includeFullMdc="true" maximumMessageSize="8192"
+              originHost="%host{fqdn}" additionalFieldTypes="type=String">
+            <Field name="timestamp" pattern="%d{dd MMM yyyy HH:mm:ss,SSS}" />
+            <Field name="level" pattern="%level" />
+            <Field name="simpleClassName" pattern="%C{1}" />
+            <Field name="className" pattern="%C" />
+            <Field name="server" pattern="%host" />
+            <Field name="server.fqdn" pattern="%host{fqdn}" />
+
+            <!-- This is a static field -->
+            <Field name="type" literal="normal" />
+        </Gelf>
+
+        <Gelf name="traffic-gelf" host="udp:graylog-udp.logging.svc.cluster.local" port="12222" version="1.1" extractStackTrace="false"
+              mdcProfiling="true" includeFullMdc="true" maximumMessageSize="8192"
+              originHost="%host{fqdn}" additionalFieldTypes="type=String">
+            <Field name="timestamp" pattern="%d{dd MMM yyyy HH:mm:ss,SSS}" />
+            <Field name="level" pattern="%level" />
+            <Field name="server" pattern="%host" />
+            <Field name="server.fqdn" pattern="%host{fqdn}" />
+
+            <!-- This is a static field -->
+            <Field name="type" literal="traffic" />
+        </Gelf>
+
         <MetricsAppender name="Metrics" registryName="default"/>
     </Appenders>
     <Loggers>
         <Logger name="traffic-log" level="info" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFileTrafficLog"/>
+            <AppenderRef ref="traffic-gelf"/>
         </Logger>
         <Root level="info">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFileGeneral"/>
+            <AppenderRef ref="gelf"/>
             <AppenderRef ref="Metrics" />
         </Root>
     </Loggers>

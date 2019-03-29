@@ -43,6 +43,8 @@ libraryDependencies += "biz.enef" %% "slogging-slf4j" % "0.6.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.11.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.11.1"
 libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.1"
+libraryDependencies += "biz.paluch.logging" % "logstash-gelf" % "1.13.0"
+
 
 // Wire Scala CDI
 libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided"
