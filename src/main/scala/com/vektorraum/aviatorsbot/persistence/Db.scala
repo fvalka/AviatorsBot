@@ -21,8 +21,6 @@ class Db(config: Config) {
   private val connection: MongoConnection = driver.connection(hosts)
 
   // Database and collections: Get references
-  val futureConnection: Future[MongoConnection] = Future.successful(connection)
-
-  def aviatorsDb: Future[DefaultDB] = futureConnection.flatMap(_.database(dbConfig.getString("database")))
+  def aviatorsDb: Future[DefaultDB] = connection.database(dbConfig.getString("database"))
 
 }
