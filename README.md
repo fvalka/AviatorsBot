@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/63287102d8ea448caae8fb7fef71edb4)](https://app.codacy.com/manual/fvalka/AviatorsBot?utm_source=github.com&utm_medium=referral&utm_content=fvalka/AviatorsBot&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/fvalka/AviatorsBot.svg?branch=master)](https://travis-ci.org/fvalka/AviatorsBot)
 [![codecov](https://codecov.io/gh/fvalka/AviatorsBot/branch/master/graph/badge.svg)](https://codecov.io/gh/fvalka/AviatorsBot)
 
