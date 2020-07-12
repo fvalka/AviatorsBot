@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/fvalka/AviatorsBot.svg?branch=master)](https://travis-ci.org/fvalka/AviatorsBot)
 [![codecov](https://codecov.io/gh/fvalka/AviatorsBot/branch/master/graph/badge.svg)](https://codecov.io/gh/fvalka/AviatorsBot)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/6b960558fb7f4ec4b2bc4a2d73dc418d)](https://www.codacy.com/manual/fvalka/AviatorsBot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=fvalka/AviatorsBot&amp;utm_campaign=Badge_Grade)
 
 <p align="center" style="margin-bottom: 10em;">
   <img src="doc/images/logo.png" alt="AviatorsBot"/>
