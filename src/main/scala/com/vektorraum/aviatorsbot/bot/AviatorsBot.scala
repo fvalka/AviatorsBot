@@ -4,8 +4,11 @@ import java.io.File
 import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
 import java.util.concurrent.atomic.AtomicLong
-
 import akka.util.ByteString
+import com.bot4s.telegram.future.{Polling, TelegramBot}
+import com.bot4s.telegram.models._
+import com.bot4s.telegram.Implicits._
+import com.bot4s.telegram.methods._
 import com.softwaremill.macwire._
 import com.softwaremill.sttp.SttpBackend
 import com.softwaremill.sttp.akkahttp.AkkaHttpBackend
@@ -26,10 +29,10 @@ import com.vektorraum.aviatorsbot.service.regions.Regions
 import com.vektorraum.aviatorsbot.service.sigmets.{PlotData, SigmetService, SigmetServiceProduction}
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
-import info.mukel.telegrambot4s.Implicits._
-import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
-import info.mukel.telegrambot4s.methods._
-import info.mukel.telegrambot4s.models._
+//import info.mukel.telegrambot4s.Implicits._
+//import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
+//import info.mukel.telegrambot4s.methods._
+//import info.mukel.telegrambot4s.models._
 import nl.grons.metrics4.scala.DefaultInstrumented
 
 import scala.concurrent.Future
@@ -97,8 +100,7 @@ trait AviatorsBot
   onCommand(Command("privacy", "Privacy policy", "Info", anyArgs)) {
     implicit msg =>
       _ =>
-        reply(HelpMessages("privacy"),
-          disableWebPagePreview = true, parseMode = ParseMode.HTML)
+        reply(HelpMessages("privacy")).void
   }
 
   onCommand(Command("region", "Preferred region", "Settings", regionOptionalArgs)) {
@@ -106,7 +108,7 @@ trait AviatorsBot
       regionsDAO.set(RegionSetting(msg.chat.id, region)) andThen {
         case Success(writeResult) =>
           if (writeResult.ok) {
-            reply("Preferred region updated")
+            reply("Preferred region updated").void
           } else {
             logger.warn(s"Region update failed with writeResult.ok false msg=$msg")
             reply(ERROR_REGION_UPDATE_FAILED)
