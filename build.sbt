@@ -20,7 +20,7 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
 // Telegram Bot
-libraryDependencies += "info.mukel" %% "telegrambot4s" % "3.0.15"
+libraryDependencies += "info.mukel" %% "telegrambot4s" % "3.0.16"
 
 // HTTP Client
 libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.3.5"
