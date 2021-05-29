@@ -3,8 +3,6 @@ version: 0.2
 phases:
   install:
     commands:
-      - echo Checking Debian version
-      - lsb_release -a
       - echo Updating package database
       - apt-get update
       - echo Installing additional packages
