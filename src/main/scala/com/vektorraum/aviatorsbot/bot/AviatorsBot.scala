@@ -184,6 +184,7 @@ trait AviatorsBot
         }
   }
 
+  /*
   onCommand(Command("sigmet", "SIGMET Map", "Weather Charts", regionOptionalArgs ++ numberOptionArgs)) {
     implicit msg =>
       args =>
@@ -237,6 +238,7 @@ trait AviatorsBot
           loadMap()
         }
   }
+   */
 
   onCommand(Command("xwind", "Current crosswind", "Calculations", oneStationArgs, longRunning = true)) {
     implicit msg =>
