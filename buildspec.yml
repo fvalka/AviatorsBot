@@ -10,10 +10,10 @@ phases:
       - echo Installing mongodb server
       - wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
       - echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-      - sudo apt-get update
-      - sudo apt-get install -y mongodb-org
+      - apt-get update
+      - apt-get install -y mongodb-org
       - echo Starting mongodb server
-      - systemctl start mongod
+      - service mongodb start
       - echo Waiting for mongodb to come up
       - sleep 10
   build:
