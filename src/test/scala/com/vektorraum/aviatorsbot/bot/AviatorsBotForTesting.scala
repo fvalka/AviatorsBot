@@ -6,8 +6,9 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.service.sigmets.SigmetService
 import com.vektorraum.aviatorsbot.service.strikes.StrikesService
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
-import info.mukel.telegrambot4s.methods.ParseMode.ParseMode
-import info.mukel.telegrambot4s.models._
+import com.bot4s.telegram.methods.ParseMode
+import com.bot4s.telegram.methods.ParseMode.ParseMode
+import com.bot4s.telegram.models._
 import nl.grons.metrics4.scala.FreshRegistries
 import org.scalamock.scalatest.MockFactory
 
@@ -118,7 +119,7 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
     val updateStub = Update(updateId = 329618378,
       message = Some(messageStub))
 
-    receiveUpdate(updateStub)
+    receiveUpdate(updateStub, Option.empty)
   }
 
   def runSubscriptionHandler(): Unit = {
@@ -128,7 +129,7 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
   /**
     * Ensures that the bot can not be started
     */
-  override def run(): Unit = {
+  override def run(): Future[Unit] = {
     throw new RuntimeException("The testing bot must never be started!")
   }
 }

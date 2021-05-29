@@ -5,9 +5,13 @@ import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
 import java.util.concurrent.atomic.AtomicLong
 import akka.util.ByteString
+import cats.syntax.functor._
+import cats.instances.future._
 import com.bot4s.telegram.future.{Polling, TelegramBot}
+import com.bot4s.telegram.clients.{AkkaHttpClient, FutureSttpClient, ScalajHttpClient}
 import com.bot4s.telegram.models._
 import com.bot4s.telegram.Implicits._
+import com.bot4s.telegram.api.RequestHandler
 import com.bot4s.telegram.methods._
 import com.softwaremill.macwire._
 import com.softwaremill.sttp.SttpBackend
@@ -29,10 +33,6 @@ import com.vektorraum.aviatorsbot.service.regions.Regions
 import com.vektorraum.aviatorsbot.service.sigmets.{PlotData, SigmetService, SigmetServiceProduction}
 import com.vektorraum.aviatorsbot.service.strikes.{StrikesService, StrikesServiceProduction}
 import com.vektorraum.aviatorsbot.service.weather.{AddsWeatherService, AddsWeatherServiceProduction}
-//import info.mukel.telegrambot4s.Implicits._
-//import info.mukel.telegrambot4s.api.{Polling, TelegramBot}
-//import info.mukel.telegrambot4s.methods._
-//import info.mukel.telegrambot4s.models._
 import nl.grons.metrics4.scala.DefaultInstrumented
 
 import scala.concurrent.Future
@@ -66,6 +66,8 @@ trait AviatorsBot
   lazy val token: String = scala.util.Properties
     .envOrNone("BOT_TOKEN")
     .getOrElse(Source.fromFile("conf/bot.token").getLines().mkString)
+
+  override val client: RequestHandler[Future] = new ScalajHttpClient(token)
 
   protected val config: Config = ConfigFactory.parseFile(new File("conf/aviatorsbot.conf"))
 
@@ -108,7 +110,7 @@ trait AviatorsBot
       regionsDAO.set(RegionSetting(msg.chat.id, region)) andThen {
         case Success(writeResult) =>
           if (writeResult.ok) {
-            reply("Preferred region updated").void
+            reply("Preferred region updated")
           } else {
             logger.warn(s"Region update failed with writeResult.ok false msg=$msg")
             reply(ERROR_REGION_UPDATE_FAILED)

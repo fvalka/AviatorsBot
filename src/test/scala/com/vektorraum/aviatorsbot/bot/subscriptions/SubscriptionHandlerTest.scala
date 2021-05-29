@@ -1,11 +1,11 @@
 package com.vektorraum.aviatorsbot.bot.subscriptions
 
+import com.bot4s.telegram.api.TelegramApiException
 import com.vektorraum.aviatorsbot.bot.AviatorsBotForTesting
 import com.vektorraum.aviatorsbot.persistence.WriteResultFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.SubscriptionFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
-import info.mukel.telegrambot4s.api.TelegramApiException
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent.Eventually

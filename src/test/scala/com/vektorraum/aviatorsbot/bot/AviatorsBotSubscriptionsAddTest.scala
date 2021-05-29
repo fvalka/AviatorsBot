@@ -1,11 +1,11 @@
 package com.vektorraum.aviatorsbot.bot
 
+import com.bot4s.telegram.methods.ParseMode
+
 import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
-
 import com.vektorraum.aviatorsbot.persistence.WriteResultFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
-import info.mukel.telegrambot4s.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.Matchers._
 import org.scalatest.concurrent._

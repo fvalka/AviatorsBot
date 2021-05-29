@@ -1,5 +1,7 @@
 package com.vektorraum.aviatorsbot.bot.subscriptions
 
+import com.bot4s.telegram.api.TelegramApiException
+import com.bot4s.telegram.models.Message
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import com.vektorraum.aviatorsbot.bot.util.LatestInfoConverter
@@ -9,8 +11,6 @@ import com.vektorraum.aviatorsbot.generated.taf.TAF
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
-import info.mukel.telegrambot4s.api.TelegramApiException
-import info.mukel.telegrambot4s.models.Message
 import nl.grons.metrics4.scala.DefaultInstrumented
 
 import scala.concurrent.ExecutionContext.Implicits.global

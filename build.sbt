@@ -10,21 +10,21 @@ resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += Resolver.sonatypeRepo("public")
 
 // Akka
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.5.14"
-libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.14"
-libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.1.3"
-libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % "10.1.3"
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.6.13"
+libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.6.13"
+libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.2.4"
+libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % "10.2.4"
 
 // Scalatest
 libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
-// Telegram Bot
+// Telegram Bot/
 // Core with minimal dependencies, enough to spawn your first bot.
-libraryDependencies += "com.bot4s" %% "telegram-core" % "4.4.0-RC2"
+libraryDependencies += "com.bot4s" %% "telegram-core" % "5.0.0"
 
 // Extra goodies: Webhooks, support for games, bindings for actors.
-libraryDependencies += "com.bot4s" %% "telegram-akka" % "4.4.0-RC2"
+libraryDependencies += "com.bot4s" %% "telegram-akka" % "5.0.0"
 
 // HTTP Client
 libraryDependencies += "com.softwaremill.sttp" %% "core" % "1.3.5"
