@@ -13,7 +13,7 @@ phases:
       - apt-get update
       - apt-get install -y mongodb-org
       - echo Starting mongodb server
-      - service mongodb start
+      - service mongod start
       - echo Waiting for mongodb to come up
       - sleep 10
   build:
