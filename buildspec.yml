@@ -10,7 +10,7 @@ phases:
       - echo Starting mongodb server
       - service mongodb start
       - echo Waiting for mongodb to come up
-      - sleep 5
+      - sleep 10
   build:
     commands:
       - echo Build started on `date`
