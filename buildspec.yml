@@ -1,21 +1,6 @@
 version: 0.2
 
 phases:
-  install:
-    commands:
-      - echo Updating package database
-      - apt-get update
-      - echo Installing additional packages
-      - apt-get -y install dpkg-sig lintian fakeroot
-      - echo Installing mongodb server
-      - wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
-      - echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" | tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-      - apt-get update
-      - apt-get install -y mongodb-org
-      - echo Starting mongodb server
-      - service mongod start
-      - echo Waiting for mongodb to come up
-      - sleep 10
   build:
     commands:
       - echo Build started on `date`
