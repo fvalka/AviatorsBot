@@ -77,22 +77,22 @@ enablePlugins(JavaServerAppPackaging)
 enablePlugins(DebianPlugin)
 enablePlugins(SystemdPlugin)
 
-unmanagedSourceDirectories in Compile += baseDirectory.value / "scalaxb-generated/main/scala"
+Compile / unmanagedSourceDirectories += baseDirectory.value / "scalaxb-generated/main/scala"
 
 lazy val scalaXml = "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6"
 lazy val dispatchV = "0.12.0"
 lazy val dispatch = "net.databinder.dispatch" %% "dispatch-core" % dispatchV
 
-mainClass in Compile := Some("com.vektorraum.aviatorsbot.bot.AviatorsBotProduction")
+Compile / mainClass := Some("com.vektorraum.aviatorsbot.bot.AviatorsBotProduction")
 
-maintainer in Linux := "Fabian Valka <contact@vektorraum.com>"
-packageSummary in Linux := "AviatorsBot"
+Linux / maintainer := "Fabian Valka <contact@vektorraum.com>"
+Linux / packageSummary  := "AviatorsBot"
 packageDescription := "A telegram bot for aviators. Focused on providing up to date weather information."
-serverLoading in Debian := Some(ServerLoader.Systemd)
+Debian / serverLoading := Some(ServerLoader.Systemd)
 startRunlevels  :=Option("3")
 stopRunlevels :=Option("3")
 
-mappings in Universal ++= directory("conf")
+Universal / mappings ++= directory("conf")
 
 coverageExcludedPackages := "com\\.vektorraum\\.aviatorsbot\\.generated.*;scalaxb.*"

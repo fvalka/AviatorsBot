@@ -5,12 +5,24 @@ phases:
     commands:
       - echo Starting mongodb
       - mongod --fork --logpath /var/log/mongod.log
+      - sleep 5
   build:
     commands:
       - echo Build started on `date`
       - echo Run the test and package the code...
       - sbt compile && sbt test && sbt debian:packageBin
       - echo Build completed on `date`
+    finally:
+      - |
+        if [ "$buildExitCode" -ne 0 ]; then
+          badge_status=failing
+          badge_colour=red
+        else
+          badge_status=passing
+          badge_colour=green
+        fi
+      - curl -s "https://img.shields.io/badge/Build-$badge_status-$badge_colour.svg" > ${GithubBranch}-build.svg
+      - aws s3 cp ${GithubBranch}-build.svg s3://${S3Bucket}/badges/${GithubBranch}-build.svg --acl public-read --cache-control no-cache
 artifacts:
   files:
     - target/aviatorsbot-scala_1.0_all.deb
