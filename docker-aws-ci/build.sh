@@ -1,0 +1,9 @@
+#!/bin/bash                                                                                                                                                                                                                                 │
+docker build \                                                                                                                                                                                                                              │
+  --build-arg BASE_IMAGE_TAG="8u242-jdk-stretch" \                                                                                                                                                                                          │
+  --build-arg SBT_VERSION="1.4.3" \                                                                                                                                                                                                         │
+  --build-arg SCALA_VERSION="2.13.5" \                                                                                                                                                                                                      │
+  --build-arg USER_ID=1001 \                                                                                                                                                                                                                │
+  --build-arg GROUP_ID=1001 \                                                                                                                                                                                                               │
+  -t 653219870532.dkr.ecr.eu-west-1.amazonaws.com/aviatorsbot-build \                                                                                                                                                                       │
+  .
