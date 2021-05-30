@@ -9,6 +9,8 @@ scalaVersion := "2.12.6"
 resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += Resolver.sonatypeRepo("public")
 
+excludeDependencies += "ch.qos.logback" % "logback-classic"
+
 // Akka
 libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.6.13"
 libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.6.13"
