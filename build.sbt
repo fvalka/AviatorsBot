@@ -40,9 +40,9 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.1.1"
 libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.3.0"
 
 // Logging
-libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.11.1"
-libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.11.1"
-libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.1"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.15.0"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.15.0"
+libraryDependencies += "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.15.0"
 
 // Wire Scala CDI
 libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.0" % "provided"
