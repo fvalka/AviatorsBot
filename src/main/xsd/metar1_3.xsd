@@ -1,0 +1,151 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="response">
+		<xsd:complexType >
+			<xsd:sequence >
+				<xsd:element ref="request_index"/>
+				<xsd:element ref="data_source" />
+				<xsd:element ref="request"/>
+				<xsd:element ref="errors"/>
+				<xsd:element ref="warnings"/>
+				<xsd:element ref="time_taken_ms"/>
+				<xsd:element ref="data"/>
+			</xsd:sequence>
+			<xsd:attribute name="version" type="xsd:string" default="1.2"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="request_index" type="xsd:int"/>
+	<xsd:element name="data_source"	>
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="request" >
+		<xsd:complexType>
+			<xsd:attribute name="type" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="errors">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0" >
+				<xsd:element ref="error" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="warnings">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:element ref="warning" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="data" >
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+				<xsd:element ref="METAR"/>
+			</xsd:sequence>
+			<xsd:attribute name="num_results" type="xsd:int"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="warning" type="xsd:string"/>
+	<xsd:element name="error" type="xsd:string"/>
+	<xsd:element name="time_taken_ms" type="xsd:int"/>
+	<xsd:attribute name="num_results" type="xsd:int"/>
+
+	<xsd:element name="METAR">
+		<xsd:complexType>
+			<xsd:sequence >
+				<xsd:element ref="raw_text" minOccurs="0" />
+				<xsd:element ref="station_id" minOccurs="0"/>
+				<xsd:element ref="observation_time" minOccurs="0"/>
+				<xsd:element ref="latitude" minOccurs="0"/>
+				<xsd:element ref="longitude" minOccurs="0"/>
+				<xsd:element ref="temp_c" minOccurs="0"/>
+				<xsd:element ref="dewpoint_c" minOccurs="0"/>
+				<xsd:element ref="wind_dir_degrees" minOccurs="0"/>
+				<xsd:element ref="wind_speed_kt" minOccurs="0"/>
+				<xsd:element ref="wind_gust_kt" minOccurs="0"/>
+				<xsd:element ref="visibility_statute_mi" minOccurs="0"/>
+				<xsd:element ref="altim_in_hg" minOccurs="0"/>
+				<xsd:element ref="sea_level_pressure_mb" minOccurs="0"/>
+				<xsd:element ref="quality_control_flags" minOccurs="0"/>
+				<xsd:element ref="wx_string" minOccurs="0"/>
+				<xsd:element ref="sky_condition" minOccurs="0" maxOccurs="4"/>
+				<xsd:element ref="flight_category" minOccurs="0"/>
+				<xsd:element ref="three_hr_pressure_tendency_mb" minOccurs="0"/>
+				<xsd:element ref="maxT_c" minOccurs="0" />
+				<xsd:element ref="minT_c" minOccurs="0" />
+				<xsd:element ref="maxT24hr_c" minOccurs="0" />
+				<xsd:element ref="minT24hr_c" minOccurs="0"/>
+				<xsd:element ref="precip_in" minOccurs="0" />
+				<xsd:element ref="pcp3hr_in" minOccurs="0"/>
+				<xsd:element ref="pcp6hr_in" minOccurs="0"/>
+				<xsd:element ref="pcp24hr_in" minOccurs="0"/>
+				<xsd:element ref="snow_in" minOccurs="0"/>
+				<xsd:element ref="vert_vis_ft" minOccurs="0"/>
+				<xsd:element ref="metar_type" minOccurs="0" />
+				<xsd:element ref="elevation_m" minOccurs="0" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="raw_text" type="xsd:string"/>
+	<xsd:element name="station_id" type="xsd:string"/>
+	<xsd:element name="observation_time" type="xsd:string"/>
+	<xsd:element name="latitude" type="xsd:float"/>
+	<xsd:element name="longitude" type="xsd:float"/>
+	<xsd:element name="temp_c" type="xsd:float" />
+	<xsd:element name="dewpoint_c" type="xsd:float"/>
+	<xsd:element name="wind_dir_degrees" type="xsd:string"/>
+	<xsd:element name="wind_speed_kt" type="xsd:int"/>
+	<xsd:element name="wind_gust_kt" type="xsd:int"/>
+	<xsd:element name="visibility_statute_mi" type="xsd:string"/>
+	<xsd:element name="altim_in_hg" type="xsd:float"/>
+	<xsd:element name="sea_level_pressure_mb" type="xsd:float"/>
+	<xsd:element name="quality_control_flags" >
+		<xsd:complexType>
+			<xsd:sequence >
+				<xsd:element ref="corrected" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="auto" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="auto_station" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="maintenance_indicator_on" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="no_signal" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="lightning_sensor_off" minOccurs="0" maxOccurs="1" />
+				<xsd:element ref="freezing_rain_sensor_off" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="present_weather_sensor_off" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="corrected" type="xsd:string" />
+	<xsd:element name="auto" type="xsd:string"/>
+	<xsd:element name="auto_station" type="xsd:string"/>
+	<xsd:element name="maintenance_indicator_on" type="xsd:string"	/>
+	<xsd:element name="no_signal" type="xsd:string"/>
+	<xsd:element name="lightning_sensor_off" type="xsd:string"/>
+	<xsd:element name="freezing_rain_sensor_off" type="xsd:string"/>
+	<xsd:element name="present_weather_sensor_off" type="xsd:string"/>
+
+	<xsd:element name="wx_string" type="xsd:string"/>
+
+	<xsd:element name="sky_condition" >
+		<xsd:complexType >
+			<xsd:attribute name="sky_cover" type="xsd:string"/>
+			<xsd:attribute name="cloud_base_ft_agl" type="xsd:int"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="flight_category" type="xsd:string"/>
+	<xsd:element name="three_hr_pressure_tendency_mb" type="xsd:float"/>
+	<xsd:element name="maxT_c" type="xsd:float"/>
+	<xsd:element name="minT_c" type="xsd:float"/>
+	<xsd:element name="maxT24hr_c" type="xsd:float"/>
+	<xsd:element name="minT24hr_c" type="xsd:float"/>
+	<xsd:element name="precip_in" type="xsd:float"/>
+	<xsd:element name="pcp3hr_in" type="xsd:float"/>
+	<xsd:element name="pcp6hr_in" type="xsd:float"/>
+	<xsd:element name="pcp24hr_in" type="xsd:float"/>
+	<xsd:element name="snow_in" type="xsd:float"/>
+	<xsd:element name="vert_vis_ft" type="xsd:int"/>
+	<xsd:element name="metar_type" type="xsd:string"/>
+	<xsd:element name="elevation_m" type="xsd:float"/>
+</xsd:schema>

@@ -19,10 +19,11 @@ object XWindCalculator {
     // Variable wind is defined as 0 degrees according to
     // https://aviationweather.gov/adds/dataserver/metars/MetarFieldDescription.php
     // Should no wind direction be present, also assume variable wind
-    val windDir = metar.wind_dir_degrees.getOrElse(0)
-    if (windDir == 0) {
+    val windDirOriginal = metar.wind_dir_degrees
+    if (windDirOriginal.forall(windDir => windDir.equals("VRB"))) {
       return "⚠ Wind variable! No calculation possible."
     }
+    val windDir = windDirOriginal.map(windDir => windDir.toInt).get
 
     val directions = SortedSet(airfield.runways flatMap { runway => runwayDirections(airfield, runway) }: _*)
 

@@ -25,7 +25,7 @@ class AddsWeatherServiceProduction extends AddsWeatherService with DefaultInstru
   metarsTimer.timeFuture {
     Future {
       blocking {
-        xml.XML.load("https://aviationweather.gov/adds/dataserver_current/httpparam?" +
+        xml.XML.load("https://aviationweather.gov/api/data/dataserver?" +
           "dataSource=metars&requestType=retrieve&format=xml&" +
           s"stationString=${stations mkString ","}&hoursBeforeNow=$maxAge"
         )
@@ -45,7 +45,7 @@ class AddsWeatherServiceProduction extends AddsWeatherService with DefaultInstru
     Future {
       blocking {
         xml.XML.load(
-          "https://aviationweather.gov/adds/dataserver_current/httpparam?" +
+          "https://aviationweather.gov/api/data/dataserver?" +
           "dataSource=tafs&requestType=retrieve&format=xml&" +
           s"stationString=${stations mkString ","}&hoursBeforeNow=$maxAge"
         )

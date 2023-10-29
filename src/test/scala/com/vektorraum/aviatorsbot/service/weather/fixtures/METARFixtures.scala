@@ -146,7 +146,7 @@ object METARFixtures {
         <longitude>14.32</longitude>
         <temp_c>20.0</temp_c>
         <dewpoint_c>4.0</dewpoint_c>
-        <wind_dir_degrees>0</wind_dir_degrees>
+        <wind_dir_degrees>VRB</wind_dir_degrees>
         <wind_speed_kt>2</wind_speed_kt>
         <visibility_statute_mi>6.21</visibility_statute_mi>
         <altim_in_hg>30.059055</altim_in_hg>
