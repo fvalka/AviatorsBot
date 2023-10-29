@@ -5,6 +5,7 @@ import scalacache._
 import scalacache.caffeine._
 import scalacache.memoization._
 
+import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.io.Source
 import scala.language.postfixOps
@@ -19,6 +20,14 @@ object HelpMessages {
 
   val logger = Logger(getClass)
 
+  /**
+    * Used to cache already loaded help messages since a runtime
+    * change of the help messages is not supported.
+    *
+    * Introduced to improve performance based upon metrics analysis.
+    */
+  private var messageCache = new mutable.HashMap[String, String]()
+
 
   /**
     * Retrieve a help message based upon the command name.
@@ -32,7 +41,8 @@ object HelpMessages {
     if(!safeFileNames.pattern.matcher(command).matches) {
       throw new IllegalArgumentException("Could not load help, unsafe filename")
     }
-    load(s"help/$command.html")
+
+    messageCache.getOrElseUpdate(command, load(s"help/$command.html"))
   }
 
   private def load(resource: String): String = {
