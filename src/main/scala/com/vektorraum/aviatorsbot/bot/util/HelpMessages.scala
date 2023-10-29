@@ -26,7 +26,7 @@ object HelpMessages {
     *
     * Introduced to improve performance based upon metrics analysis.
     */
-  private var messageCache = new mutable.HashMap[String, String]()
+  private val messageCache = new mutable.HashMap[String, String]()
 
 
   /**
