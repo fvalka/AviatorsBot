@@ -9,7 +9,7 @@ import com.vektorraum.aviatorsbot.bot.weather.{FormatMetar, FormatTaf}
 import com.vektorraum.aviatorsbot.generated.metar.METAR
 import com.vektorraum.aviatorsbot.generated.taf.TAF
 import com.vektorraum.aviatorsbot.persistence.subscriptions.SubscriptionDAO
-import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
+import com.vektorraum.aviatorsbot.persistence.subscriptions.model.{LatestInfo, Subscription}
 import com.vektorraum.aviatorsbot.service.weather.AddsWeatherService
 import nl.grons.metrics4.scala.DefaultInstrumented
 
@@ -115,6 +115,7 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
     */
   private def sendUpdatesForStation(metars: Map[String, Seq[METAR]], tafs: Map[String, Seq[TAF]],
   subscriptions: List[Subscription]): Future[Seq[Any]] = {
+
     val result: Seq[Future[Any]] = subscriptions map { sub =>
       val metar = metars.get(sub.icao)
       val taf = tafs.get(sub.icao)
@@ -125,10 +126,10 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
       // Only send the metar if the date and hash do not match the ones already stored in the db
       // and if the user has subscribed to the metar and taf
       val metarToSend = metar.flatMap { in =>
-        if (latestMetar == sub.latestMetar || !sub.metar) { None } else { Some(in) }
+        if (wasAlreadySent(latestMetar, sub.latestMetar) || !sub.metar) { None } else { Some(in) }
       }
       val tafToSend = taf.flatMap { in =>
-        if (latestTaf == sub.latestTaf || !sub.taf) { None } else { Some(in) }
+        if (wasAlreadySent(latestTaf, sub.latestTaf) || !sub.taf) { None } else { Some(in) }
       }
 
       if(metarToSend.nonEmpty || tafToSend.nonEmpty) {
@@ -164,6 +165,23 @@ class SubscriptionHandler(subscriptionDAO: SubscriptionDAO, weatherService: Adds
     }
 
     Future.sequence(result)
+  }
+
+  /**
+    * Check if a weather update or a newer weather update were already sent.
+    *
+    * Based upon the issuedAt date and hash stored in the database
+    *
+    * @param latest LatestInfo of the weather information just retrieved from the weather service
+    * @param stored LatestInfo for the subscription stored in the database
+    * @return True if the weather information has already been sent, or if a newer weather information was already sent before
+    */
+  private def wasAlreadySent(latest: Option[LatestInfo], stored: Option[LatestInfo]): Boolean = {
+    latest.forall { latestInfo =>
+      stored.exists { storedInfo =>
+        latestInfo.issuedAt.before(storedInfo.issuedAt) || latestInfo.hash == storedInfo.hash
+      }
+    }
   }
 
   /**
