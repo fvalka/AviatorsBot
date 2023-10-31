@@ -2,12 +2,12 @@ package com.vektorraum.aviatorsbot.bot.util
 
 import java.text.ParseException
 import java.time.{Duration, LocalTime, ZonedDateTime}
-
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FunSuite, GivenWhenThen}
+import org.scalatest.GivenWhenThen
+import org.scalatest.funsuite.AnyFunSuite
 
-class TimeUtilTest extends FunSuite with TableDrivenPropertyChecks with GivenWhenThen {
+class TimeUtilTest extends AnyFunSuite with TableDrivenPropertyChecks with GivenWhenThen {
   test("Time only matches various valid times") {
     Given("Various valid and invalid time strings")
     val properties = Table(

@@ -2,11 +2,11 @@ package com.vektorraum.aviatorsbot.persistence.subscriptions
 
 import java.time.{ZoneOffset, ZonedDateTime}
 import java.util.Date
-
 import com.vektorraum.aviatorsbot.persistence.DatabaseSetup
 import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.SubscriptionFixtures
-import org.scalatest.Matchers._
-import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.AsyncFeatureSpec
 
 import scala.concurrent.Future
 import scala.language.postfixOps

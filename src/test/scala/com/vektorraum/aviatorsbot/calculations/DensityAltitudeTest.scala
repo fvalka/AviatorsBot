@@ -1,14 +1,15 @@
 package com.vektorraum.aviatorsbot.calculations
 
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FunSuite, GivenWhenThen}
+import org.scalatest.GivenWhenThen
+import org.scalatest.funsuite.AnyFunSuite
 import squants.MetricSystem
 import squants.motion.Bars
 import squants.space.{Feet, Length, Meters}
 import squants.thermal.{Celsius, Fahrenheit}
 
-class DensityAltitudeTest extends FunSuite with TableDrivenPropertyChecks with GivenWhenThen {
+class DensityAltitudeTest extends AnyFunSuite with TableDrivenPropertyChecks with GivenWhenThen {
   implicit val tolerance: Length = Feet(2)
 
   test("Density altitude calculations for various valid data points") {

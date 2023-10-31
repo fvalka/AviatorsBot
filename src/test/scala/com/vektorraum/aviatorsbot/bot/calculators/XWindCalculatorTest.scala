@@ -2,13 +2,14 @@ package com.vektorraum.aviatorsbot.bot.calculators
 
 import com.vektorraum.aviatorsbot.persistence.airfielddata.model.Airfield
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARFixtures}
-import org.scalatest.Matchers._
-import org.scalatest.{FunSuite, GivenWhenThen}
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
   * Created by fvalka on 25.05.2017.
   */
-class XWindCalculatorTest extends FunSuite with GivenWhenThen {
+class XWindCalculatorTest extends AnyFunSuite with GivenWhenThen {
 
   test("Normal wind") {
     Given("METAR containing normal wind, with no variation or gusts")

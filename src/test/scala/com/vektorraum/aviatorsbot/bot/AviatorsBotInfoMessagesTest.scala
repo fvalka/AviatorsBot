@@ -1,12 +1,13 @@
 package com.vektorraum.aviatorsbot.bot
 
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.{Assertion, FeatureSpec, GivenWhenThen}
+import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.{Assertion, GivenWhenThen}
 
-class AviatorsBotInfoMessagesTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
+class AviatorsBotInfoMessagesTest extends AnyFeatureSpec with GivenWhenThen with MockFactory with Eventually {
   info("As a pilot I want to be able to ")
   info("get information about the bot")
 

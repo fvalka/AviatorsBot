@@ -1,11 +1,12 @@
 package com.vektorraum.aviatorsbot.bot.util
 
 import com.vektorraum.aviatorsbot.service.regions.Regions
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FunSuite, GivenWhenThen}
+import org.scalatest.GivenWhenThen
+import org.scalatest.funsuite.AnyFunSuite
 
-class RegionUtilTest extends FunSuite with TableDrivenPropertyChecks with GivenWhenThen {
+class RegionUtilTest extends AnyFunSuite with TableDrivenPropertyChecks with GivenWhenThen {
   test("Region validity is detected correctly") {
     Given("Various valid and invalid regions")
     val properties = Table(

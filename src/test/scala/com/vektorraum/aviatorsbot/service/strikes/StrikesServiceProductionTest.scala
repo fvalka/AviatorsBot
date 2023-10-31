@@ -1,10 +1,11 @@
 package com.vektorraum.aviatorsbot.service.strikes
 
 import com.vektorraum.aviatorsbot.service.regions.Regions
-import org.scalatest.{FeatureSpec, GivenWhenThen}
-import org.scalatest.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.matchers.should.Matchers._
 
-class StrikesServiceProductionTest extends FeatureSpec with GivenWhenThen {
+class StrikesServiceProductionTest extends AnyFeatureSpec with GivenWhenThen {
   feature("Strikes service finds URLs for lightning strike maps for different regions") {
     scenario("Valid region is used to request a URL from the service"){
       Given("Service instance")

@@ -7,14 +7,15 @@ import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.Subscriptio
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, METARResponseFixturesOlder, TAFResponseFixtures}
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.AnyFeatureSpec
 
 import scala.concurrent.Future
 
-class SubscriptionHandlerTest extends FeatureSpec
+class SubscriptionHandlerTest extends AnyFeatureSpec
   with GivenWhenThen with MockFactory with Eventually with SubscriptionFixtures  {
   info("As a pilot I want to be able to receive continuous weather updates")
 

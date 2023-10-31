@@ -3,8 +3,9 @@ package com.vektorraum.aviatorsbot.bot
 import com.bot4s.telegram.methods.ParseMode
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARFixtures, METARResponseFixtures}
 import org.scalamock.scalatest.AsyncMockFactory
-import org.scalatest.Matchers._
-import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.AsyncFeatureSpec
 
 import scala.concurrent.Future
 

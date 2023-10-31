@@ -3,17 +3,18 @@ package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARResponseFixtures, TAFResponseFixtures}
 import com.bot4s.telegram.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.concurrent._
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.AnyFeatureSpec
 
 import scala.concurrent.Future
 
 /**
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotXWindTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
+class AviatorsBotXWindTest extends AnyFeatureSpec with GivenWhenThen with MockFactory with Eventually {
   info("As a pilot I want to")
   info("be able to calculate the crosswind for an airfield")
   info("without having to manually copy all the weather information into an additional calculation program")

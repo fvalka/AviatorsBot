@@ -1,13 +1,14 @@
 package com.vektorraum.aviatorsbot.calculations
 
-import org.scalatest.{FunSuite, GivenWhenThen}
-import org.scalatest.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
 import squants.{Length, MetricSystem}
 import squants.motion.{Bars, Pressure}
 import squants.space.{Feet, Meters}
 
-class StationPressureTest extends FunSuite with TableDrivenPropertyChecks with GivenWhenThen {
+class StationPressureTest extends AnyFunSuite with TableDrivenPropertyChecks with GivenWhenThen {
   implicit val tolerance: Pressure = Bars(MetricSystem.Milli * 0.02)
 
   test("Station pressure calculation for various valid data points") {

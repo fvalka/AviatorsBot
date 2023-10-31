@@ -3,8 +3,9 @@ package com.vektorraum.aviatorsbot.bot.calculators
 import com.vektorraum.aviatorsbot.bot.AviatorsBotForTesting
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{AirfieldFixtures, METARFixtures}
 import org.scalamock.scalatest.{AsyncMockFactory, MockFactory}
-import org.scalatest.Matchers._
-import org.scalatest.{AsyncFunSuite, GivenWhenThen}
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.funsuite.AsyncFunSuite
 
 import scala.concurrent.Future
 

@@ -2,8 +2,9 @@ package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.service.regions.Regions
 import org.scalamock.scalatest.AsyncMockFactory
-import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
-import org.scalatest.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.AsyncFeatureSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.concurrent.Future
 

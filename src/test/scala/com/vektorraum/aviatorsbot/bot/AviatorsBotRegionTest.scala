@@ -4,8 +4,9 @@ import com.vektorraum.aviatorsbot.persistence.WriteResultFixtures
 import com.vektorraum.aviatorsbot.persistence.regions.model.RegionSetting
 import com.vektorraum.aviatorsbot.service.regions.Regions
 import org.scalamock.scalatest.AsyncMockFactory
-import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
-import org.scalatest.Matchers._
+import org.scalatest.GivenWhenThen
+import org.scalatest.featurespec.{AnyFeatureSpec, AsyncFeatureSpec}
+import org.scalatest.matchers.should.Matchers._
 
 import scala.concurrent.Future
 
