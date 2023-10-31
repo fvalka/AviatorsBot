@@ -6,18 +6,13 @@ import com.softwaremill.sttp._
 import com.softwaremill.sttp.json4s._
 import com.typesafe.config.Config
 import com.vektorraum.aviatorsbot.service.regions.Regions
-import org.json4s.native.Serialization
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-
 class SigmetServiceProduction(config: Config,
                               implicit val backend: SttpBackend[Future, Source[ByteString, Any]])
   extends SigmetService {
-  implicit val serialization: Serialization.type = org.json4s.native.Serialization
-
   /**
     * Retrieve a sigmet map and the map with further information about the SIGMETs plot onto the
     * map from the service.

@@ -139,19 +139,15 @@ trait InstrumentedCommands extends Messages[Future]
     *                     A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to hide reply keyboard or to force a reply from the user.
     */
   override def reply(text: String, parseMode: Option[ParseMode],
-                     entities: Option[List[MessageEntity]] = None,
                      disableWebPagePreview: Option[Boolean],
                      disableNotification: Option[Boolean],
-                     protectContent: Option[Boolean] = None,
                      replyToMessageId: Option[Int],
-                     allowSendingWithoutReply: Option[Boolean] = None,
                      replyMarkup: Option[ReplyMarkup])
                     (implicit message: Message): Future[Message] = {
     trafficLog.info(s"Outbound reply chatId=${message.chat.id} - chatUserName=${message.chat.username} - " +
       s"text=$text - inboundMessage=${message.text} - inboundMessageId=${message.messageId}")
     messagesSent.mark()
-    super.reply(text, parseMode, entities, disableWebPagePreview, disableNotification, protectContent,
-      replyToMessageId, allowSendingWithoutReply, replyMarkup)
+    super.reply(text, parseMode, disableWebPagePreview, disableNotification, replyToMessageId, replyMarkup)
   }
 
 

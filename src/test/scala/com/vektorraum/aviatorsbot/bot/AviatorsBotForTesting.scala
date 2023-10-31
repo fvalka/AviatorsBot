@@ -54,14 +54,12 @@ class AviatorsBotForTesting(val sendMessageFailsException: Option[Throwable] = N
   // Fixed values only used for testing
   val testChatId = 119771589
 
-  override def reply(text: String, parseMode: Option[ParseMode],
-                     entities: Option[List[MessageEntity]] = None,
-                     disableWebPagePreview: Option[Boolean],
-                     disableNotification: Option[Boolean],
-                     protectContent: Option[Boolean] = None,
-                     replyToMessageId: Option[Int],
-                     allowSendingWithoutReply: Option[Boolean] = None,
-                     replyMarkup: Option[ReplyMarkup])
+  override def reply(text: String,
+                     parseMode: Option[ParseMode] = None,
+                     disableWebPagePreview: Option[Boolean] = None,
+                     disableNotification: Option[Boolean] = None,
+                     replyToMessageId: Option[Int] = None,
+                     replyMarkup: Option[ReplyMarkup] = None)
                     (implicit message: Message): Future[Message] = {
     recordSentMessage(text, parseMode)
   }
