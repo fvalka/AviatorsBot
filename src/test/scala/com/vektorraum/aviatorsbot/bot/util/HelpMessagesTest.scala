@@ -1,9 +1,9 @@
 package com.vektorraum.aviatorsbot.bot.util
 
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.FunSuite
+import org.scalatest.Matchers._
 
-class HelpMessagesTest extends AnyFunSuite {
+class HelpMessagesTest extends FunSuite {
   test("Loading valid help file") {
     HelpMessages("rm") should include ("usage")
   }

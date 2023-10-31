@@ -1,11 +1,10 @@
 package com.vektorraum.aviatorsbot.bot.commands
 
 import com.vektorraum.aviatorsbot.bot.util.StationUtil
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
+import org.scalatest.Matchers._
 
-class CommandTest extends AnyFunSuite with GivenWhenThen {
+class CommandTest extends FunSuite with GivenWhenThen {
   test("Valid command matches") {
     Given("Command with one argument")
     val argument1 = Argument("station", StationUtil.isICAOAptIdentifier)

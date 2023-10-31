@@ -1,14 +1,14 @@
 package com.vektorraum.aviatorsbot.bot.util
 
 import java.time.{ZoneOffset, ZonedDateTime}
-import org.scalatest.matchers.should.Matchers._
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
+
+import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 30.05.2017.
   */
-class TimeFormatterTest extends AnyFunSuite with GivenWhenThen {
+class TimeFormatterTest extends FunSuite with GivenWhenThen {
 
   test("shortUTCDateTimeFormat returns only the hour and minute if the input is a date on this day") {
     Given("A UTC date which is today")

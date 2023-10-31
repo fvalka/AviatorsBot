@@ -1,15 +1,14 @@
 package com.vektorraum.aviatorsbot.bot
 
 import com.vektorraum.aviatorsbot.bot.util.StationUtil
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 20.05.2017.
   */
-class StationUtilTest extends AnyFunSuite with GivenWhenThen with TableDrivenPropertyChecks {
+class StationUtilTest extends FunSuite with GivenWhenThen with TableDrivenPropertyChecks {
   val validStations = Table("LOWW", "LO", "LO*", "LOW*", "@WY", "~AT", "KJFK", "KY50")
   val invalidStations = Table("L", "LOWÜ","LOWWW", "B LA", "ASDKSDKSAD(", "LSL%", "MNW$")
 

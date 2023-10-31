@@ -3,12 +3,12 @@ package com.vektorraum.aviatorsbot.bot.util
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
-import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARFixtures, TAFFixtures}
-import org.scalatest.matchers.should.Matchers._
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
 
-class LatestInfoConverterTest extends AnyFunSuite with GivenWhenThen {
+import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARFixtures, TAFFixtures}
+import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
+
+class LatestInfoConverterTest extends FunSuite with GivenWhenThen {
 
   test("Valid metar conversion") {
     Given("A valid METAR")

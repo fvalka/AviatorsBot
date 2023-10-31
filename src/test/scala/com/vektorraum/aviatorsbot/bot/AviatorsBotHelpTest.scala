@@ -1,9 +1,8 @@
 package com.vektorraum.aviatorsbot.bot
 
 import org.scalamock.scalatest.AsyncMockFactory
-import org.scalatest.matchers.should.Matchers._
-import org.scalatest.GivenWhenThen
-import org.scalatest.featurespec.AsyncFeatureSpec
+import org.scalatest.Matchers._
+import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
 
 class AviatorsBotHelpTest extends AsyncFeatureSpec with GivenWhenThen with AsyncMockFactory {
   info("As a pilot I want to")

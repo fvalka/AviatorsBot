@@ -2,11 +2,10 @@ package com.vektorraum.aviatorsbot.bot.util
 
 import com.typesafe.config.ConfigFactory
 import com.vektorraum.aviatorsbot.bot.AviatorsBotForTesting
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
+import org.scalatest.Matchers._
 
-class ReporterUtilTest extends AnyFunSuite with GivenWhenThen {
+class ReporterUtilTest extends FunSuite with GivenWhenThen {
   test("Graphite reporter interprets configuration correctly") {
     Given("Valid Configuration and metrics registry")
     val bot = new AviatorsBotForTesting()

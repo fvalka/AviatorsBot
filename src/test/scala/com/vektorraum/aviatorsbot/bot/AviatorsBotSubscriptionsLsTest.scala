@@ -1,18 +1,18 @@
 package com.vektorraum.aviatorsbot.bot
 
 import java.time.{ZoneOffset, ZonedDateTime}
+
 import com.vektorraum.aviatorsbot.bot.util.TimeFormatter
 import com.vektorraum.aviatorsbot.persistence.subscriptions.fixtures.SubscriptionFixtures
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent._
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.Matchers._
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.GivenWhenThen
-import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 import scala.concurrent.Future
 
-class AviatorsBotSubscriptionsLsTest extends AnyFeatureSpec
+class AviatorsBotSubscriptionsLsTest extends FeatureSpec
   with GivenWhenThen with MockFactory with Eventually with SubscriptionFixtures {
   info("As a pilot I want to")
   info("be able to see all my current subscriptions")

@@ -3,18 +3,17 @@ package com.vektorraum.aviatorsbot.bot
 import com.vektorraum.aviatorsbot.service.weather.fixtures.{METARResponseFixtures, TAFResponseFixtures}
 import com.bot4s.telegram.methods.ParseMode
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.Matchers._
 import org.scalatest.concurrent._
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.GivenWhenThen
-import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 import scala.concurrent.Future
 
 /**
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotWxTest extends AnyFeatureSpec with GivenWhenThen with MockFactory with Eventually {
+class AviatorsBotWxTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
   info("As a pilot I want to")
   info("Be able to retrieve up to date METAR and TAF weather information")
   info("Enhanced with mark up for faster recognition of the current flight conditions and trend")

@@ -12,15 +12,14 @@ resolvers += Resolver.sonatypeRepo("public")
 excludeDependencies += "ch.qos.logback" % "logback-classic"
 
 // Akka
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.8.0"
-libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.8.0"
-libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.5.0"
-libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % "10.5.0"
+libraryDependencies += "com.typesafe.akka" %% "akka-actor" % "2.6.13"
+libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.6.13"
+libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.2.4"
+libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % "10.2.4"
 
 // Scalatest
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.15"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % "test"
-libraryDependencies += "org.scalatest" %% "scalatest-shouldmatchers" % "3.2.15" % "test"
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
 // Telegram Bot/
 // Core with minimal dependencies, enough to spawn your first bot.
@@ -37,9 +36,6 @@ libraryDependencies += "org.json4s" %% "json4s-native" % "4.0.6"
 
 // XML
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
-
-// Parsers
-libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0"
 
 // Scheduler
 libraryDependencies += "org.quartz-scheduler" % "quartz" % "2.3.2"
@@ -75,8 +71,8 @@ libraryDependencies += "io.dropwizard.metrics" % "metrics-graphite" % "4.2.17"
 libraryDependencies += "org.typelevel"  %% "squants"  % "1.8.3"
 
 // Enums
-libraryDependencies += "com.beachape" %% "enumeratum" % "1.5.13"
-libraryDependencies += "com.beachape" %% "enumeratum-reactivemongo-bson" % "1.5.13"
+libraryDependencies += "com.beachape" %% "enumeratum" % "1.7.2"
+libraryDependencies += "com.beachape" %% "enumeratum-reactivemongo-bson" % "1.7.2"
 
 enablePlugins(JavaServerAppPackaging)
 enablePlugins(DebianPlugin)
@@ -84,9 +80,9 @@ enablePlugins(SystemdPlugin)
 
 Compile / unmanagedSourceDirectories += baseDirectory.value / "scalaxb-generated/main/scala"
 
-lazy val scalaXml = "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
-lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0"
-lazy val dispatchV = "0.13.4"
+lazy val scalaXml = "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
+lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6"
+lazy val dispatchV = "0.12.0"
 lazy val dispatch = "net.databinder.dispatch" %% "dispatch-core" % dispatchV
 
 Compile / mainClass := Some("com.vektorraum.aviatorsbot.bot.AviatorsBotProduction")

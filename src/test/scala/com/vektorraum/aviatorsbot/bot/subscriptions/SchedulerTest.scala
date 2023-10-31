@@ -1,16 +1,16 @@
 package com.vektorraum.aviatorsbot.bot.subscriptions
 
 import java.time.Instant
+
 import com.typesafe.config.ConfigFactory
 import com.vektorraum.aviatorsbot.bot.subscriptions.helpers.CallTracker
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.GivenWhenThen
-import org.scalatest.featurespec.AnyFeatureSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.{FeatureSpec, GivenWhenThen}
+import org.scalatest.Matchers._
 
-class SchedulerTest extends AnyFeatureSpec with GivenWhenThen with MockFactory with Eventually {
+class SchedulerTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
   info("As a pilot I want to received scheduled messages")
   info("these messages must arrive on time and be fault tolerant")
 

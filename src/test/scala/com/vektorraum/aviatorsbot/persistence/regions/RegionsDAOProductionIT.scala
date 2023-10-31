@@ -3,9 +3,8 @@ package com.vektorraum.aviatorsbot.persistence.regions
 import com.vektorraum.aviatorsbot.persistence.DatabaseSetup
 import com.vektorraum.aviatorsbot.persistence.regions.model.RegionSetting
 import com.vektorraum.aviatorsbot.service.regions.Regions
-import org.scalatest.GivenWhenThen
-import org.scalatest.matchers.should.Matchers._
-import org.scalatest.featurespec.AsyncFeatureSpec
+import org.scalatest.{AsyncFeatureSpec, GivenWhenThen}
+import org.scalatest.Matchers._
 
 class RegionsDAOProductionIT
   extends AsyncFeatureSpec

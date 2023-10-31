@@ -1,14 +1,13 @@
 package com.vektorraum.aviatorsbot.bot.weather
 
 import com.vektorraum.aviatorsbot.service.weather.fixtures.TAFFixtures
-import org.scalatest.matchers.should.Matchers._
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 25.05.2017.
   */
-class FormatTafTest extends AnyFunSuite with GivenWhenThen {
+class FormatTafTest extends FunSuite with GivenWhenThen {
   test("FormatTafTest returns a correctly formatted string") {
     Given("Valid TAF Input")
     val taf = TAFFixtures.ValidAndCompleteLOWW

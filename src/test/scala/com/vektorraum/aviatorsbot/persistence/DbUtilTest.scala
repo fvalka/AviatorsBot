@@ -1,11 +1,10 @@
 package com.vektorraum.aviatorsbot.persistence
 
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{FunSuite, GivenWhenThen}
 
-class DbUtilTest extends AnyFunSuite with TableDrivenPropertyChecks with GivenWhenThen {
+class DbUtilTest extends FunSuite with TableDrivenPropertyChecks with GivenWhenThen {
   test("Wildcards are converted correctly") {
     Given("Various wildcard inputs")
     val properties = Table(

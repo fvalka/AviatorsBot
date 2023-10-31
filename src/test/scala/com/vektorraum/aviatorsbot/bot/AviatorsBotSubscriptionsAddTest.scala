@@ -7,11 +7,10 @@ import java.util.Date
 import com.vektorraum.aviatorsbot.persistence.WriteResultFixtures
 import com.vektorraum.aviatorsbot.persistence.subscriptions.model.Subscription
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.Matchers._
 import org.scalatest.concurrent._
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.GivenWhenThen
-import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.{FeatureSpec, GivenWhenThen}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -19,7 +18,7 @@ import scala.concurrent.Future
 /**
   * Created by fvalka on 21.05.2017.
   */
-class AviatorsBotSubscriptionsAddTest extends AnyFeatureSpec with GivenWhenThen with MockFactory with Eventually {
+class AviatorsBotSubscriptionsAddTest extends FeatureSpec with GivenWhenThen with MockFactory with Eventually {
   info("As a pilot I want to")
   info("be able to receive periodic weather updates")
   info("by adding subscriptions to the bot")

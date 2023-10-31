@@ -1,14 +1,13 @@
 package com.vektorraum.aviatorsbot.bot.weather
 
 import com.vektorraum.aviatorsbot.service.weather.fixtures.METARFixtures
-import org.scalatest.matchers.should.Matchers._
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 
 /**
   * Created by fvalka on 20.05.2017.
   */
-class FormatMetarTest extends AnyFunSuite with GivenWhenThen {
+class FormatMetarTest extends FunSuite with GivenWhenThen {
 
   test("FormatMetar should return the raw string with markup and emoji when neither diff nor sparklines are set") {
     Given("Valid METAR with VFR flight category")

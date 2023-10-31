@@ -1,11 +1,10 @@
 package com.vektorraum.aviatorsbot.persistence.airfielddata.model
 
-import org.scalatest.matchers.should.Matchers._
-import org.scalatest.GivenWhenThen
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.Matchers._
+import org.scalatest.{FunSuite, GivenWhenThen}
 import reactivemongo.bson.{BSONArray, BSONDocument}
 
-class CoordinateReaderTest extends AnyFunSuite with GivenWhenThen {
+class CoordinateReaderTest extends FunSuite with GivenWhenThen {
   test("A BSONDocument is correctly converted") {
     Given("A valid BSON Document")
     val doc = BSONDocument("type" -> "Point", "coordinates" -> BSONArray(34.12, 44.44))

@@ -1,8 +1,7 @@
 package com.vektorraum.aviatorsbot.service.weather
 
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.funsuite.AsyncFunSuite
 
 /**
   * Created by fvalka on 20.05.2017.
